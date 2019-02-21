@@ -126,6 +126,8 @@ This is the minimal RabbitMQ configuration we will need. we have kept the intern
 ].
 ```
 
+**TODO** deploy RabbitMq
+
 ## Create users/clients and grant them permissions
 
 In OAuth 2.0, permissions/roles are named *scopes*. They are free form strings. When a RabbitMQ user connects to RabbitMQ, it must provide a JWT token with those *scopes* as a password. And RabbitMQ determines from those *scopes* what permissions it has.
@@ -167,3 +169,5 @@ uaac group add "rabbitmq.write:%2F/*"
 ```
 
 ### Create Management Users
+
+**TODO**
