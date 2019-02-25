@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+CONTEXT=${1:?First parameter must be the uaac context name. Run uaac contexts to find out which contexts are available}
+
+token=$(uaac context $CONTEXT | awk '/access_token/ { print $2}')
+url="http://localhost:15672/#/login//$token"
+open $url

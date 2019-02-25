@@ -1,0 +1,3 @@
+FROM rabbitmq:3.8-rc
+
+ADD plugin/*.ez /opt/rabbitmq/plugins/

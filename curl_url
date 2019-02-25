@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+CONTEXT=${1:?First parameter must be the uaac context name. Run uaac contexts to find out which contexts are available}
+URL=${2:?Second parameter must be the url to curl}
+
+token=$(uaac context $CONTEXT | awk '/access_token/ { print $2}')
+curl -u :$token $URL 

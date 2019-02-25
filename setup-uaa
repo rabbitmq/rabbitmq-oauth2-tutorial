@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# switch to admin so taht we can perform the next operations
+uaac context admin
+
+echo "Creating groups ...."
+uaac group add "rabbitmq.read:*/*"
+uaac group add "rabbitmq.write:*/*"
+uaac group add "rabbitmq.configure:*/*"
+uaac group add "rabbitmq.tag:management"
+uaac group add "rabbitmq.tag:monitoring"
+uaac group add "rabbitmq.tag:administrator"
+uaac group add "rabbitmq.write:%2F/*"
+
+echo "Creating users ...."
+uaac user add rabbit_admin -p rabbit_admin --email rabbit_admin@example.com
+uaac user add rabbit_monitor -p rabbit_monitor --email rabbit_monitor@example.com
+
+uaac member add "rabbitmq.read:*/*" rabbit_admin
+uaac member add "rabbitmq.write:*/*" rabbit_admin
+uaac member add "rabbitmq.configure:*/*" rabbit_admin
+uaac member add "rabbitmq.tag:administrator" rabbit_admin
+
+uaac member add "rabbitmq.tag:monitoring" rabbit_monitor
+
+echo "Adding rabbit_client OAuth client used to issue tokens for users and applications"
+@uaac client add rabbit_client --name rabbit_client --scope 'rabbitmq.*' --authorized_grant_types password,client_credentials --authorities rabbitmq --secret rabbit_secret --redirect_uri 'http://localhost:15672'
+
+echo "Produce token for rabbit-admin user"
+uaac token owner get rabbit_client rabbit_admin -s rabbit_secret -p rabbit_admin
+
+echo "Produce token for rabbit-monitor user"
+uaac token owner get rabbit_client rabbit_monitor -s rabbit_secret -p rabbit_monitor
+
+echo "Adding Oauth client for producer and consumer apps"
+uaac client add admin_client --name producer --scope "rabbitmq.write:%2F/*" --authorized_grant_types client_credentials --authorities rabbitmq --secret producer_secret
+uaac client add admin_client --name consumer --scope "rabbitmq.read:*/*" --authorized_grant_types client_credentials --authorities rabbitmq --secret consumer_secret
