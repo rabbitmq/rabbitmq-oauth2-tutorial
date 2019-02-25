@@ -4,18 +4,17 @@ The main goal of this guide is to explore how to set up RabbitMQ to authenticate
 
 ## Getting started with the environment
 
+### prerequisites
+
+- Docker must be installed
+
 ### Deploy UAA server
-To deploy UAA with docker follow these instructions:
+
 ```
-wget https://github.com/cloudfoundry/uaa/archive/4.24.0.tar.gz
-tar xvfz 4.24.0.tar.gz
-rm 4.24.0.tar.gz
-cd uaa-4.24.0
-docker run -it -v $PWD:/uaa -p 8080:8080 openjdk:8-jdk /uaa/gradlew run
+make start-uaa
 ```
 
 **IMPORTANT**:
-- It will be improved the way we launch UAA with docker
 - UAA can run with an external database. But for the purposes of this exploration, the internal database is sufficient
 
 Wait until you see the following in the standard output:
