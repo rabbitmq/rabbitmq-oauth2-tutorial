@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker network ls | grep oauth2 > /dev/null || docker network create oauth2

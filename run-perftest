@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+CLIENT_ID=${1:?First parameter must be client id}
+
+token=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
+url="amqp://ignore:$token@rabbitmq:5672/%2F"
+
+shift 1
+
+echo "Launching $CLIENT_ID app with arguments: $@ "
+echo " and url: $url"
+
+docker run -d --rm \
+  --network oauth2 \
+  --name $CLIENT_ID \
+  pivotalrabbitmq/perf-test:latest \
+  --uri $url \
+  $@

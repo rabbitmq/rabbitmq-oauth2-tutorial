@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 
-CONTEXT=${1:?First parameter must be the uaac context name. Run uaac contexts to find out which contexts are available}
+set -ue
 
-token=$(uaac context $CONTEXT | awk '/access_token/ { print $2}')
+USERNAME=${1:?First parameter must be the USERNAME}
+PASSWORD=${2:?Second parameter must be the PASSWORD}
+
+echo "Log in as $USERNAME:$PASSWORD with UAA using rabbit_client OAuth client ..."
+uaac token owner get rabbit_client $USERNAME -s rabbit_secret -p $PASSWORD \
+  && echo "Login succeeded. We have the JWT Token"
+
+echo "Opening Management UI as $USERNAME ... "
+token=$(uaac context $USERNAME | awk '/access_token/ { print $2}')
 url="http://localhost:15672/#/login//$token"
 open $url
