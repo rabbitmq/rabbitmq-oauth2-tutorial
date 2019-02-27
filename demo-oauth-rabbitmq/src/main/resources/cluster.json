@@ -1,0 +1,17 @@
+{
+  "user-provided": [
+    {
+      "credentials":  {
+        "uri": "amqp://bob:bob@localhost:5672/%2F",
+        "uris": [
+            "amqp://localhost:5672/%2F",
+            "amqp://localhost:5673/%2F",
+            "amqp://localhost:5674/%2F"
+          ]
+      },
+      "instance_name": "rmq",
+      "label": "rabbitmq",
+      "name": "rmq"
+    }
+  ]
+}
