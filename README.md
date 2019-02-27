@@ -116,7 +116,7 @@ aud: scim clients uaa admin
 This section is only to explain one of things we need to take care to configure RabbitMQ with OAuth2 auth backend. Do not run any of the commands explained on this section. They are all included in the `make` commands we will cover in the following sections.
 
 To configure Oauth plugin in RabbitMQ we need to obtain the JWT signing key used by UAA when it issues JWT tokens.
-But our `admin` client does not have yet the right *authority* to get that signing key. We are going to "auto" grant it ourselves:
+But our `admin` client does not have yet the right *authority* (`uaa.resource`) to get that signing key. We are going to "auto" grant it ourselves:
 ```
 uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
 ```
@@ -133,6 +133,8 @@ value: tokenKey
 use: sig
 kid: legacy-token-key
 ```
+> We could retrieve it via the UAA REST API as follows:
+> `curl 'http://localhost:8080/uaa/token_key' -i  -H 'Accept: application/json' -u admin:adminsecret`
 
 This is the minimal RabbitMQ configuration we will need. we have kept the internal auth backend although it is not necessary:
 ```
@@ -235,7 +237,7 @@ make open username=rabbit_monitor password=rabbit_monitor
 This is what it happens the under hood:
 1. First of all, both users must be declared in UAA. We already created them (`rabbit_admin` & `rabbit_monitor`) when we ran `make setup-users-and-tokens` command.
 2. In order to access the RabbitMQ management ui, the user must first login with *username* blank and with a JWT token as the *password*.
-  RabbitMQ does not support a *Service Provider initiated flow* where RabbitMQ would redirect the user to some url to authenticate if the user does not present any credentials. Instead, RabbitMQ only supports an *Identity Provider initiated flow* where the user must come with its credentials.
+  RabbitMQ does not support a *Service Provider initiated flow* where RabbitMQ would redirect the user to some url (a.k.a. *authorization endpoint*) to authenticate if the user does not present any credentials. Instead, RabbitMQ only supports an *Identity Provider initiated flow* where the user must come with its credentials.
 3. To obtain the JWT Token, the user presents its credentials (username & password) to some application which acts like a **login server** which authenticates the user with UAA. In our case, the flow is implemented by calling the following command in `uaac`. The `rabbit_client` is an Oauth client in UAA that we use to obtain a token on behalf of the end user.  
   ```
   uaac token owner get rabbit_client $USERNAME -s rabbit_secret -p $PASSWORD
