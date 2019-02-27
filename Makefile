@@ -74,6 +74,7 @@ start-rabbitmq:  ## Run RabbitMQ Server
 		--network oauth2 \
 		-v $(CURDIR)/plugin:/etc/rabbitmq \
 		-p 15672:15672 \
+		-p 5672:5672 \
 		rabbitmq-oauth2
 
 stop-rabbitmq:
