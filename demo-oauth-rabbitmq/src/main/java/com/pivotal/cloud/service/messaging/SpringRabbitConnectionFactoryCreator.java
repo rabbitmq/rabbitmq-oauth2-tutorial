@@ -21,7 +21,7 @@ public class SpringRabbitConnectionFactoryCreator  {
         this.amqpConnectionFactoryCreator = amqpConnectionFactoryCreator;
     }
 
-    public ConnectionFactory create(AmqpServiceInfo serviceInfo, RabbitProperties rabbitProperties,
+    public ConnectionFactory create(AmqpOAuthServiceInfo serviceInfo, RabbitProperties rabbitProperties,
                                     ObjectProvider<ConnectionNameStrategy> connectionNameStrategy) {
         try {
             return this.createSpringConnectionFactory(serviceInfo, rabbitProperties, connectionNameStrategy);
@@ -30,7 +30,7 @@ public class SpringRabbitConnectionFactoryCreator  {
         }
     }
 
-    private CachingConnectionFactory createSpringConnectionFactory(AmqpServiceInfo serviceInfo, RabbitProperties properties,
+    private CachingConnectionFactory createSpringConnectionFactory(AmqpOAuthServiceInfo serviceInfo, RabbitProperties properties,
                                                                    ObjectProvider<ConnectionNameStrategy> connectionNameStrategy) {
         PropertyMapper map = PropertyMapper.get();
         com.rabbitmq.client.ConnectionFactory amqpConnectionFactory = amqpConnectionFactoryCreator.create(serviceInfo, properties);

@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.pivotal.cloud.service.messaging.OAuthClientInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,26 +14,23 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenRespon
 @Configuration
 public class OAuthConfiguration {
 
-    @Autowired
-    private ClientRegistration oauthClient;
 
     @Autowired
     private DefaultClientCredentialsTokenResponseClient tokenRequester;
 
-	@Bean
-    ClientRegistration oauthClient() {
-        return ClientRegistration.withRegistrationId("producer")
-                .clientId("producer")
-                .clientSecret("producer_secret")
+    private ClientRegistration oauthClient(OAuthClientInfo client) {
+        return ClientRegistration.withRegistrationId(client.getClientId())
+                .clientId(client.getClientId())
+                .clientSecret(client.getClientSecret())
                 .clientAuthenticationMethod(ClientAuthenticationMethod.POST)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .tokenUri("http://localhost:8080/uaa/oauth/token")
-                .clientName("producer")
+                .tokenUri(String.format("%s/oauth/token", client.getAuthDomain()))
                 .build();
     }
 
-    public OAuth2AccessTokenResponse oauthAccessToken() {
-        OAuth2ClientCredentialsGrantRequest tokenRequest = new OAuth2ClientCredentialsGrantRequest(oauthClient);
+    public OAuth2AccessTokenResponse oauthAccessToken(OAuthClientInfo client) {
+        ClientRegistration clientRegistration = oauthClient(client);
+        OAuth2ClientCredentialsGrantRequest tokenRequest = new OAuth2ClientCredentialsGrantRequest(clientRegistration);
         return tokenRequester.getTokenResponse(tokenRequest);
     }
 

@@ -1,4 +1,10 @@
 
+durable-consumer:
+  queue: q-perf-test
+  directExchange: x-incoming-transaction
+  routingKey: q-perf-test
+
+
 spring:
   security:
     oauth2:

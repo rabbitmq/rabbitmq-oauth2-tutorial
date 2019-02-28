@@ -27,7 +27,7 @@ public class DurableResourcesConfiguration {
 
     @Bean("durable-consumer.directExchange")
     public Exchange consumerExchange() {
-        return ExchangeBuilder.directExchange(exchangeName).build();
+        return ExchangeBuilder.directExchange(exchangeName).durable(false).build();
     }
 
     @Bean("durable-consumer.binding")

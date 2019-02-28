@@ -3,12 +3,14 @@
     {
       "credentials":  {
         "uri": "amqp://localhost:5672/%2F",
-        "client_id": "producer",
-        "client_secret" : "producer_secret",
-        "auth_domain": "http://localhost:8080/uaa"
+        "oauth_client": {
+          "client_id": "consumer",
+          "client_secret": "consumer_secret",
+          "auth_domain": "http://localhost:8080/uaa"
+        }
       },
       "instance_name": "rmq",
-      "label": "rabbitmq",
+      "label": "rabbitmq-oauth",
       "name": "rmq"
     }
   ]

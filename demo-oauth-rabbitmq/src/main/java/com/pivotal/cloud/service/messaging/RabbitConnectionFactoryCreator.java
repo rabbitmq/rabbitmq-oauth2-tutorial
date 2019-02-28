@@ -1,6 +1,7 @@
 package com.pivotal.cloud.service.messaging;
 
 
+import com.example.demo.OAuthConfiguration;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.impl.CredentialsProvider;
 import com.rabbitmq.client.impl.DefaultCredentialsProvider;
@@ -9,18 +10,20 @@ import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.cloud.service.common.AmqpServiceInfo;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 
 import java.time.Duration;
 
 public class RabbitConnectionFactoryCreator  {
 
-    private CredentialsProvider credentialsProvider;
+    OAuthConfiguration authConfiguration;
 
-    public RabbitConnectionFactoryCreator(CredentialsProvider credentialsProvider) {
-        this.credentialsProvider = credentialsProvider;
+    public RabbitConnectionFactoryCreator(OAuthConfiguration authConfiguration) {
+        this.authConfiguration = authConfiguration;
     }
 
-    public ConnectionFactory create(AmqpServiceInfo serviceInfo, RabbitProperties rabbitProperties) {
+
+    public ConnectionFactory create(AmqpOAuthServiceInfo serviceInfo, RabbitProperties rabbitProperties) {
         try {
             return createConnectionFactory(serviceInfo, rabbitProperties);
         } catch (Exception e) {
@@ -28,13 +31,20 @@ public class RabbitConnectionFactoryCreator  {
         }
     }
 
-    private ConnectionFactory createConnectionFactory(AmqpServiceInfo serviceInfo, RabbitProperties properties) throws Exception {
+    private ConnectionFactory createConnectionFactory(AmqpOAuthServiceInfo serviceInfo, RabbitProperties properties) throws Exception {
         ConnectionFactory amqpConnectionFactory = getRabbitConnectionFactoryBean(properties).getObject();
         amqpConnectionFactory.setUri(serviceInfo.getUri());
-        if (credentialsProvider != null) {
-            amqpConnectionFactory.setCredentialsProvider(credentialsProvider);
-        }
+        setCredentialsProvider(amqpConnectionFactory, serviceInfo);
+
         return amqpConnectionFactory;
+
+    }
+
+    private void setCredentialsProvider(ConnectionFactory amqpConnectionFactory, AmqpOAuthServiceInfo serviceInfo) {
+        if (serviceInfo.getOAuthClient() == null) {
+           return;
+        }
+        amqpConnectionFactory.setCredentialsProvider(new OauthCredentialProvider(authConfiguration, serviceInfo.getOAuthClient()));
 
     }
 
@@ -66,4 +76,30 @@ public class RabbitConnectionFactoryCreator  {
         return factory;
     }
 
+}
+class OauthCredentialProvider implements CredentialsProvider {
+
+    private OAuthConfiguration oAuthConfiguration;
+    private OAuth2AccessTokenResponse oAuth2AccessTokenResponse;
+    private OAuthClientInfo clientInfo;
+
+
+    public OauthCredentialProvider(OAuthConfiguration oAuthConfiguration, OAuthClientInfo clientInfo) {
+        this.oAuthConfiguration = oAuthConfiguration;
+        this.clientInfo = clientInfo;
+    }
+
+    @Override
+    public String getUsername() {
+        return "";
+    }
+
+    @Override
+    public String getPassword() {
+        if (oAuth2AccessTokenResponse == null) {
+            oAuth2AccessTokenResponse = oAuthConfiguration.oauthAccessToken(clientInfo);
+            // WHEN DO WE REFRESH IT ?
+        }
+        return oAuth2AccessTokenResponse.getAccessToken().getTokenValue();
+    }
 }
