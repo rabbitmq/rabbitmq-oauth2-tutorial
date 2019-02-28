@@ -50,6 +50,7 @@ public class RabbitMQConfiguration {
             SpringRabbitConnectionFactoryCreator rabbitConnectionFactoryCreator,
             Cloud cloud) {
         logger.info("Creating consumer Spring ConnectionFactory ...");
+
         ConnectionFactory factory = rabbitConnectionFactoryCreator.create(
                 cloud.getSingletonServiceInfoByType(AmqpOAuthServiceInfo.class),
                 rabbitProperties, connectionNameStrategies);

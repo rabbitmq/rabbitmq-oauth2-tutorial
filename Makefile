@@ -9,40 +9,40 @@ SHELL = bash# we depend on bash expansion for e.g. queue patterns
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-install-uaa:
+
+4.24.0.tar.gz:
 	@wget https://github.com/cloudfoundry/uaa/archive/4.24.0.tar.gz
 	@tar xvfz 4.24.0.tar.gz
-	@rm 4.24.0.tar.gz
 	@mv uaa-4.24.0 uaa
 
 install-uaac: ## Install UAA Client
-	@sudo gem install cf-uacc
+	@sudo gem install cf-uaac
+
+setup-uaa-admin-client:
 	@uaac target  http://localhost:8080/uaa
 	@uaac token client get admin -s adminsecret
 	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
 
-setup-users-and-tokens:	 ## create users and obtain tokens for them
+setup-users-and-tokens: install-uaac setup-uaa-admin-client ## create users and obtain tokens for them
 	@./setup-uaa
-	@./refresh-tokens
 
-uaa: install-uaa
+uaa: 4.24.0.tar.gz
 
 start-uaa: uaa ## Install and run uaa
 	@./init-docker-network
-	@docker run -rm  \
+	@docker run  --rm \
 		--name uaa \
 		--network oauth2 \
 		-v $(CURDIR)/uaa:/uaa \
 		-p 8080:8080 \
+		-w /uaa \
 		openjdk:8-jdk \
-		/uaa/gradlew run
-	@curl -k  -H 'Accept: application/json' http://localhost:8080/uaa/info | jq .
+		./gradlew run
+	@echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
+	@echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
 
-refresh-admin-token: ## [Re-]Obtain tokens for OAuth client used to issue RabbitMQ client's and user's tokens
-	@uaac token client get admin -s adminsecret
-
-refresh-other-tokens: ## [Re-]Obtain tokens for RabbitMQ client and users
-	@./refresh-tokens
+stop-uaa:
+	@docker kill uaa
 
 get-plugin:
 	@wget https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/archive/master.zip
@@ -57,15 +57,16 @@ build-plugin: get-plugin
 
 rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez: build-plugin
 
-build-docker-image: rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez ## Build RabbitMQ docker image
+.built-rabbitmq-docker: rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez ## Build RabbitMQ docker image
 	@rm -rf plugin
 	@mkdir plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/base64url-*.ez plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/jose-*.ez plugin
 	@docker build -t rabbitmq-oauth2 -f rabbitmq-Dockerfile .
+	@touch .built-rabbitmq-docker
 
-start-rabbitmq:  ## Run RabbitMQ Server
+start-rabbitmq: .built-rabbitmq-docker ## Run RabbitMQ Server
 	@cp rabbitmq.config plugin
 	@cp enabled_plugins plugin
 	@./init-docker-network
@@ -80,7 +81,7 @@ start-rabbitmq:  ## Run RabbitMQ Server
 stop-rabbitmq:
 	@docker stop rabbitmq
 
-start-producer: ## Start producer application
+start-perftest-producer: ## Start PerfTest producer application
 	@./init-docker-network
 	@uaac token client get producer -s producer_secret
 	@./run-perftest producer \
@@ -92,7 +93,7 @@ start-producer: ## Start producer application
 		--exchange "x-incoming-transaction" \
 		--auto-delete "false"
 
-start-consumer: ## Start consumer application
+start-perftest-consumer: ## Start Perftest consumer application
 	@./init-docker-network
 	@uaac token client get consumer -s consumer_secret
 	@./run-perftest consumer \
@@ -104,9 +105,15 @@ start-consumer: ## Start consumer application
 		--exchange "x-incoming-transaction" \
 		--auto-delete "false"
 
-stop-apps: ## Stop consumer and producer apps
-	@docker kill consumer
-	@docker kill producer
+demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar:
+	@cd demo-oauth-rabbitmq; mvn clean package
+
+start-spring-demo-oauth-cf: demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar ## Start the spring-demo-auth-rabbitmq application simulating CloudFoundry env
+	@./init-docker-network
+	@./run-demo-oauth-cf consumer consumer_secret
+
+stop-all-apps: ## Stop all appications we can start with this Makefile
+	@docker kill consumer producer spring-demo-oauth 2>/dev/null
 
 pivotalrabbitmq/perf-test:latest
 

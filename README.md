@@ -14,18 +14,32 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
 - [Prerequisites to use this repository](#Prerequisites-to-use-this-repository)
 - [Set up environment](#set-up-environment)
   - [Deploy UAA server](#deploy-uaa-server)
-  - [Install and Setup UAA client to interact with UAA server](#Install-and-Setup-UAA-client-to-interact-with-UAA-server)
+  - [Set up UAA with users, clients and permissions]()
   - [Deploy RabbitMQ with OAuth2 plugin and UAA signing key](#Deploy-RabbitMQ-with-OAuth2-plugin-and-UAA-signing-key)
-  - [Create users/clients and grant them permissions](#Create-users%2Fclients-and-grant-them-permissions)
 - [Access RabbitMQ with OAuth](#access-rabbitmq-with-oauth)
-
+  - [End user access to management ui](#End-user-access-to-management-ui)
+  - [AMQP access](#AMQP-access)
 
 ## Prerequisites to use this repository
 
 - Docker must be installed
 
-
 ## Set up environment
+
+The next sections will walk thru all the steps with detailed description of the process. If you want to jump straight to action, instead invoke the following commands:
+1. `make start-uaa` to get UAA server running
+2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
+3. `make setup-users-and-tokens` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+4. `make start-rabbitmq` to start RabbitMQ server
+
+We have the environment ready. To use it:
+1. `make open username=rabbit_admin password=rabbit_admin` to open the RabbitMQ Management UI as an administrator user
+2. `make open username=rabbit_monitor password=rabbit_monitor` to open the RabbitMQ Management UI as a monitoring user
+3. `make start-perftest-consumer` to launch a consumer application based on PerfTest that uses `consumer` oauth client and Oauth client grant flow to obtain a JWT token
+4. `make start-perftest-producer` to launch a producer application based on PerfTest that uses `producer` oauth client and Oauth client grant flow to obtain a JWT token
+5. `make start-spring-demo-oauth-cf` to launch a Spring boot application as if it were running in CloudFoundry (i.e `VCAP_SERVICES` provides the RabbitMQ credentials including the auth-client). It uses OAuth client grant flow to obtain a JWT token
+6. `make stop-all-apps` to stop all the applications
+
 
 ### Deploy UAA server
 
@@ -52,9 +66,19 @@ To check that UAA is running fine:
 curl -k  -H 'Accept: application/json' http://localhost:8080/uaa/info | jq .
 ```
 
-### Install and Setup UAA client to interact with UAA server
+### Set up UAA with users, clients and permissions
 
-We have the UAA server running. In order to interact with it there is a convenient command-line application called `uaac`. To install it and get it ready run the following command:
+At this point, we must have the UAA server running. It is time to create users, clients and grant them permissions. To do that we are going to interact with UAA via a command-line tool called **UAAC**.
+
+The following command installs **uaac** and set up users, clients and permissions:
+```
+make setup-users-and-tokens
+```
+
+The next subsections are to explain in more detail about UAAC and how users/client/permissions are managed in UAA and in particular which users/clients we are going to create. You can skip them if you just want to get the environment ready.
+
+#### Install and Setup UAA client to interact with UAA server
+At this point, wee already have the UAA server running. In order to interact with it there is a convenient command-line application called `uaac`. To install it and get it ready run the following command:
 ```
 make install-uaac
 ```
@@ -109,7 +133,65 @@ zid: uaa
 aud: scim clients uaa admin
 ```
 
+#### Create users/clients and grant them permissions
+
+**About Users and Clients**
+
+First of all, we need to clarify the distinction between *users* and *clients*.
+- A *user* is often represented as a live person. This is typically the user who wants to access the RabbitMQ Management UI/API.  
+- A *client* (a.k.a. *service account*) is an application that acts on behalf of a user or act on its own. This is typically an AMQP application.
+
+**About Permissions**
+
+*Users* and *clients* will both need to get granted permissions. In OAuth 2.0, permissions/roles are named *scopes*. They are free form strings. When a RabbitMQ user connects to RabbitMQ, it must provide a JWT token with those *scopes* as a password (and empty username). And RabbitMQ determines from those *scopes* what permissions it has.
+
+The *scope* format recognized by RabbitMQ is as follows
+  ```
+  <resource_server_id>.<permission>:<vhost_pattern>/<name_pattern>[/<routing_key_pattern>]
+  ```
+
+where:
+- `<resource_server_id>` is a prefix used for *scopes* in UAA to avoid scope collisions (or unintended overlap)
+- `<permission>` is an access permission (configure, read, write, tag)
+- `<vhost_pattern>` is a wildcard pattern for vhosts token has access to
+- `<name_pattern>` is a wildcard pattern for resource name
+- `<routing_key_pattern>` is an optional wildcard pattern for routing key in topic authorization
+
+For more information, check the [plugin ](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2#scope-to-permission-translation) and [rabbitmq permissions](https://www.rabbitmq.com/access-control.html#permissions) docs.
+
+Sample *scope*(s):
+- `rabbitmq.read:*/*` grants `read` permission on any *vhost* and on any *resource*
+- `rabbitmq.write:uaa_vhost/x-*` grants `write` permissions on `uaa_vhost` on any *resource* that starts with `x-`
+- `rabbitmq.tag:monitoring` grants `monitoring` *user tag*
+
+> Be aware that we have used `rabbitmq` resource_server_id in the sample scopes. RabbitMQ must be configured with this same `resource_server_id`. Check out [rabbitmq.config](rabbitmq.config)
+
+**Create Clients, Users, Permissions and grant them**
+
+Run the command `make setup-users-and-tokens` to achieve the following:
+- Create `rabbit_admin` user who is going to be the full administrator user with full access
+- Create `rabbit_monitor` user who is going to be monitoring user with just the *monitoring* *user tag*
+- Create `consumer` client who is going to be the RabbitMQ User for the consumer application
+- Create `producer` client who is going to be the RabbitMQ User for the producer application
+- Create tokens for the 2 end users and for 2 clients
+
+
 ### Deploy RabbitMQ with OAuth2 plugin and UAA signing key
+
+To deploy RabbitMQ server we only need to run the following command:
+```
+make start-rabbitmq
+```
+
+It will do under the hood a few things such as building a docker image for RabbitMQ with the Oauth 2 plugin built-in and configuring RabbitMQ with the UAA server's JWT signing key. The next subsection explains it in more detail.
+
+#### Build RabbitMQ docker image with Oauth 2.0 plugin
+
+First, we need to build the plugin (`.ez` file) because it does not come, by default, in the list of installed plugins in RabbitMQ server. And then we build a Docker image starting from [rabbitmq:3.8-rc](https://hub.docker.com/_/rabbitmq).
+
+```
+make build-docker-image
+```
 
 #### Obtain the UAA signing key required to configure RabbitMQ
 
@@ -158,14 +240,6 @@ This is the minimal RabbitMQ configuration we will need. we have kept the intern
 ].
 ```
 
-#### Build RabbitMQ docker image with Oauth 2.0 plugin
-
-First, we need to build the plugin (`.ez` file) because it does not come, by default, in the list of installed plugins in RabbitMQ server. And then we build a Docker image starting from [rabbitmq:3.8-rc](https://hub.docker.com/_/rabbitmq).
-
-```
-make build-docker-image
-```
-
 #### Start RabbitMQ Server  
 
 We are going to launch RabbitMQ using 3.8 of the [official docker image](https://hub.docker.com/_/rabbitmq) but with
@@ -176,47 +250,6 @@ We are going to launch RabbitMQ using 3.8 of the [official docker image](https:/
 make start-rabbitmq`
 ```
 
-### Create users/clients and grant them permissions
-
-**About Users and Clients**
-
-First of all, we need to clarify the distinction between *users* and *clients*.
-- A *user* is often represented as a live person. This is typically the user who wants to access the RabbitMQ Management UI/API.  
-- A *client* (a.k.a. *service account*) is an application that acts on behalf of a user or act on its own. This is typically an AMQP application.
-
-**About Permissions**
-
-*Users* and *clients* will both need to get granted permissions. In OAuth 2.0, permissions/roles are named *scopes*. They are free form strings. When a RabbitMQ user connects to RabbitMQ, it must provide a JWT token with those *scopes* as a password (and empty username). And RabbitMQ determines from those *scopes* what permissions it has.
-
-The *scope* format recognized by RabbitMQ is as follows
-  ```
-  <resource_server_id>.<permission>:<vhost_pattern>/<name_pattern>[/<routing_key_pattern>]
-  ```
-
-where:
-- `<resource_server_id>` is a prefix used for *scopes* in UAA to avoid scope collisions (or unintended overlap)
-- `<permission>` is an access permission (configure, read, write, tag)
-- `<vhost_pattern>` is a wildcard pattern for vhosts token has access to
-- `<name_pattern>` is a wildcard pattern for resource name
-- `<routing_key_pattern>` is an optional wildcard pattern for routing key in topic authorization
-
-For more information, check the [plugin ](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2#scope-to-permission-translation) and [rabbitmq permissions](https://www.rabbitmq.com/access-control.html#permissions) docs.
-
-Sample *scope*(s):
-- `rabbitmq.read:*/*` grants `read` permission on any *vhost* and on any *resource*
-- `rabbitmq.write:uaa_vhost/x-*` grants `write` permissions on `uaa_vhost` on any *resource* that starts with `x-`
-- `rabbitmq.tag:monitoring` grants `monitoring` *user tag*
-
-> Be aware that we have used `rabbitmq` resource_server_id in the sample scopes. RabbitMQ must be configured with this same `resource_server_id`. Check out [rabbitmq.config](rabbitmq.config)
-
-**Create Clients, Users, Permissions and grant them**
-
-Run the command `make setup-users-and-tokens` to achieve the following:
-- Create `rabbit_admin` user who is going to be the full administrator user with full access
-- Create `rabbit_monitor` user who is going to be monitoring user with just the *monitoring* *user tag*
-- Create `consumer` client who is going to be the RabbitMQ User for the consumer application
-- Create `producer` client who is going to be the RabbitMQ User for the producer application
-- Create tokens for the 2 end users and for 2 clients
 
 ## Access RabbitMQ with OAuth
 
@@ -253,11 +286,11 @@ This is what it happens the under hood:
 These two commands demonstrates how two distinct applications access RabbitMQ via AMQP using Oauth 2.0 protocol:
 
 ```
-make start-consumer
+make start-perftest-consumer
 ```
 
 ```
-make start-producer
+make start-perftest-producer
 ```
 
 This is what it happens the under hood:
@@ -272,6 +305,14 @@ This is what it happens the under hood:
   token=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
   url="amqp://ignore:$token@rabbitmq:5672/%2F"
   ```
+
+### AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type
+
+The following command starts an Spring Boot application that uses Spring OAuth2 support to obtain a JWT token using OAuth2 Client Credentials grant type. It leverages Spring Cloud Connectors, in particular for Cloud Foundry, to retrieve the RabbitMQ Credentials (i.e. url, oauth client credentials).
+
+```
+make start-spring-demo-oauth-cf
+```
 
 
 ## Findings

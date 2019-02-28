@@ -4,9 +4,9 @@
       "credentials":  {
         "uri": "amqp://localhost:5672/%2F",
         "oauth_client": {
-          "client_id": "consumer",
-          "client_secret": "consumer_secret",
-          "auth_domain": "http://localhost:8080/uaa"
+          "client_id": "myapp",
+          "client_secret": "myapp_secret",
+          "auth_domain": "http://uaa:8080/uaa"
         }
       },
       "instance_name": "rmq",
