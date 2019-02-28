@@ -23,7 +23,7 @@ setup-uaa-admin-client:
 	@uaac token client get admin -s adminsecret
 	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
 
-setup-users-and-tokens: install-uaac setup-uaa-admin-client ## create users and obtain tokens for them
+setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients 
 	@./bin/setup-uaa
 
 uaa: 4.24.0.tar.gz

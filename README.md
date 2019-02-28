@@ -30,7 +30,7 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
 The next sections will walk thru all the steps with detailed description of the process. If you want to jump straight to action, instead invoke the following commands:
 1. `make start-uaa` to get UAA server running
 2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
-3. `make setup-users-and-tokens` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 4. `make start-rabbitmq` to start RabbitMQ server
 
 We have the environment ready. To use it:
@@ -73,7 +73,7 @@ At this point, we must have the UAA server running. It is time to create users, 
 
 The following command installs **uaac** and set up users, clients and permissions:
 ```
-make setup-users-and-tokens
+make setup-users-and-clients
 ```
 
 The next subsections are to explain in more detail about UAAC and how users/client/permissions are managed in UAA and in particular which users/clients we are going to create. You can skip them if you just want to get the environment ready.
@@ -169,7 +169,7 @@ Sample *scope*(s):
 
 **Create Clients, Users, Permissions and grant them**
 
-Run the command `make setup-users-and-tokens` to achieve the following:
+Run the command `make setup-users-and-clients` to achieve the following:
 - Create `rabbit_admin` user who is going to be the full administrator user with full access
 - Create `rabbit_monitor` user who is going to be monitoring user with just the *monitoring* *user tag*
 - Create `consumer` client who is going to be the RabbitMQ User for the consumer application
@@ -269,7 +269,7 @@ make open username=rabbit_monitor password=rabbit_monitor
 ```
 
 This is what it happens the under hood:
-1. First of all, both users must be declared in UAA. We already created them (`rabbit_admin` & `rabbit_monitor`) when we ran `make setup-users-and-tokens` command.
+1. First of all, both users must be declared in UAA. We already created them (`rabbit_admin` & `rabbit_monitor`) when we ran `make setup-users-and-clients` command.
 2. In order to access the RabbitMQ management ui, the user must first login with *username* blank and with a JWT token as the *password*.
   RabbitMQ does not support a *Service Provider initiated flow* where RabbitMQ would redirect the user to some url (a.k.a. *authorization endpoint*) to authenticate if the user does not present any credentials. Instead, RabbitMQ only supports an *Identity Provider initiated flow* where the user must come with its credentials.
 3. To obtain the JWT Token, the user presents its credentials (username & password) to some application which acts like a **login server** which authenticates the user with UAA. In our case, the flow is implemented by calling the following command in `uaac`. The `rabbit_client` is an Oauth client in UAA that we use to obtain a token on behalf of the end user.  
@@ -295,7 +295,7 @@ make start-perftest-producer
 ```
 
 This is what it happens the under hood:
-1. First of all, both applications must have their OAuth client declared in UAA. We already created them (`consumer` & `producer`) when we ran `make setup-users-and-tokens` command.
+1. First of all, both applications must have their OAuth client declared in UAA. We already created them (`consumer` & `producer`) when we ran `make setup-users-and-clients` command.
 2. In order to open an AMQP connection with RabbitMQ, the client must present a JWT token as the *password*. The username is ignored.
 3. To obtain the JWT Token, the application requests it from UAA using its credentials (*client_id* & *client_secret*). For instance, the consumer app gets its token using this command:
   ```
