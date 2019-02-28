@@ -104,6 +104,9 @@ start-consumer: ## Start consumer application
 		--exchange "x-incoming-transaction" \
 		--auto-delete "false"
 
+stop-apps: ## Stop consumer and producer apps
+	@docker kill consumer
+	@docker kill producer
 
 pivotalrabbitmq/perf-test:latest
 
