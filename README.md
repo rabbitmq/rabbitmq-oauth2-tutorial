@@ -9,16 +9,17 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
 - a consumer application and a producer application.
 
 
-*Table of Context*
+**Table of Context**
 
 - [Prerequisites to use this repository](#Prerequisites-to-use-this-repository)
 - [Set up environment](#set-up-environment)
   - [Deploy UAA server](#deploy-uaa-server)
-  - [Set up UAA with users, clients and permissions]()
+  - [Set up UAA with users, clients and permissions](#set-up-uaa-with-users-clients-and-permissions)
   - [Deploy RabbitMQ with OAuth2 plugin and UAA signing key](#Deploy-RabbitMQ-with-OAuth2-plugin-and-UAA-signing-key)
 - [Access RabbitMQ with OAuth](#access-rabbitmq-with-oauth)
   - [End user access to management ui](#End-user-access-to-management-ui)
   - [AMQP access](#AMQP-access)
+  - [AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type](#amqp-access-via-spring-and-spring-cloud-services-using-oauth-client-credentials-grant-type)
 
 ## Prerequisites to use this repository
 
@@ -308,12 +309,73 @@ This is what it happens the under hood:
 
 ### AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type
 
-The following command starts an Spring Boot application that uses Spring OAuth2 support to obtain a JWT token using OAuth2 Client Credentials grant type. It leverages Spring Cloud Connectors, in particular for Cloud Foundry, to retrieve the RabbitMQ Credentials (i.e. url, oauth client credentials).
+It is worth clarifying that this is a **service to service** interaction in the sense that the application is not using RabbitMQ on behalf a user. In other words, the application authenticates with RabbitMQ with its own identity not with the user's identity. In a classical Oauth application, the application uses the user's identity to access downstream resources. But this is not our case.
+
+With that in mind, an application needs an Oauth client so that it obtains an JWT Token using Oauth Client Credentials grant type. How we tell the application which Oauth client to use is what we need to agree upon. There are two options:
+  - The RabbitMQ credentials (found in the RabbitMQ's service instance in `VCAP_SERVICES`) provide not only the amqp url (and management urls) but also the oauth client credentials. See below:
+      ```
+      {
+        "user-provided": [
+          {
+            "credentials":  {
+              "uri": "amqp://localhost:5672/%2F",
+              "oauth_client": {
+                "client_id": "myapp",
+                "client_secret": "myapp_secret",
+                "auth_domain": "http://uaa:8080/uaa"
+              }
+            },
+            "instance_name": "rmq",
+            "label": "rabbitmq-oauth",
+            "name": "rmq"
+          }
+        ]
+      }
+
+      ```
+      THIS IS THE OPTION DEMONSTRATED WHEN WE RUN `make start-spring-demo-oauth-cf`
+
+  - The application provides its own Oauth client. For instance, the application could use the [Single-Sign-One service for PCF](https://docs.pivotal.io/p-identity/1-8/index.html) to assign an Oauth client to the application. In the sample
+    ```
+    {
+      "user-provided": [
+        {
+          "credentials":  {
+            "uri": "amqp://localhost:5672/%2F",
+            "auth_enabled" : true          
+          },
+          "instance_name": "rmq",
+          "label": "rabbitmq-oauth",
+          "name": "rmq"
+        }
+      ],
+      "sso": [
+      {
+        "credentials":  {
+          "client_id": "myapp",
+          "client_secret": "myapp_secret",
+          "auth_domain": "http://uaa:8080/uaa"
+        },
+        "instance_name": "sso",
+        "label": "sso",
+        "name": "sso"
+      }
+      ]
+    }
+
+    ```
+
+#### Option 1 - Oauth client provided by RabbitMQ service instance
+
+[demo-oauth-rabbitmq](demo-oauth-rabbitmq) is a Spring Boot application that uses Spring OAuth2 support to obtain a JWT token using OAuth2 Client Credentials grant type. It leverages Spring Cloud Connectors, in particular for Cloud Foundry, to retrieve the RabbitMQ Credentials (i.e. url, oauth client credentials).
+
+The application extends the [AmqpServiceInfo](demo-oauth-rabbitmq/src/main/java/com/pivotal/cloud/service/messaging/AmqpOAuthServiceInfo.java) so that it can get Oauth client credentials from the service instance.
+
+The demo application consumes messages from the `q-perf-test` queue. It uses the `consumer` auth client to obtain the JWT Token.
 
 ```
 make start-spring-demo-oauth-cf
 ```
-
 
 ## Findings
 
