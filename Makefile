@@ -24,12 +24,12 @@ setup-uaa-admin-client:
 	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
 
 setup-users-and-tokens: install-uaac setup-uaa-admin-client ## create users and obtain tokens for them
-	@./setup-uaa
+	@./bin/setup-uaa
 
 uaa: 4.24.0.tar.gz
 
 start-uaa: uaa ## Install and run uaa
-	@./init-docker-network
+	@./bin/init-docker-network
 	@docker run  --rm \
 		--name uaa \
 		--network oauth2 \
@@ -63,13 +63,12 @@ rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez: build-plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/base64url-*.ez plugin
 	@cp rabbitmq-auth-backend-oauth2-master/plugins/jose-*.ez plugin
-	@docker build -t rabbitmq-oauth2 -f rabbitmq-Dockerfile .
+	@docker build -t rabbitmq-oauth2 -f dockerfiles/rabbitmq-Dockerfile .
 	@touch .built-rabbitmq-docker
 
 start-rabbitmq: .built-rabbitmq-docker ## Run RabbitMQ Server
-	@cp rabbitmq.config plugin
-	@cp enabled_plugins plugin
-	@./init-docker-network
+	@cp conf/* plugin
+	@./bin/init-docker-network
 	@docker run -d --rm \
 		--name rabbitmq \
 		--network oauth2 \
@@ -82,9 +81,9 @@ stop-rabbitmq:
 	@docker stop rabbitmq
 
 start-perftest-producer: ## Start PerfTest producer application
-	@./init-docker-network
+	@./bin/init-docker-network
 	@uaac token client get producer -s producer_secret
-	@./run-perftest producer \
+	@./bin/run-perftest producer \
 		--queue "q-perf-test" \
 		--producers 1 \
 		--consumers 0 \
@@ -94,9 +93,9 @@ start-perftest-producer: ## Start PerfTest producer application
 		--auto-delete "false"
 
 start-perftest-consumer: ## Start Perftest consumer application
-	@./init-docker-network
+	@./bin/init-docker-network
 	@uaac token client get consumer -s consumer_secret
-	@./run-perftest consumer \
+	@./bin/run-perftest consumer \
 		--queue "q-perf-test" \
 		--producers 0 \
 		--consumers 1 \
@@ -109,8 +108,8 @@ demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar:
 	@cd demo-oauth-rabbitmq; mvn clean package
 
 start-spring-demo-oauth-cf: demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar ## Start the spring-demo-auth-rabbitmq application simulating CloudFoundry env
-	@./init-docker-network
-	@./run-demo-oauth-cf consumer consumer_secret
+	@./bin/init-docker-network
+	@./bin/run-demo-oauth-cf consumer consumer_secret
 
 stop-all-apps: ## Stop all appications we can start with this Makefile
 	@docker kill consumer producer spring-demo-oauth 2>/dev/null
@@ -118,7 +117,7 @@ stop-all-apps: ## Stop all appications we can start with this Makefile
 pivotalrabbitmq/perf-test:latest
 
 curl: ## Run curl with a JWT token. Syntax: make curl url=http://localhost:15672/api/overview as=rabbit_admin
-	@./curl_url $(as) $(url)
+	@./bin/curl_url $(as) $(url)
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
-	@./open_url $(username) $(password)
+	@./bin/open_url $(username) $(password)
