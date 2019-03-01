@@ -327,8 +327,8 @@ With that in mind, an application needs an Oauth client so that it obtains an JW
             "credentials":  {
               "uri": "amqp://localhost:5672/%2F",
               "oauth_client": {
-                "client_id": "myapp",
-                "client_secret": "myapp_secret",
+                "client_id": "consumer",
+                "client_secret": "consumer_secret",
                 "auth_domain": "http://uaa:8080/uaa"
               }
             },
