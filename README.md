@@ -284,7 +284,10 @@ This is what it happens the under hood:
 
 ### AMQP access
 
-These two commands demonstrates how two distinct applications access RabbitMQ via AMQP using Oauth 2.0 protocol:
+**DL;DR:**
+  In this section, we are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next section](#amqp-access-via-spring-and-spring-cloud-services-using-oauth-client-credentials-grant-type) for an OAuth 2.0 aware demo app. Instead we are launching the application with a token that we have previously obtained from UAA. This is just to probe AMQP access with a JWT Token. Needless to say that the application should instead obtain the JWT Token prior to connecting to RabbitMQ and it should also be able to refresh it before reconnecting. RabbitMQ validates the token before accepting it. If the token has expired, RabbitMQ will reject the connection.
+
+These two commands demonstrates two applications -with their respective OAuth clients- connecting to RabbitMQ via AMQP using a JWT Token:
 
 ```
 make start-perftest-consumer
@@ -309,10 +312,14 @@ This is what it happens the under hood:
 
 ### AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type
 
-It is worth clarifying that this is a **service to service** interaction in the sense that the application is not using RabbitMQ on behalf a user. In other words, the application authenticates with RabbitMQ with its own identity not with the user's identity. In a classical Oauth application, the application uses the user's identity to access downstream resources. But this is not our case.
+**TL;DR:**
+  It is worth clarifying that this is a **service to service** interaction in the sense that the application is not using RabbitMQ on behalf a user. In other words, the application authenticates with RabbitMQ with its own identity not with the user's identity. In a classical Oauth application, the application uses the user's identity to access downstream resources. But this is not our case.
 
-With that in mind, an application needs an Oauth client so that it obtains an JWT Token using Oauth Client Credentials grant type. How we tell the application which Oauth client to use is what we need to agree upon. There are two options:
-  - The RabbitMQ credentials (found in the RabbitMQ's service instance in `VCAP_SERVICES`) provide not only the amqp url (and management urls) but also the oauth client credentials. See below:
+> We are demonstrating an application running in Cloud Foundry and this is the reason for referring to VCAP_SERVICES as the means to retrieve the RabbitMQ's credentials.
+
+With that in mind, an application needs an Oauth client so that it obtains an JWT Token using Oauth Client Credentials grant type. How we tell the application which Oauth client to use is what we need to agree upon. There are two options -once again when we run RabbitMQ and our apps in Cloud Foundry :
+
+  - **Option 1** - The **RabbitMQ service instance** provides both, the AMQP url (and management urls) and the OAuth client credentials. See below:
       ```
       {
         "user-provided": [
@@ -333,9 +340,11 @@ With that in mind, an application needs an Oauth client so that it obtains an JW
       }
 
       ```
+      > rabbitmq-oauth label is a custom one created for this demonstration. The demo application extends the Spring Cloud Connector with a new AmqpOauthServiceInfo which is able to parse the `oauth_client` entry.
+
       THIS IS THE OPTION DEMONSTRATED WHEN WE RUN `make start-spring-demo-oauth-cf`
 
-  - The application provides its own Oauth client. For instance, the application could use the [Single-Sign-One service for PCF](https://docs.pivotal.io/p-identity/1-8/index.html) to assign an Oauth client to the application. In the sample
+  - **Option 2** - **The application provides its own OAuth client**. For instance, the application could use the [Single-Sign-One service for PCF](https://docs.pivotal.io/p-identity/1-8/index.html) to assign an Oauth client to the application. In the sample
     ```
     {
       "user-provided": [
@@ -376,6 +385,8 @@ The demo application consumes messages from the `q-perf-test` queue. It uses the
 ```
 make start-spring-demo-oauth-cf
 ```
+
+
 
 ## Findings
 
