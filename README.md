@@ -16,7 +16,7 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
   - [Deploy UAA server](#deploy-uaa-server)
   - [Set up UAA with users, clients and permissions](#set-up-uaa-with-users-clients-and-permissions)
   - [Deploy RabbitMQ with OAuth2 plugin and UAA signing key](#Deploy-RabbitMQ-with-OAuth2-plugin-and-UAA-signing-key)
-  - [Day 2 operations - Rotate signing key](#Day-2-operations-Rotate-signing-key)
+  - [Day 2 operations - Rotate signing key](#day-2-operations---rotate-signing-key)
 - [Access RabbitMQ with OAuth](#access-rabbitmq-with-oauth)
   - [Access tokens and how RabbitMQ uses it](#Access-tokens-and-how-RabbitMQ-uses-it)
   - [End user access to management ui](#End-user-access-to-management-ui)
