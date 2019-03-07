@@ -9,7 +9,7 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
 - a consumer application and a producer application.
 
 
-**Table of Context**
+**Table of Content**
 
 - [Prerequisites to use this repository](#Prerequisites-to-use-this-repository)
 - [Set up environment](#set-up-environment)
