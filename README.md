@@ -264,7 +264,7 @@ Instead, thru the `rabbitmqctl add_uaa_key` command we can add more keys. This i
 
 One way to keep RabbitMQ up-to-date is to periodically check with [token keys endpoint](https://docs.cloudfoundry.org/api/uaa/version/4.28.0/index.html#token-keys) (using the `E-tag` header). When the list of active tokens key has changed, we retrieve them and add them using `rabbitmqctl add_uaa_key`.
 
-> We are probably missing the ability to remove deprecated/obsolete signing keys. The [function](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/uaa_jwt.erl) is there so we could potentially invoke it via `rabbitmqctl eval` command. 
+> We are probably missing the ability to remove deprecated/obsolete signing keys. The [function](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/uaa_jwt.erl) is there so we could potentially invoke it via `rabbitmqctl eval` command.
 
 #### Start RabbitMQ Server  
 
@@ -526,8 +526,6 @@ make start-spring-demo-oauth-cf
 
 ### Management UI shows token's client_id as user in the top right corner
 
-Given that we have a token for `rabbit_admin`. When we use it to login to RabbitMQ we should see `User rabbit_admin` in the top right corner of the Management UI. However, it shows `User rabbit_client` which is the identity used to get a token for the user.
-```
-make get-token-for-rabbit-admin
-open as=rabbit_admin
-```
+Given that we have a token for `rabbit_admin`. When we use it to login to RabbitMQ we should see `User rabbit_admin` in the top right corner of the Management UI. However, it shows `User rabbit_client` which is the identity used to get a token for the user. This is due to how RabbitMQ determines the username. It first looks up `client_id` and it does not exist, it looks up `sub`. I would say `sub` should be the first field to check, and `client_id` as last. It works for both, end-users coming over http and applications coming over AMQP.
+
+Although, tokens issued by UAA sets the *user id* (GUID) in the `sub` field rather than the actual *user name* (the *user name* is in the `user_name` field of the JWT).
