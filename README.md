@@ -23,11 +23,6 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
   - [AMQP access](#AMQP-access)
   - [AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type](#amqp-access-via-spring-and-spring-cloud-services-using-oauth-client-credentials-grant-type)
 
-**Tasks to do**
-- Leverage [token_end_point](https://docs.cloudfoundry.org/api/uaa/version/4.6.0/index.html#token-key-s) to automatically download the signing key when RabbitMQ starts up.
-  Why? Because if authorization server rotates the signing key, we only need to restart RabbitMQ. Could we change the signing key in RabbitMQ live, i.e. without restarting it?
-
-
 
 ## Prerequisites to use this repository
 
