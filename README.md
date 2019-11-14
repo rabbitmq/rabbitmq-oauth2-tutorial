@@ -41,12 +41,13 @@ Set up the environment by running the following 4 commands:
 4. `make start-rabbitmq` to start RabbitMQ server
 
 Once you have run the commands above, we have the environment ready. To use it, the commands below help you test different kind of use-cases:
-1. `make open username=rabbit_admin password=rabbit_admin` to open the RabbitMQ Management UI as an administrator user
-2. `make open username=rabbit_monitor password=rabbit_monitor` to open the RabbitMQ Management UI as a monitoring user
-3. `make start-perftest-consumer` to launch a consumer application based on PerfTest that uses `consumer` oauth client and Oauth client grant flow to obtain a JWT token
-4. `make start-perftest-producer` to launch a producer application based on PerfTest that uses `producer` oauth client and Oauth client grant flow to obtain a JWT token
-5. `make start-spring-demo-oauth-cf` to launch a Spring boot application as if it were running in CloudFoundry (i.e `VCAP_SERVICES` provides the RabbitMQ credentials including the auth-client). It uses OAuth client grant flow to obtain a JWT token
-6. `make stop-all-apps` to stop all the applications
+1. Go to http://localhost:15672; you will be redirected to UAA login page. You can login as `rabbit_admin:rabbit_admin` or `rabbit_monitor:rabbit_monitor` depending on the type of user you want to login as.
+2. `make open username=rabbit_admin password=rabbit_admin` to open the RabbitMQ Management UI as an administrator user without engaging in a redirect flow with UAA. This was required before RabbitMQ management ui supported SSO flows.
+3. `make open username=rabbit_monitor password=rabbit_monitor` to open the RabbitMQ Management UI as a monitoring user
+4. `make start-perftest-consumer` to launch a consumer application based on PerfTest that uses `consumer` oauth client and Oauth client grant flow to obtain a JWT token
+5. `make start-perftest-producer` to launch a producer application based on PerfTest that uses `producer` oauth client and Oauth client grant flow to obtain a JWT token
+6. `make start-spring-demo-oauth-cf` to launch a Spring boot application as if it were running in CloudFoundry (i.e `VCAP_SERVICES` provides the RabbitMQ credentials including the auth-client). It uses OAuth client grant flow to obtain a JWT token
+7. `make stop-all-apps` to stop all the applications
 
 The following section, [Environment explained](#Environment-explained) goes in depth into what it takes to deploy UAA, set up users and deploy RabbitMQ with Oauth2 authentication. And the last section, [Access tokens and how RabbitMQ uses it](#access-rabbitmq-with-oauth), goes in depth into the various ways to access RabbitMQ with OAuth, which goes from http to AMQP.
 
