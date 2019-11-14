@@ -1,20 +1,15 @@
+server:
+  port: 8081
 
-durable-consumer:
-  queue: q-perf-test
-  directExchange: x-incoming-transaction
-  routingKey: q-perf-test
-
-
-spring:
-  security:
-    oauth2:
-      client:
-        provider:
-          uaa:
-            tokenUri: http://localhost:8080/uaa/oauth/token
-
-        registration:
-          consumer:
-            clientId: consumer
-            clientSecret: consumer
-            provider: uaa
+security:
+  basic:
+    enabled: false
+  oauth2:
+    resource:
+      jwt:
+        key-value: tokenKey
+    client:
+      clientId: consumer
+      clientSecret: consumer_secret
+      accessTokenUri: http://localhost:8080/uaa/oauth/token
+      userAuthorizationUri: http://localhost:8080/uaa/oauth/authorize

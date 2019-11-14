@@ -10,8 +10,11 @@ shift 1
 echo "Launching $CLIENT_ID app with arguments: $@ "
 echo " and url: $url"
 
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f $CLIENT_ID 2>/dev/null || echo "$CLIENT_ID was not running"
+
 docker run -d --rm \
-  --network oauth2 \
+  --network rabbitmq_net \
   --name $CLIENT_ID \
   pivotalrabbitmq/perf-test:latest \
   --uri $url \

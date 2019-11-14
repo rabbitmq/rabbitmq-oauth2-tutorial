@@ -23,10 +23,12 @@ read -r -d '' VCAP_SERVICES <<EOF
 }
 EOF
 
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f spring-demo-oauth 2>/dev/null || echo "spring-demo-oauth was not running"
 
 echo "Launching demo-oauth-rabbitmq with client_id $CLIENT_ID simulating CloudFoundry environment "
 docker run -d --rm \
-		--network oauth2 \
+		--network rabbitmq_net \
 		--name spring-demo-oauth \
 		-v $PWD/demo-oauth-rabbitmq/target:/app \
 		-e "SPRING_PROFILES_ACTIVE=Cloud" \

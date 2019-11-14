@@ -6,7 +6,7 @@ USERNAME=${1:?First parameter must be the USERNAME}
 PASSWORD=${2:?Second parameter must be the PASSWORD}
 
 echo "Log in as $USERNAME:$PASSWORD with UAA using rabbit_client OAuth client ..."
-uaac token owner get rabbit_client $USERNAME -s rabbit_secret -p $PASSWORD \
+uaac token owner get test_client $USERNAME -s test_client -p $PASSWORD \
   && echo "Login succeeded. We have the JWT Token"
 
 echo "Opening Management UI as $USERNAME ... "

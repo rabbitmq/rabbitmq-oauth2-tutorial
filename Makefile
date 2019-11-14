@@ -9,7 +9,6 @@ SHELL = bash# we depend on bash expansion for e.g. queue patterns
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-
 4.24.0.tar.gz:
 	@wget https://github.com/cloudfoundry/uaa/archive/4.24.0.tar.gz
 	@tar xvfz 4.24.0.tar.gz
@@ -23,65 +22,24 @@ setup-uaa-admin-client:
 	@uaac token client get admin -s adminsecret
 	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
 
-setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients 
+setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients
 	@./bin/setup-uaa
 
 uaa: 4.24.0.tar.gz
 
 start-uaa: uaa ## Install and run uaa
-	@./bin/init-docker-network
-	@docker run  --rm \
-		--name uaa \
-		--network oauth2 \
-		-v $(CURDIR)/uaa:/uaa \
-		-p 8080:8080 \
-		-w /uaa \
-		openjdk:8-jdk \
-		./gradlew run
-	@echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
-	@echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
+	@./bin/deploy-uaa
 
 stop-uaa:
 	@docker kill uaa
 
-get-plugin:
-	@wget https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/archive/master.zip
-	@rm -rf rabbitmq-auth-backend-oauth2-master
-	@unzip master.zip
-	@rm master.zip
-
-build-plugin: get-plugin
-	@cd rabbitmq-auth-backend-oauth2-master; \
-		make; \
-		make dist
-
-rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez: build-plugin
-
-.built-rabbitmq-docker: rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez ## Build RabbitMQ docker image
-	@rm -rf plugin
-	@mkdir plugin
-	@cp rabbitmq-auth-backend-oauth2-master/plugins/rabbitmq_auth*.ez plugin
-	@cp rabbitmq-auth-backend-oauth2-master/plugins/base64url-*.ez plugin
-	@cp rabbitmq-auth-backend-oauth2-master/plugins/jose-*.ez plugin
-	@docker build -t rabbitmq-oauth2 -f dockerfiles/rabbitmq-Dockerfile .
-	@touch .built-rabbitmq-docker
-
-start-rabbitmq: .built-rabbitmq-docker ## Run RabbitMQ Server
-	@cp conf/* plugin
-	@./bin/init-docker-network
-	@docker run -d --rm \
-		--name rabbitmq \
-		--network oauth2 \
-		-v $(CURDIR)/plugin:/etc/rabbitmq \
-		-p 15672:15672 \
-		-p 5672:5672 \
-		rabbitmq-oauth2
+start-rabbitmq:  ## Run RabbitMQ Server
+	@./bin/deploy-rabbit
 
 stop-rabbitmq:
 	@docker stop rabbitmq
 
 start-perftest-producer: ## Start PerfTest producer application
-	@./bin/init-docker-network
 	@uaac token client get producer -s producer_secret
 	@./bin/run-perftest producer \
 		--queue "q-perf-test" \
@@ -93,7 +51,6 @@ start-perftest-producer: ## Start PerfTest producer application
 		--auto-delete "false"
 
 start-perftest-consumer: ## Start Perftest consumer application
-	@./bin/init-docker-network
 	@uaac token client get consumer -s consumer_secret
 	@./bin/run-perftest consumer \
 		--queue "q-perf-test" \
@@ -108,7 +65,6 @@ demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar:
 	@cd demo-oauth-rabbitmq; mvn clean package
 
 start-spring-demo-oauth-cf: demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar ## Start the spring-demo-auth-rabbitmq application simulating CloudFoundry env
-	@./bin/init-docker-network
 	@./bin/run-demo-oauth-cf consumer consumer_secret
 
 stop-all-apps: ## Stop all appications we can start with this Makefile

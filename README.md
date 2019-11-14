@@ -1,12 +1,15 @@
 # RabbitMQ integration with OAuth 2.0
 
-The two goals of this integration guide:
-- Explore how applications and end users can authenticate with RabbitMQ server using OAuth 2.0 protocol rather than the traditional username/password, or others.
-- Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. In addition to exploring how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 Authorization Server and all the operations to create OAuth clients, users and obtain their tokens.
+These are the two goals of this integration guide:
+1. Explore how applications and end users can authenticate with RabbitMQ server using OAuth 2.0 protocol rather than the traditional username/password, or others.
+2. Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. Additionally we explore how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 Authorization Server and all the operations to create OAuth clients, users and obtain their tokens.
 
-We will start first exploring what it takes to set up RabbitMQ along with the OAuth 2.0 authentication server. Once we have that running, we move onto creating users and clients. And finally, we test 2 usage scenarios:
-- an end user accessing the management UI
-- a consumer application and a producer application.
+We will proceed in 3 steps:
+1. First, we will start exploring what it takes to set up RabbitMQ along with the OAuth 2.0 authentication server.
+2. Once we have that running, we move onto creating users and clients.
+3. And finally, we test several usage scenarios such as:
+  - an end user accesses the management UI
+  - or an application accesses the AMQP protocol
 
 
 **Table of Content**
@@ -27,16 +30,17 @@ We will start first exploring what it takes to set up RabbitMQ along with the OA
 ## Prerequisites to use this repository
 
 - Docker must be installed
+- Ruby runtime
 
-## Set up environment
+## Quick getting started
 
-The next sections will walk thru all the steps with detailed description of the process. If you want to jump straight to action, instead invoke the following commands:
+Set up the environment by running the following 4 commands:
 1. `make start-uaa` to get UAA server running
 2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
 3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 4. `make start-rabbitmq` to start RabbitMQ server
 
-We have the environment ready. To use it:
+Once you have run the commands above, we have the environment ready. To use it, the commands below help you test different kind of use-cases:
 1. `make open username=rabbit_admin password=rabbit_admin` to open the RabbitMQ Management UI as an administrator user
 2. `make open username=rabbit_monitor password=rabbit_monitor` to open the RabbitMQ Management UI as a monitoring user
 3. `make start-perftest-consumer` to launch a consumer application based on PerfTest that uses `consumer` oauth client and Oauth client grant flow to obtain a JWT token
@@ -44,6 +48,9 @@ We have the environment ready. To use it:
 5. `make start-spring-demo-oauth-cf` to launch a Spring boot application as if it were running in CloudFoundry (i.e `VCAP_SERVICES` provides the RabbitMQ credentials including the auth-client). It uses OAuth client grant flow to obtain a JWT token
 6. `make stop-all-apps` to stop all the applications
 
+The following section, [Environment explained](#Environment-explained) goes in depth into what it takes to deploy UAA, set up users and deploy RabbitMQ with Oauth2 authentication. And the last section, [Access tokens and how RabbitMQ uses it](#access-rabbitmq-with-oauth), goes in depth into the various ways to access RabbitMQ with OAuth, which goes from http to AMQP.
+
+## Environment explained
 
 ### Deploy UAA server
 
@@ -82,7 +89,7 @@ make setup-users-and-clients
 The next subsections are to explain in more detail about UAAC and how users/client/permissions are managed in UAA and in particular which users/clients we are going to create. You can skip them if you just want to get the environment ready.
 
 #### Install and Setup UAA client to interact with UAA server
-At this point, wee already have the UAA server running. In order to interact with it there is a convenient command-line application called `uaac`. To install it and get it ready run the following command:
+At this point, we already have the UAA server running. In order to interact with it there is a convenient command-line application called `uaac`. To install it and get it ready run the following command:
 ```
 make install-uaac
 ```
@@ -174,11 +181,15 @@ Sample *scope*(s):
 **Create Clients, Users, Permissions and grant them**
 
 Run the command `make setup-users-and-clients` to achieve the following:
+- Create `rabbit_client` client who is going to be used by RabbitMQ server to authenticate management users coming
+to the management ui.
+- Create `test_client` client who is going to be used by our scripts to get JWT tokens for our RabbitMQ management users
+before they access the management ui. This was required before RabbitMQ Management UI supported SSO.
 - Create `rabbit_admin` user who is going to be the full administrator user with full access
-- Create `rabbit_monitor` user who is going to be monitoring user with just the *monitoring* *user tag*
+- Create `rabbit_monitor` user who is going to be the monitoring user with just the *monitoring* *user tag*
 - Create `consumer` client who is going to be the RabbitMQ User for the consumer application
 - Create `producer` client who is going to be the RabbitMQ User for the producer application
-- Create tokens for the 2 end users and for 2 clients
+- Create tokens for the 2 end users and for the 2 clients
 
 
 ### Deploy RabbitMQ with OAuth2 plugin and UAA signing key
@@ -188,19 +199,11 @@ To deploy RabbitMQ server we only need to run the following command:
 make start-rabbitmq
 ```
 
-It will do under the hood a few things such as building a docker image for RabbitMQ with the Oauth 2 plugin built-in and configuring RabbitMQ with the UAA server's JWT signing key. The next subsection explains it in more detail.
-
-#### Build RabbitMQ docker image with Oauth 2.0 plugin
-
-First, we need to build the plugin (`.ez` file) because it does not come, by default, in the list of installed plugins in RabbitMQ server. And then we build a Docker image starting from [rabbitmq:3.8-rc](https://hub.docker.com/_/rabbitmq).
-
-```
-make build-docker-image
-```
+It will launch RabbitMQ with the Oauth 2 plugin enabled and configured with the UAA server's JWT signing key. The next subsection explains it in more detail.
 
 #### Obtain the UAA signing key required to configure RabbitMQ
 
-This section is only to explain one of things we need to take care to configure RabbitMQ with OAuth2 auth backend. Do not run any of the commands explained on this section. They are all included in the `make` commands we will cover in the following sections.
+This section is only to explain one of things we need to take care to configure RabbitMQ with OAuth2 auth-backend. Do not run any of the commands explained on this section. They are all included in the `make` commands we will cover in the following sections.
 
 To configure Oauth plugin in RabbitMQ we need to obtain the JWT signing key used by UAA when it issues JWT tokens.
 But our `admin` client does not have yet the right *authority* (`uaa.resource`) to get that signing key. We are going to "auto" grant it ourselves:
@@ -223,12 +226,17 @@ kid: legacy-token-key
 > We could retrieve it via the UAA REST API as follows:
 > `curl 'http://localhost:8080/uaa/token_key' -i  -H 'Accept: application/json' -u admin:adminsecret`
 
-This is the minimal RabbitMQ configuration we will need. we have kept the internal auth backend although it is not necessary:
+This is the minimal RabbitMQ configuration we will need. We have kept the internal auth-backend although it is not necessary:
 ```
 [
   % Enable auth backend
   {rabbit, [
      {auth_backends, [rabbit_auth_backend_oauth2, rabbit_auth_backend_internal]}
+  ]},
+  {rabbitmq_management, [
+       {enable_uaa, true},
+       {uaa_client_id, "rabbit_client"},
+       {uaa_location, "http://localhost:8080/uaa"}
   ]},
   {rabbitmq_auth_backend_oauth2, [
     {resource_server_id, <<"rabbitmq">>}
@@ -266,155 +274,36 @@ One way to keep RabbitMQ up-to-date is to periodically check with [token keys en
 
 > We are probably missing the ability to remove deprecated/obsolete signing keys. The [function](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/uaa_jwt.erl) is there so we could potentially invoke it via `rabbitmqctl eval` command.
 
-#### Start RabbitMQ Server  
-
-We are going to launch RabbitMQ using 3.8 of the [official docker image](https://hub.docker.com/_/rabbitmq) but with
-- custom `rabbitmq.conf` file,
-- `rabbitmq-auth-backend-oauth2` plugin enabled
-
-```
-make start-rabbitmq`
-```
-
 
 ## Access RabbitMQ with OAuth
 
-We are going to explore 2 types of access:
-- End users accessing management ui
-- Applications accessing AMQP protocol
+We are going to explore 3 types of access:
+- End users accessing management ui. RabbitMQ redirect the user to the UAA login page to authenticate.
+- A service account accessing the management rest api. This could be a monitoring agent such as Prometheus
+- Applications accessing AMQP protocol (or other protocols such as MQTT, or STOMP)
+- Federation/Shovel plugin. This is going to be a problem
 
-### Access tokens and how RabbitMQ uses it
+### End user access to management ui without any token
 
-**How RabbitMQ gets the token**
+Just open the browser and go to http://localhost:15672. You will be redirected to the UAA login page.
+If you are not directly redirected, click on the button "Go to UAA".
 
-RabbitMQ expects a [JWS](https://tools.ietf.org/html/rfc7515) in the `password` field.
+You can login using: `rabbit_admin:rabbit_admin` or `rabbit_monitor:rabbit_monitor` credentials.
+After you login, you will be prompted to accept RabbitMQ to get a token on your behalf. After you approve it,
+you are redirected to the management ui.
 
-For end users, the best way to come to the management ui is by the following url, replacing `<token>` by the actual JWT. This is how `make open` command is able to open the browser and login the user using a JWT.
-```
-http://localhost:15672/#/login//<token>
-```
+> TL;DR the user displayed by the management ui is not the user name but `rabbitmq_client` which is the
+identity of RabbitMQ to work on half of the user
 
-**RabbitMQ expects a signed token**
+### Service Account access management REST api
 
-RabbitMQ expects a JWS, i.e. signed JWT. It consists of 3 parts: a header which describes the signing algorithm and the signing key identifier used to sign the JWT. A body with the actual token and a signature.
+We have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, we refer to it as a *service account*. This *service account* is the `rabbit_monitor` user we created in UAA with the `monitoring` *user tag*.
 
-This is a example of the header of a JWT issued by UAA:
-  > By the way, the command `uaac token decode` does not print the header only the actual token.
-  > One simple way to get this information is going to this url https://jwt.io/.
+This *service account* would use the *client credentials* or *password* grant flow.
 
-```json
-{
-  "alg": "HS256",
-  "jku": "https://localhost:8080/uaa/token_keys",
-  "kid": "legacy-token-key",
-  "typ": "JWT"
-}
-```
-
-where:
-  - [typ](https://tools.ietf.org/html/rfc7515#page-8) is the media type which in this case is JWT. However the JWT protected header and JWT payload are secured using HMAC SHA-256 algorithm
-  - [alg](https://tools.ietf.org/html/rfc7515#page-10) is the signature algorithm
-  - [jku](https://tools.ietf.org/html/rfc7515#page-10) is the HTTP GET resource that returns the signing keys supported by the server that issued this token
-  - [kid](https://tools.ietf.org/html/rfc7515#page-11) identifies the signing key used to sign this token
-
-
-To get the signing key used by UAA we access the *token key* access point with the credentials of the `admin` UAA client; or a client which has the permission to get it.
-```bash
-curl http://localhost:8080/uaa/token_key \
- -H 'Accept: application/json' \
- -u admin:adminsecret  | jq .
-```
-
-It should print out:
-```json
-{
-  "kty": "MAC",
-  "alg": "HS256",
-  "value": "tokenKey",
-  "use": "sig",
-  "kid": "legacy-token-key"
-}
-```
-
-We can see that the `kid`s value above matches the `kid`'s in the JWT.
-
-**About the relevant information we find in the token**
-
-Let's examine the following token which corresponds to end-user `rabbit_admin`.
-```
-{
-  "jti": "dfb5f6a0d8d54be1b960e5ffc996f7aa",
-  "sub": "71bde130-7738-47b8-8c7d-ad98fbebce4a",
-  "scope": [
-    "rabbitmq.read:*/*",
-    "rabbitmq.write:*/*",
-    "rabbitmq.tag:administrator",
-    "rabbitmq.configure:*/*"
-  ],
-  "client_id": "rabbit_client",
-  "cid": "rabbit_client",
-  "azp": "rabbit_client",
-  "grant_type": "password",
-  "user_id": "71bde130-7738-47b8-8c7d-ad98fbebce4a",
-  "origin": "uaa",
-  "user_name": "rabbit_admin",
-  "email": "rabbit_admin@example.com",
-  "auth_time": 1551957721,
-  "rev_sig": "d5cf8503",
-  "iat": 1551957721,
-  "exp": 1552000921,
-  "iss": "http://localhost:8080/uaa/oauth/token",
-  "zid": "uaa",
-  "aud": [
-    "rabbitmq",
-    "rabbit_client"
-  ]
-}
-```
-
-These are the fields relevant for RabbitMQ:
-- `sub` ([Subject](https://tools.ietf.org/html/rfc7519#page-9)) this is the identify of the subject of the token. **RabbitMQ uses this field to identify the user**. This token corresponds to the `rabbit_admin` end user. If we logged into the management ui, we would see it in the top-right corner. If this were an AMPQ user, we would see it on each connection listed in the connections tab.  
-  UAA would add 2 more fields relative to the *subject*: a `user_id` with the same value as the `sub` field, and `user_name` with user's name. In UAA, the `sub`/`user_id` fields contains the user identifier, which is a GUID.
-
-- `client_id` (not part of the RFC-7662) identifies the OAuth client that obtained the JWT. We used `rabbit_client` client to obtain the JWT for `rabbit_admin` user. **RabbitMQ also [uses](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/rabbit_auth_backend_oauth2.erl#L169) this field to identify the user**.
-
-- `aud` ([Audience](https://tools.ietf.org/html/rfc7519#page-9)) this identifies the recipients and/or resource_server of the JWT. **RabbitMQ uses this field to validate the token**. When we configured RabbitMQ OAuth plugin, we set `resource_server_id` attribute with the value `rabbitmq`. The list of audience must have the `rabbitmq` otherwise RabbitMQ rejects the token.
-
-- `jti` ([JWT ID](https://tools.ietf.org/html/rfc7662#section-2.2)) this is just an identifier for the JWT
-
-- `iss` ([Issuer](https://tools.ietf.org/html/rfc7662#section-2.2)) identifies who issued the JWT. UAA will set it to end-point that returned the token.
-
-- `scope` is an array of [OAuth Scope](https://tools.ietf.org/html/rfc7523#page-4). **This is what RabbitMQ uses to determine the user's permissions**. However, RabbitMQ will only use the *scopes* which belong to this RabbitMQ identified by the plugin configuration parameter `resource_server_id`. In other words, if the `resource_server_id` is `rabbitmq`, RabbitMQ will only use the *scopes* which start with `rabbimq.`.
-
-- `exp` ([exp](https://tools.ietf.org/html/rfc7519#page-9)) identifies the expiration time on
-   or after which the JWT MUST NOT be accepted for processing. RabbitMQ uses this field to validate the token if it is present.
-   > Implementers MAY provide for some small leeway, usually no more than
-   a few minutes, to account for clock skew. However, RabbitMQ does not add any leeway.
-
-
-### End user access to management ui
-
-These two commands demonstrates how two distinct end users log into the Management UI using Oauth 2.0 protocol:
-```
-make open username=rabbit_admin password=rabbit_admin
-```
 ```
 make open username=rabbit_monitor password=rabbit_monitor
 ```
-
-This is what it happens the under hood:
-1. First of all, both users must be declared in UAA. We already created them (`rabbit_admin` & `rabbit_monitor`) when we ran `make setup-users-and-clients` command.
-2. In order to access the RabbitMQ management ui, the user must first login with *username* blank and with a JWT token as the *password*.
-  RabbitMQ does not support a *Service Provider initiated flow* where RabbitMQ would redirect the user to some url (a.k.a. *authorization endpoint*) to authenticate if the user does not present any credentials. Instead, RabbitMQ only supports an *Identity Provider initiated flow* where the user must come with its credentials.
-3. To obtain the JWT Token, the user presents its credentials (username & password) to some application which acts like a **login server** which authenticates the user with UAA. In our case, the flow is implemented by calling the following command in `uaac`. The `rabbit_client` is an Oauth client in UAA that we use to obtain a token on behalf of the end user.  
-  ```
-  uaac token owner get rabbit_client $USERNAME -s rabbit_secret -p $PASSWORD
-  ```
-4. If we successfully obtained the token, we can build the *login url* to the RabbitMQ management ui with a blank *username* and the token as the *password*
-  ```
-  url="http://localhost:15672/#/login//$token"
-  open $url
-  ```
 
 ### AMQP access
 
@@ -520,6 +409,116 @@ The demo application consumes messages from the `q-perf-test` queue. It uses the
 make start-spring-demo-oauth-cf
 ```
 
+
+### Understanding Access tokens and how RabbitMQ uses it
+
+First of all, lets quickly go thru how RabbitMQ uses the OAuth Access Tokens; how RabbitMQ users/clients pass the token; whats inside the token and what information in the token is relevant for RabbitMQ and how it uses it.
+
+**How RabbitMQ gets the token**
+
+RabbitMQ expects a [JWS](https://tools.ietf.org/html/rfc7515) in the `password` field.
+
+For end users, the best way to come to the management ui is by the following url, replacing `<token>` by the actual JWT. This is how `make open` command is able to open the browser and login the user using a JWT.
+```
+http://localhost:15672/#/login//<token>
+```
+
+**RabbitMQ expects a signed token**
+
+RabbitMQ expects a JWS, i.e. signed JWT. It consists of 3 parts: a header which describes the signing algorithm and the signing key identifier used to sign the JWT. A body with the actual token and a signature.
+
+This is a example of the header of a JWT issued by UAA:
+  > By the way, the command `uaac token decode` does not print the header only the actual token.
+  > One simple way to get this information is going to this url https://jwt.io/.
+
+```json
+{
+  "alg": "HS256",
+  "jku": "https://localhost:8080/uaa/token_keys",
+  "kid": "legacy-token-key",
+  "typ": "JWT"
+}
+```
+
+where:
+  - [typ](https://tools.ietf.org/html/rfc7515#page-8) is the media type which in this case is JWT. However the JWT protected header and JWT payload are secured using HMAC SHA-256 algorithm
+  - [alg](https://tools.ietf.org/html/rfc7515#page-10) is the signature algorithm
+  - [jku](https://tools.ietf.org/html/rfc7515#page-10) is the HTTP GET resource that returns the signing keys supported by the server that issued this token
+  - [kid](https://tools.ietf.org/html/rfc7515#page-11) identifies the signing key used to sign this token
+
+
+To get the signing key used by UAA we access the *token key* access point with the credentials of the `admin` UAA client; or a client which has the permission to get it.
+```bash
+curl http://localhost:8080/uaa/token_key \
+ -H 'Accept: application/json' \
+ -u admin:adminsecret  | jq .
+```
+
+It should print out:
+```json
+{
+  "kty": "MAC",
+  "alg": "HS256",
+  "value": "tokenKey",
+  "use": "sig",
+  "kid": "legacy-token-key"
+}
+```
+
+We can see that the `kid`s value above matches the `kid`'s in the JWT.
+
+**Relevant token information for RabbitMQ**
+
+Let's examine the following token which corresponds to end-user `rabbit_admin`.
+```
+{
+  "jti": "dfb5f6a0d8d54be1b960e5ffc996f7aa",
+  "sub": "71bde130-7738-47b8-8c7d-ad98fbebce4a",
+  "scope": [
+    "rabbitmq.read:*/*",
+    "rabbitmq.write:*/*",
+    "rabbitmq.tag:administrator",
+    "rabbitmq.configure:*/*"
+  ],
+  "client_id": "rabbit_client",
+  "cid": "rabbit_client",
+  "azp": "rabbit_client",
+  "grant_type": "password",
+  "user_id": "71bde130-7738-47b8-8c7d-ad98fbebce4a",
+  "origin": "uaa",
+  "user_name": "rabbit_admin",
+  "email": "rabbit_admin@example.com",
+  "auth_time": 1551957721,
+  "rev_sig": "d5cf8503",
+  "iat": 1551957721,
+  "exp": 1552000921,
+  "iss": "http://localhost:8080/uaa/oauth/token",
+  "zid": "uaa",
+  "aud": [
+    "rabbitmq",
+    "rabbit_client"
+  ]
+}
+```
+
+These are the fields relevant for RabbitMQ:
+- `sub` ([Subject](https://tools.ietf.org/html/rfc7519#page-9)) this is the identify of the subject of the token. **RabbitMQ uses this field to identify the user**. This token corresponds to the `rabbit_admin` end user. If we logged into the management ui, we would see it in the top-right corner. If this were an AMPQ user, we would see it on each connection listed in the connections tab.  
+  UAA would add 2 more fields relative to the *subject*: a `user_id` with the same value as the `sub` field, and `user_name` with user's name. In UAA, the `sub`/`user_id` fields contains the user identifier, which is a GUID.
+
+- `client_id` (not part of the RFC-7662) identifies the OAuth client that obtained the JWT. We used `rabbit_client` client to obtain the JWT for `rabbit_admin` user. **RabbitMQ also [uses](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/rabbit_auth_backend_oauth2.erl#L169) this field to identify the user**.
+
+- `aud` ([Audience](https://tools.ietf.org/html/rfc7519#page-9)) this identifies the recipients and/or resource_server of the JWT. **RabbitMQ uses this field to validate the token**. When we configured RabbitMQ OAuth plugin, we set `resource_server_id` attribute with the value `rabbitmq`. The list of audience must have the `rabbitmq` otherwise RabbitMQ rejects the token.
+
+- `jti` ([JWT ID](https://tools.ietf.org/html/rfc7662#section-2.2)) this is just an identifier for the JWT
+
+- `iss` ([Issuer](https://tools.ietf.org/html/rfc7662#section-2.2)) identifies who issued the JWT. UAA will set it to end-point that returned the token.
+
+- `scope` is an array of [OAuth Scope](https://tools.ietf.org/html/rfc7523#page-4). **This is what RabbitMQ uses to determine the user's permissions**. However, RabbitMQ will only use the *scopes* which belong to this RabbitMQ identified by the plugin configuration parameter `resource_server_id`. In other words, if the `resource_server_id` is `rabbitmq`, RabbitMQ will only use the *scopes* which start with `rabbimq.`.
+
+- `exp` ([exp](https://tools.ietf.org/html/rfc7519#page-9)) identifies the expiration time on
+   or after which the JWT MUST NOT be accepted for processing. RabbitMQ uses this field to validate the token if it is present.
+   > Implementers MAY provide for some small leeway, usually no more than
+   a few minutes, to account for clock skew. However, RabbitMQ does not add any leeway.
 
 
 ## Findings

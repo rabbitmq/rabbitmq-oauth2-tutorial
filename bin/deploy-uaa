@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f uaa 2>/dev/null || echo "uaa was not running"
+
+docker run -d --name uaa --net rabbitmq_net \
+    -v ${SCRIPT}/../uaa:/uaa \
+    -p 8080:8080 \
+    -w /uaa \
+    openjdk:8-jdk \
+    ./gradlew run
+
+echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
+echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
