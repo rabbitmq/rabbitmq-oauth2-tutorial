@@ -176,7 +176,7 @@ between two RMQ Cluster we need to have at least another authentication backend 
 
 We need to launch RabbitMQ with the following prerequisites:
 - plugin enabled. See [bin/enabled_plugins](bin/enabled_plugins)
-- plugin configured with the signing key used by UAA
+- plugin configured with the signing key used by UAA. For more details check out [this section](#about-signing-key-required-to-configure-rabbitmq)
   ```
     {rabbitmq_auth_backend_oauth2, [
       {resource_server_id, <<"rabbitmq">>}
