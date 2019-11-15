@@ -4,13 +4,9 @@ These are the two goals of this integration guide:
 1. Explore how applications and end users can authenticate with RabbitMQ server using OAuth 2.0 protocol rather than the traditional username/password, or others.
 2. Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. Additionally we explore how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 Authorization Server and all the operations to create OAuth clients, users and obtain their tokens.
 
-We will proceed in 3 steps:
-1. First, we will start exploring what it takes to set up RabbitMQ along with the OAuth 2.0 authentication server.
-2. Once we have that running, we move onto creating users and clients.
-3. And finally, we test several usage scenarios such as:
-  - an end user accesses the management UI
-  - or an application accesses the AMQP protocol
+If you want to quickly test how it works go straight to [OAuth2 plugin in action](#oauth2-plugin-in-action) section.
 
+If you want to understand the details of how to configure RabbitMQ with Oauth2 go straight to [Understand the environment](#understand-the-environment) section.
 
 **Table of Content**
 
