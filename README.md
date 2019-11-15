@@ -67,7 +67,7 @@ Next, we will use the following use cases to see the Oauth2 plugin in action
 
 ### Use Case 1 - Management user accessing the Management UI
 
-End users accesses the management ui. The first time they come (`1.`), they are redirected (`2.`) to UAA to authenticate. They are redirected (`3.`) back to RabbitMQ with a valid JWT token -in case of a successful login.
+The first time an end user arrives to the management ui (`1`), they are redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identify the user and its permissions from the JWT token.
 
 ```
     [ UAA ] <----2. auth----    [ RabbitMQ ]
