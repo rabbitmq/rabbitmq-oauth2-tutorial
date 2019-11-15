@@ -160,8 +160,6 @@ make stop-all-apps
 ```
 
 
-The following section, [Environment explained](#Environment-explained) goes in depth into what it takes to deploy UAA, set up users and deploy RabbitMQ with Oauth2 authentication. And the last section, [Access tokens and how RabbitMQ uses it](#access-rabbitmq-with-oauth), goes in depth into the various ways to access RabbitMQ with OAuth, which goes from http to AMQP.
-
 ### Use Case 4 - OAuth2 Application accessing the AMQP port
 
 
