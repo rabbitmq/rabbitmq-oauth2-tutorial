@@ -14,11 +14,11 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
 - [OAuth2 plugin in action](#oauth2-plugin-in-action)
-	- [Use Case 1 - Management user accessing the Management UI](#use-case-1-management-user-accessing-the-management-ui)
-	- [Use Case 2 - Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
-	- [Use Case 3 - Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
-	- [Use Case 4 - OAuth2 Application accessing the AMQP port](#use-case-4-oauth2-application-accessing-the-amqp-port)
-	- [Use Case 5 - Federation & Shovel](#use-case-5-federation-shovel)
+	- [Use Case 1 Management user accessing the Management UI](#use-case-1-management-user-accessing-the-management-ui)
+	- [Use Case 2 Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
+	- [Use Case 3 Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
+	- [Use Case 4 OAuth2 Application accessing the AMQP port](#use-case-4-oauth2-application-accessing-the-amqp-port)
+	- [Use Case 5 Federation & Shovel](#use-case-5-federation-shovel)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -65,7 +65,7 @@ Run the following 4 commands to get the environment ready to see Oauth2 plugin i
 
 Next, we will use the following use cases to see the Oauth2 plugin in action
 
-### Use Case 1 - Management user accessing the Management UI
+### Use Case 1 Management user accessing the Management UI
 
 The first time an end user arrives to the management ui (`1`), they are redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identify the user and its permissions from the JWT token.
 
@@ -86,7 +86,7 @@ Go to http://localhost:15672 and login using any of those two users.
 > TL;DR the user displayed by the management ui is not the user name but `rabbitmq_client` which is the
 identity of RabbitMQ to work on half of the user
 
-### Use Case 2 - Monitoring agent accessing management REST api
+### Use Case 2 Monitoring agent accessing management REST api
 
 We may have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, we refer to it as a *service account*. This *service account* could be our `rabbit_monitor` user we created in UAA with the `monitoring` *user tag*.
 
@@ -111,7 +111,7 @@ make open username=rabbit_monitor password=rabbit_monitor
 fact is that we are accessing the management port with a JWT token.
 
 
-### Use Case 3 - Non-OAuth2 Application accessing the AMQP port
+### Use Case 3 Non-OAuth2 Application accessing the AMQP port
 
 **DL;DR:**
   In this section, we are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application we are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
@@ -160,10 +160,10 @@ make stop-all-apps
 ```
 
 
-### Use Case 4 - OAuth2 Application accessing the AMQP port
+### Use Case 4 OAuth2 Application accessing the AMQP port
 
 
-### Use Case 5 - Federation & Shovel
+### Use Case 5 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
