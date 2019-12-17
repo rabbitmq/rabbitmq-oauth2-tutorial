@@ -77,6 +77,10 @@ The first time an end user arrives to the management ui (`1`), they are redirect
                             1. rabbit_admin from a browser
 ```
 
+> At step 2, if this is the first time the user is accessing RabbitMQ resource, UAA will prompt the user to
+authorize RabbitMQ application as shown on the screenshot below.
+> ![authorize application](assets/authorize-app.png)
+
 We have previously configured UAA with 2 users:
  - `rabbit_admin:rabbit_admin`
  - and `rabbit_monitor:rabbit_monitor`
@@ -589,3 +593,7 @@ These are the fields relevant for RabbitMQ:
 Given that we have a token for `rabbit_admin`. When we use it to login to RabbitMQ we should see `User rabbit_admin` in the top right corner of the Management UI. However, it shows `User rabbit_client` which is the identity used to get a token for the user. This is due to how RabbitMQ determines the username. It first looks up `client_id` and it does not exist, it looks up `sub`. I would say `sub` should be the first field to check, and `client_id` as last. It works for both, end-users coming over http and applications coming over AMQP.
 
 Although, tokens issued by UAA sets the *user id* (GUID) in the `sub` field rather than the actual *user name* (the *user name* is in the `user_name` field of the JWT).
+
+### Logout from management ui should redirect the user back to the initial login
+
+Given that we have successfully logged in, when we click on the logout link, it does not take the user out to the initial page shown to non-authorized users. Instead the user stays in the same page, for instance the overview page, it was. The user is actually logged out from a session/security standpoint because if we refresh ui, we are no longer authenticated.
