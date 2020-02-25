@@ -8,4 +8,4 @@ docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 \
     -v $SCRIPT/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro \
     -v $SCRIPT/enabled_plugins:/etc/rabbitmq/enabled_plugins \
-    rabbitmq:3.8-rc-management
+    rabbitmq:3.8.2-management

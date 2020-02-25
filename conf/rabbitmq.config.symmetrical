@@ -1,0 +1,25 @@
+[
+    % Enable auth backend
+    {rabbit, [
+        {auth_backends, [rabbit_auth_backend_oauth2]}
+    ]},
+
+    % Set a resource server ID. Will require all scopes to be prefixed with `rabbitmq.`
+    {rabbitmq_auth_backend_oauth2, [
+        {resource_server_id, <<"rabbitmq">>},
+        % Set up a legacy signing key
+        {key_config, [
+            {default_key, <<"legacy-token-key">>},
+            {signing_keys, #{
+                <<"legacy-token-key">> =>
+                    {map, #{
+                        <<"alg">> => <<"HS256">>,
+                        <<"value">> => <<"tokenKey">>,
+                        <<"kty">> => <<"MAC">>,
+                        <<"use">> => <<"sig">>}
+                    } % end map
+                } % end signing_keys map
+            } % end signing_keys
+        ]} % end key_config
+    ]} % end rabbitmq_auth_backend_oauth2
+].
