@@ -13,4 +13,4 @@ docker run -d --name uaa --net rabbitmq_net \
     ./gradlew run
 
 echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
-echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
+echo "Once UAA is ready; run 'make setup-users-and-clients' before starting any application and/or rabbitmq"
