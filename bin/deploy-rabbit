@@ -6,6 +6,6 @@ docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rab
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
 docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 \
-    -v $SCRIPT/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro \
-    -v $SCRIPT/enabled_plugins:/etc/rabbitmq/enabled_plugins \
+    -v $SCRIPT/../conf/rabbitmq.config.symmetrical:/etc/rabbitmq/rabbitmq.config:ro \
+    -v $SCRIPT/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \
     rabbitmq:3.8.2-management
