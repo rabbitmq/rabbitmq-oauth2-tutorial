@@ -55,17 +55,39 @@ First of all, let's bring up RabbitMQ fully configured with Oauth2 plugin and UA
 
 ```
 
+### Set up UAA and RabbitMQ
+
+There are two ways to set up OAuth2 in RabbitMQ. One uses symmetrical signing keys. And the other uses
+asymmetrical signing keys. The Authorization server is who digitally signs the JWT tokens and RabbitMQ
+has to be configured to validate any of the two types of digital signatures.
+
+If you want to test Oauth2 use cases that we will see in the next sections using
+symmetrical keys, follow the steps on the next section.  Instead follow the steps
+on the next section called [Use Asymmetrical digital singing keys](#use-asymmetrical-digital-singing-keys)
+
+#### Use Symmetrical digital singing keys
+
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make start-uaa` to get UAA server running
   2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
-		
+
   4. `make start-rabbitmq` to start RabbitMQ server
 
 
-Next, we will use the following use cases to see the Oauth2 plugin in action
+#### Use Asymmetrical digital singing keys
+
+Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
+
+  1. `MODE=asymmetric_key make start-uaa` to get UAA server running
+  2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
+  3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+		> *IMPORTANT*: hit enter when prompted for client secret.
+
+  4. `MODE=asymmetric_key make start-rabbitmq` to start RabbitMQ server
+
 
 ### Use Case 1 Management user accessing the Management UI
 
@@ -181,7 +203,7 @@ between two RMQ Cluster we need to have at least another authentication backend 
 ### RabbitMQ server
 
 We need to launch RabbitMQ with the following prerequisites:
-- plugin enabled. See [bin/enabled_plugins](bin/enabled_plugins)
+- plugin enabled. See [conf/enabled_plugins](conf/enabled_plugins)
 - plugin configured with the signing key used by UAA. For more details check out [this section](#about-signing-key-required-to-configure-rabbitmq)
   ```
     {rabbitmq_auth_backend_oauth2, [
@@ -217,7 +239,7 @@ authenticate users with UAA and the URL of UAA (`http://localhost:8080/uaa`)
   ]},
 ].
 ```
-- check out the full [bin/rabbitmq.config](bin/rabbitmq.config)
+- check out the full [conf/rabbitmq.config.symmetrical](conf/rabbitmq.config.symmetrical)
 
 
 ### UAA server
@@ -285,7 +307,7 @@ Sample *scope*(s):
 - `rabbitmq.write:uaa_vhost/x-*` grants `write` permissions on `uaa_vhost` on any *resource* that starts with `x-`
 - `rabbitmq.tag:monitoring` grants `monitoring` *user tag*
 
-> Be aware that we have used `rabbitmq` resource_server_id in the sample scopes. RabbitMQ must be configured with this same `resource_server_id`. Check out [rabbitmq.config](rabbitmq.config)
+> Be aware that we have used `rabbitmq` resource_server_id in the sample scopes. RabbitMQ must be configured with this same `resource_server_id`. Check out [conf/symmetric_keys/rabbitmq.config](rabbitmq.config)
 
 
 ### About signing key required to configure RabbitMQ

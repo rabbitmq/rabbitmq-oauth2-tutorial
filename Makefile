@@ -15,6 +15,7 @@ help:
 	@mv uaa-4.24.0 uaa
 
 install-uaac: ## Install UAA Client
+	@echo "Installing uaac client on your local machine "
 	@sudo gem install cf-uaac
 
 setup-uaa-admin-client:

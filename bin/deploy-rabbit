@@ -2,10 +2,13 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+MODE=${MODE:-symmetric_key}
+
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
+echo "running RabbitMQ with mode $MODE"
 docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 \
-    -v $SCRIPT/../conf/rabbitmq.config.symmetrical:/etc/rabbitmq/rabbitmq.config:ro \
+    -v $SCRIPT/../conf/${MODE}/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro \
     -v $SCRIPT/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \
     rabbitmq:3.8.2-management

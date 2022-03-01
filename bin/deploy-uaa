@@ -2,13 +2,17 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+MODE=${MODE:-symmetric_key}
+
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"
 
 docker run -d --name uaa --net rabbitmq_net \
     -v ${SCRIPT}/../uaa:/uaa \
+    -v ${SCRIPT}/../conf/${MODE}:/config \
     -p 8080:8080 \
     -w /uaa \
+    --env CLOUD_FOUNDRY_CONFIG_PATH=/config \
     openjdk:8-jdk \
     ./gradlew run
 

@@ -1,0 +1,4 @@
+jwt:
+  token:
+    signing-key: tokenKey
+    verification-key: tokenKey
