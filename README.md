@@ -60,6 +60,8 @@ Run the following 4 commands to get the environment ready to see Oauth2 plugin i
   1. `make start-uaa` to get UAA server running
   2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+		> *IMPORTANT*: hit enter when prompted for client secret.
+		
   4. `make start-rabbitmq` to start RabbitMQ server
 
 

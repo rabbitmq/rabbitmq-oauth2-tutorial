@@ -24,6 +24,7 @@ uaac member add "rabbitmq.tag:administrator" rabbit_admin
 uaac member add "rabbitmq.tag:monitoring" rabbit_monitor
 
 echo "Adding rabbit_client OAuth client used to issue tokens for users and applications"
+echo "Hit enter when prompted for client secret. It should not have password"
 uaac client add rabbit_client --name rabbit_client \
   --scope 'rabbitmq.*,openid' \
   --authorized_grant_types password,implicit,refresh_token  \
