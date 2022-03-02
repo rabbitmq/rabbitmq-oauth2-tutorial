@@ -116,7 +116,7 @@ identity of RabbitMQ to work on half of the user
 
 This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow we just saw above.
 It was signed with the symmetric key.
-![JWT token](assets/admin-token-signed-with-sym-key.png)
+![JWT token](assets/admin-token-signed-sym-key.png)
 
 ### Use Case 2 Monitoring agent accessing management REST api
 
