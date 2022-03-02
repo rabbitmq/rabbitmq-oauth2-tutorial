@@ -85,10 +85,10 @@ build-jms-client: ## build jms client docker image
 build-uaa-client: ## build uaa docker image
 	@(docker build -f Dockerfile-for-uaa . -t uaa)
 
-start-allowed-jms-client: ## test JMS client using producer client
+start-jms-publisher: ## start jms publisher that sends 1 message
 	@uaac token client get producer -s producer_secret
-	@./bin/run-jms-client producer
+	@./bin/run-jms-client producer pub
 
-start-not-allowed-jms-client: ## test JMS client using consumer client
+start-jms-subscriber: ## start jms subscriber
 	@uaac token client get consumer -s consumer_secret
-	@./bin/run-jms-client consumer
+	@./bin/run-jms-client consumer sub

@@ -39,5 +39,5 @@ uaac client add test_client --name test_client \
     --redirect_uri 'http://localhost:15672'
 
 echo "Adding Oauth client for producer and consumer apps"
-uaac client add producer --name producer --authorities "rabbitmq.configure:*/* rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/# rabbitmq.read:*/# rabbitmq.write:*/#" --authorized_grant_types client_credentials --secret producer_secret
-uaac client add consumer --name consumer --authorities "rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-*" --authorized_grant_types client_credentials --secret consumer_secret
+uaac client add producer --name producer --authorities "rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/* rabbitmq.configure:*/jms.durable.queues rabbitmq.write:*/jms.durable.queues rabbitmq.read:*/jms.durable.queues" --authorized_grant_types client_credentials --secret producer_secret
+uaac client add consumer --name consumer --authorities "rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-* rabbitmq.write:*/jms.durable.queues" --authorized_grant_types client_credentials --secret consumer_secret

@@ -16,9 +16,9 @@ echo "TOKEN: $token"
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f $CLIENT_ID 2>/dev/null || echo "$CLIENT_ID was not running"
 
-docker run --rm \
+docker run --rm --name jms-$CLIENT_ID \
   --network rabbitmq_net \
   --env HOSTNAME=$hostname \
   --env TOKEN=$token \
   --env QUEUE=$queue \
-  jms-client
+  jms-client $@

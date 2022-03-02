@@ -69,24 +69,26 @@ on the next section called [Use Asymmetrical digital singing keys](#use-asymmetr
 
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
-  1. `make start-uaa` to get UAA server running
-  2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
-  3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+  1. `make build-uaa` to build a docker image of UAA
+  2. `make start-uaa` to get UAA server running
+  3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
+  4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  4. `make start-rabbitmq` to start RabbitMQ server
+  5. `make start-rabbitmq` to start RabbitMQ server
 
 
 #### Use Asymmetrical digital singing keys
 
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
-  1. `MODE=asymmetric_key make start-uaa` to get UAA server running
-  2. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
-  3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+  1. `make build-uaa` to build a docker image of UAA
+  2. `MODE=asymmetric_key make start-uaa` to get UAA server running
+  3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
+  4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  4. `MODE=asymmetric_key make start-rabbitmq` to start RabbitMQ server
+  5. `MODE=asymmetric_key make start-rabbitmq` to start RabbitMQ server
 
 
 ### Use Case 1 Management user accessing the Management UI
@@ -116,6 +118,7 @@ identity of RabbitMQ to work on half of the user
 
 This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow we just saw above.
 It was signed with the symmetric key.
+
 ![JWT token](assets/admin-token-signed-sym-key.png)
 
 ### Use Case 2 Monitoring agent accessing management REST api
@@ -166,12 +169,13 @@ authentication, it gets back a JWT token (`2.`) which uses it to connect (`3.`) 
        --------2.JWT-------->
 ```
 
-We have previously configured UAA with these 2 Oauth clients:
+We have previously configured UAA with these 2 OAuth clients:
  - `consumer`
  - and `producer`
 > An application requires an oauth client in order to get an JWT token. Applications use the `Oauth client grant flow` to obtain a JWT token
 
-This the token issued by UAA for the `consumer` Oauth client.
+This the token issued by UAA for the `consumer` OAuth client.
+
 ![JWT token](assets/consumer-token-signed-with-sym-key.png)
 
 To launch the consumer application invoke the following command:
@@ -198,11 +202,40 @@ make stop-all-apps
 ### Use Case 4 OAuth2 Application accessing the AMQP port
 
 
+### Use Case 4 JMS application
+
+In this use case we are demonstrating a basic JMS application which reads, via an environment variable (`TOKEN`),
+the JWT token that will use as password when authenticating with RabbitMQ.
+
+It is **VERY IMPORTANT** to grant the required permission to the *exchange* `jms.durable.queues`.
+
+Applications which needs to send JMS messages require of these permissions:
+- `rabbitmq.configure:*/jms.durable.queues`
+- `rabbitmq.write:*/jms.durable.queues`
+- `rabbitmq.read:*/jms.durable.queues`
+> Those permissions grant access on any vhost.
+
+To test a JMS application sending a message and authenticating via OAuth run this command:
+```
+make start-jms-publisher
+```
+
+Applications which needs to subscribe to a JMS queue require of these permissions:
+- `rabbitmq.write:*/jms.durable.queues`
+> Those permissions grant access on any vhost.
+
+To test a JMS application subscribe to a queue and authenticating via OAuth run this command:
+```
+make start-jms-subscriber
+```
+
+
 ### Use Case 5 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
 between two RMQ Cluster we need to have at least another authentication backend in addition to Oauth2.
+
 
 
 ## Understand the environment
