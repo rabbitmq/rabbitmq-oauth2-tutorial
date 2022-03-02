@@ -14,10 +14,12 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
 - [OAuth2 plugin in action](#oauth2-plugin-in-action)
+	- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
 	- [Use Case 1 Management user accessing the Management UI](#use-case-1-management-user-accessing-the-management-ui)
 	- [Use Case 2 Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
 	- [Use Case 3 Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
 	- [Use Case 4 OAuth2 Application accessing the AMQP port](#use-case-4-oauth2-application-accessing-the-amqp-port)
+	- [Use Case 4 JMS application](#use-case-4-jms-application)
 	- [Use Case 5 Federation & Shovel](#use-case-5-federation-shovel)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
@@ -35,6 +37,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Useful uaac commands](#useful-uaac-commands)
 - [Findings](#findings)
 	- [Management UI shows token's client_id as user in the top right corner](#management-ui-shows-tokens-clientid-as-user-in-the-top-right-corner)
+	- [Logout from management ui should redirect the user back to the initial login](#logout-from-management-ui-should-redirect-the-user-back-to-the-initial-login)
 
 <!-- /TOC -->
 
