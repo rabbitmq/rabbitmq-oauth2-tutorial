@@ -114,6 +114,10 @@ Go to http://localhost:15672 and login using any of those two users.
 > TL;DR the user displayed by the management ui is not the user name but `rabbitmq_client` which is the
 identity of RabbitMQ to work on half of the user
 
+This is a token issued by UAA for one of the `consumer` OAuth client which was signed
+with the symmetrical key. 
+![JWT token](assets/token-signed-with-sym-key.png)
+
 ### Use Case 2 Monitoring agent accessing management REST api
 
 We may have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, we refer to it as a *service account*. This *service account* could be our `rabbit_monitor` user we created in UAA with the `monitoring` *user tag*.

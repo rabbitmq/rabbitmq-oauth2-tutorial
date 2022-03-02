@@ -29,7 +29,7 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 uaa: 4.24.0.tar.gz
 
 start-uaa: uaa ## Install and run uaa
-	@./bin/deploy-uaa
+	@./bin/deploy-uaa0
 
 stop-uaa:
 	@docker kill uaa
@@ -78,3 +78,17 @@ curl: ## Run curl with a JWT token. Syntax: make curl url=http://localhost:15672
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)
+
+build-jms-client: ## build jms client docker image
+	@(docker build jms-client/. -t jms-client)
+
+build-uaa-client: ## build uaa docker image
+	@(docker build -f Dockerfile-for-uaa . -t uaa)
+
+start-allowed-jms-client: ## test JMS client using producer client
+	@uaac token client get producer -s producer_secret
+	@./bin/run-jms-client producer
+
+start-not-allowed-jms-client: ## test JMS client using consumer client
+	@uaac token client get consumer -s consumer_secret
+	@./bin/run-jms-client consumer

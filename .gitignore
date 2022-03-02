@@ -5,3 +5,7 @@ master-*.zip
 .built-rabbitmq-docker
 *.tar.gz
 *.zip.*
+.idea
+target/
+.mvn
+*.iml
