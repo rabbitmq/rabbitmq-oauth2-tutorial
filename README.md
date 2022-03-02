@@ -114,9 +114,9 @@ Go to http://localhost:15672 and login using any of those two users.
 > TL;DR the user displayed by the management ui is not the user name but `rabbitmq_client` which is the
 identity of RabbitMQ to work on half of the user
 
-This is a token issued by UAA for one of the `consumer` OAuth client which was signed
-with the symmetrical key. 
-![JWT token](assets/token-signed-with-sym-key.png)
+This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow we just saw above.
+It was signed with the symmetric key.
+![JWT token](assets/admin-token-signed-with-sym-key.png)
 
 ### Use Case 2 Monitoring agent accessing management REST api
 
@@ -170,6 +170,9 @@ We have previously configured UAA with these 2 Oauth clients:
  - `consumer`
  - and `producer`
 > An application requires an oauth client in order to get an JWT token. Applications use the `Oauth client grant flow` to obtain a JWT token
+
+This the token issued by UAA for the `consumer` Oauth client.
+![JWT token](assets/consumer-token-signed-with-sym-key.png)
 
 To launch the consumer application invoke the following command:
 ```
