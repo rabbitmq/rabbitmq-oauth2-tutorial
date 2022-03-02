@@ -212,7 +212,7 @@ the JWT token that will use as password when authenticating with RabbitMQ.
 
 It is **VERY IMPORTANT** to grant the required permission to the *exchange* `jms.durable.queues`.
 
-Applications which needs to send JMS messages require of these permissions:
+Applications which send JMS messages require of these permissions:
 - `rabbitmq.configure:*/jms.durable.queues`
 - `rabbitmq.write:*/jms.durable.queues`
 - `rabbitmq.read:*/jms.durable.queues`
@@ -222,16 +222,17 @@ To test a JMS application sending a message and authenticating via OAuth run thi
 ```
 make start-jms-publisher
 ```
+> It sends a message to a queue called `q-test-queue`
 
-Applications which needs to subscribe to a JMS queue require of these permissions:
+Applications which subscribe to a JMS queue require of these permissions:
 - `rabbitmq.write:*/jms.durable.queues`
 > Those permissions grant access on any vhost.
 
-To test a JMS application subscribe to a queue and authenticating via OAuth run this command:
+To test a JMS application subscribing to a queue and authenticating via OAuth run this command:
 ```
 make start-jms-subscriber
 ```
-
+> It subscribes to a queue called `q-test-queue`
 
 ### Use Case 5 Federation & Shovel
 
