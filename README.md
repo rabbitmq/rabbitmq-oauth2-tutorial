@@ -218,6 +218,12 @@ Applications which send JMS messages require of these permissions:
 - `rabbitmq.read:*/jms.durable.queues`
 > Those permissions grant access on any vhost.
 
+Before testing a publisher and a subscriber application we need to build a local image for the
+basic jms application by invoking this command:
+```
+make build-jms-client
+```
+
 To test a JMS application sending a message and authenticating via OAuth run this command:
 ```
 make start-jms-publisher

@@ -82,7 +82,7 @@ open: ## Open the browser and login the user with the JWT Token. e.g: make open 
 build-jms-client: ## build jms client docker image
 	@(docker build jms-client/. -t jms-client)
 
-build-uaa-client: ## build uaa docker image
+build-uaa: ## build uaa docker image
 	@(docker build -f Dockerfile-for-uaa . -t uaa)
 
 start-jms-publisher: ## start jms publisher that sends 1 message
