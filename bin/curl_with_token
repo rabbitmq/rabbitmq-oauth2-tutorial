@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+URL=${1:?First parameter must be the url to curl}
+TOKEN=${2:?Second parameter must be the token}
+
+curl -u :$TOKEN $URL

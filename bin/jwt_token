@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+$SCRIPT/jwt_token.py $SCRIPT/../conf/private.pem $SCRIPT/../conf/public.pem ${1:-some-client}

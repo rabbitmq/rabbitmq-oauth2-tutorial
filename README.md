@@ -239,8 +239,7 @@ make start-jms-subscriber
 There are some Authorization servers which cannot include RabbitMQ scopes into the standard
 JWT `scope` field. Instead, they can include RabbitMQ scopes in a custom JWT scope of their choice.
 
-By default RabbitMQ -since 3.9- will look for the `scope` field in the token, but you can configure it to
-also look in other fields using the `extra_scopes_source` as shown below:
+Since RabbitMQ 3.9, it is possible to configure RabbitMQ with a different field to look for scopes as shown below:
 
 ```
 [
@@ -253,8 +252,18 @@ also look in other fields using the `extra_scopes_source` as shown below:
 ].
 ```
 
-To test this feature we are going to build ourselves the following JWT token, sign it and send it to the management rest endpoint.
-WIP
+To test this feature we are going to build a token, sign it and use it to hit one of the RabbitMQ management endpoints.
+The command below allows us to hit any management endpoint, in this case it is the `overview`, with a token.
+
+```
+make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token)
+```
+
+We use the python script `bin/jwt:token.py` to build the minimal JWT token possible that RabbitMQ is able to
+validate.
+**NOTE**: At the moment, RabbitMQ is not able to use the `extra_scope` field. If we copied the scopes from that field
+and put it under `scopes` field it works.
+
 
 ### Use Case 6 Federation & Shovel
 

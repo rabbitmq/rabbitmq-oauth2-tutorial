@@ -94,6 +94,5 @@ start-jms-subscriber: ## start jms subscriber
 	@uaac token client get consumer -s consumer_secret
 	@./bin/run-jms-client consumer sub
 
-curl-with-extra-scopes: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes url=http://localhost:15672/api/overview client_id=consumer secret=consumer_secret
-	@uaac token client get $(client_id) -s $(secret)
-	@./bin/curl_url_with_extra_scopes $(client_id) $(url)
+curl-with-token: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes url=http://localhost:15672/api/overview token=....
+	@curl -u :$(token) $(url)
