@@ -19,7 +19,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 2 Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
 	- [Use Case 3 Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
 	- [Use Case 4 JMS application](#use-case-4-jms-application)
-	- [Use Case 5 JMS application](#use-case-5-use-custom-scope-field)
+	- [Use Case 5 Use custom scope field](#use-case-5-use-custom-scope-field)
 	- [Use Case 6 Federation & Shovel](#use-case-5-federation-shovel)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
