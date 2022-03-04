@@ -279,8 +279,11 @@ validate which is:
 **NOTE**: At the moment, RabbitMQ is not able to use the `extra_scope` field. If we copied the scopes from that field
 and put it under `scopes` field it works.
 
+### Use Case 6 Use external OAuth server https://auth0.com/
 
-### Use Case 6 Federation & Shovel
+WIP
+
+### Use Case 7 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
