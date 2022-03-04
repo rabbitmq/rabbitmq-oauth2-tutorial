@@ -18,7 +18,6 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 1 Management user accessing the Management UI](#use-case-1-management-user-accessing-the-management-ui)
 	- [Use Case 2 Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
 	- [Use Case 3 Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
-	- [Use Case 4 OAuth2 Application accessing the AMQP port](#use-case-4-oauth2-application-accessing-the-amqp-port)
 	- [Use Case 4 JMS application](#use-case-4-jms-application)
 	- [Use Case 5 Federation & Shovel](#use-case-5-federation-shovel)
 - [Understand the environment](#understand-the-environment)
@@ -126,7 +125,7 @@ It was signed with the symmetric key.
 
 ### Use Case 2 Monitoring agent accessing management REST api
 
-We may have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, we refer to it as a *service account*. This *service account* could be our `rabbit_monitor` user we created in UAA with the `monitoring` *user tag*.
+We may have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, we refer to it as a *service account*. This *service account* could be our `mgt_api_client` client we created in UAA with the `monitoring` *user tag*.
 
 This *monitoring agent* would use the *client credentials* or *password* grant flow to authenticate (`1`) with
 UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a HTTP request to the RabbitMQ management endpoint passing the JWT token.
@@ -135,18 +134,16 @@ UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a H
     [ UAA ]                  [ RabbitMQ ]
       /|\                    [  http    ]
        |                          /|\
-       |                       3.http://broker:15672/api/ passing JWT token
+       |                       3.http://broker:15672/api/overview passing JWT token
        |                           |
        +-----1.auth---------  monitoring agent
        --------2.JWT-------->
 ```
 
-The following command launches the browser with `rabbit_monitor` user with a JWT token previously obtained from UAA:
+The following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
 ```
-make open username=rabbit_monitor password=rabbit_monitor
+make curl url=http://broker:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
-> We are not hitting the rest endpoint `/api` but the normal management ui but it is irrelevant the important
-fact is that we are accessing the management port with a JWT token.
 
 
 ### Use Case 3 Non-OAuth2 Application accessing the AMQP port
@@ -202,9 +199,6 @@ make stop-all-apps
 ```
 
 
-### Use Case 4 OAuth2 Application accessing the AMQP port
-
-
 ### Use Case 4 JMS application
 
 In this use case we are demonstrating a basic JMS application which reads, via an environment variable (`TOKEN`),
@@ -240,7 +234,29 @@ make start-jms-subscriber
 ```
 > It subscribes to a queue called `q-test-queue`
 
-### Use Case 5 Federation & Shovel
+### Use Case 5 Use custom scope field  
+
+There are some Authorization servers which cannot include RabbitMQ scopes into the standard
+JWT `scope` field. Instead, they can include RabbitMQ scopes in a custom JWT scope of their choice.
+
+By default RabbitMQ -since 3.9- will look for the `scope` field in the token, but you can configure it to
+also look in other fields using the `extra_scopes_source` as shown below:
+
+```
+[
+  {rabbitmq_auth_backend_oauth2, [
+    ...
+    {extra_scopes_source, <<"extra_scope">>},
+    ...
+    ]}
+  ]},
+].
+```
+
+To test this feature we are going to build ourselves the following JWT token, sign it and send it to the management rest endpoint.
+WIP
+
+### Use Case 6 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages

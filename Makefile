@@ -73,8 +73,9 @@ stop-all-apps: ## Stop all appications we can start with this Makefile
 
 pivotalrabbitmq/perf-test:latest
 
-curl: ## Run curl with a JWT token. Syntax: make curl url=http://localhost:15672/api/overview as=rabbit_admin
-	@./bin/curl_url $(as) $(url)
+curl: ## Run curl with a JWT token. Syntax: make curl url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@uaac token client get $(client_id) -s $(secret)
+	@./bin/curl_url $(client_id) $(url)
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)
@@ -92,3 +93,7 @@ start-jms-publisher: ## start jms publisher that sends 1 message
 start-jms-subscriber: ## start jms subscriber
 	@uaac token client get consumer -s consumer_secret
 	@./bin/run-jms-client consumer sub
+
+curl-with-extra-scopes: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes url=http://localhost:15672/api/overview client_id=consumer secret=consumer_secret
+	@uaac token client get $(client_id) -s $(secret)
+	@./bin/curl_url_with_extra_scopes $(client_id) $(url)
