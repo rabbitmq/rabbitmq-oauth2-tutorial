@@ -260,8 +260,22 @@ The command below allows us to hit any management endpoint, in this case it is t
 make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token)
 ```
 
-We use the python script `bin/jwt:token.py` to build the minimal JWT token possible that RabbitMQ is able to
-validate.
+We use the python script `bin/jwt_token.py` to build the minimal JWT token possible that RabbitMQ is able to
+validate which is:
+```
+{
+  "scope": [
+
+  ],
+  "extra_scope": [
+    "rabbitmq.tag:management"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}
+```
+
 **NOTE**: At the moment, RabbitMQ is not able to use the `extra_scope` field. If we copied the scopes from that field
 and put it under `scopes` field it works.
 
