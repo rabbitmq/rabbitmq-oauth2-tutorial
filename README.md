@@ -277,9 +277,6 @@ validate which is:
 }
 ```
 
-**NOTE**: At the moment, RabbitMQ is not able to use the `extra_scope` field. If we copied the scopes from that field
-and put it under `scopes` field it works.
-
 ### Use Case 6 Use external OAuth server https://auth0.com/
 
 WIP
