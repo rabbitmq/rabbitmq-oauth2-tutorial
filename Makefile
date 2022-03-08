@@ -11,8 +11,7 @@ help:
 
 4.24.0.tar.gz:
 	@wget https://github.com/cloudfoundry/uaa/archive/4.24.0.tar.gz
-	@tar xvfz 4.24.0.tar.gz
-	@mv uaa-4.24.0 uaa
+
 
 install-uaac: ## Install UAA Client
 	@echo "Installing uaac client on your local machine "
@@ -26,10 +25,14 @@ setup-uaa-admin-client:
 setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients
 	@./bin/setup-uaa
 
-uaa: 4.24.0.tar.gz
+download-uaa: 4.24.0.tar.gz extract-uaa
 
-start-uaa: uaa ## Install and run uaa
+start-uaa: download-uaa ## Install and run uaa
 	@./bin/deploy-uaa0
+
+extract-uaa: 4.24.0.tar.gz
+	@tar xvfz 4.24.0.tar.gz
+	@mv uaa-4.24.0 uaa
 
 stop-uaa:
 	@docker kill uaa
@@ -83,7 +86,7 @@ open: ## Open the browser and login the user with the JWT Token. e.g: make open 
 build-jms-client: ## build jms client docker image
 	@(docker build jms-client/. -t jms-client)
 
-build-uaa: ## build uaa docker image
+build-uaa: download-uaa ## build uaa docker image
 	@(docker build -f Dockerfile-for-uaa . -t uaa)
 
 start-jms-publisher: ## start jms publisher that sends 1 message
