@@ -258,7 +258,7 @@ To test this feature we are going to build a token, sign it and use it to hit on
 The command below allows us to hit any management endpoint, in this case it is the `overview`, with a token.
 
 ```
-make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token)
+make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token legacy-token-key private.pem public.pem)
 ```
 
 We use the python script `bin/jwt_token.py` to build the minimal JWT token possible that RabbitMQ is able to
@@ -277,11 +277,36 @@ validate which is:
 }
 ```
 
-### Use Case 6 Use external OAuth server https://auth0.com/
+### Use Case 6 Use multiple asymmetrical signing keys
+
+This scenario demonstrates the situation where RabbitMQ may be presented with tokens signed with
+different signing keys. In particular, asymmetrical signing keys.
+
+There are 2 alternatives. We can either statically configure RabbitMQ with as many signing keys
+as needed via the `rabbitmq.conf` file as shown in the [plugin documentation page](https://github.com/rabbitmq/rabbitmq-server/tree/master/deps/rabbitmq_auth_backend_oauth2#variables-configurable-in-rabbitmqconf).
+
+Or we can do it dynamically, i.e, add signing keys while RabbitMQ is running and without having to
+restart it. This alternative is explained in more detail in the section [About rotating UAA signing key](#about-rotating-uaa-signing-key).
+However, we are going to demonstrate it here as well.
+
+We saw in the previous use case how to send a JWT token signed with signing key
+RabbitMQ is configured with. That is, the `conf/asymmetric_key/rabbitmq.config` is configured with a
+ key called `legacy-token-key` and with a private key file `conf/private.pem`.
+And we build a token using the command `bin/jwt_token` specifying the name of the signing key, the private and the public key filenames.
+And we eventually use that token to access a management endpoint.
+
+Now, we are going to add a second key-pair:
+```
+docker exec -it rabbitmq rabbitmqctl add_uaa_key legacy-token-2-key conf/private-2.pem
+```
+
+
+
+### Use Case 7 Use external OAuth server https://auth0.com/
 
 WIP
 
-### Use Case 7 Federation & Shovel
+### Use Case 8 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
