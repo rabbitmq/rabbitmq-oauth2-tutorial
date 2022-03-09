@@ -280,29 +280,26 @@ validate which is:
 
 ### Use Case 6 Use multiple asymmetrical signing keys
 
-This scenario demonstrates the situation where RabbitMQ may be presented with tokens signed with
-different signing keys. In particular, asymmetrical signing keys.
+This scenario explores the use case where JWT tokens may be signed by different asymmetrical signing keys.
 
-There are 2 alternatives:
-- We can either **statically** configure RabbitMQ with as many signing keys
-as needed via the `rabbitmq.conf` file as shown in the [plugin documentation page](https://github.com/rabbitmq/rabbitmq-server/tree/master/deps/rabbitmq_auth_backend_oauth2#variables-configurable-in-rabbitmqconf).
+There are 2 ways to configure RabbitMQ with multiple signing keys:
+- We can either **statically** configure them via `rabbitmq.conf` as shown in the [plugin documentation page](https://github.com/rabbitmq/rabbitmq-server/tree/master/deps/rabbitmq_auth_backend_oauth2#variables-configurable-in-rabbitmqconf).
 - Or we can do it **dynamically**, i.e, add signing keys while RabbitMQ is running and without having to
 restart it. This alternative is explained in more detail in the section [About rotating UAA signing key](#about-rotating-uaa-signing-key).
 However, we are going to demonstrate it here as well.
 
-We are going to **dynamically** add a second signing key as it is very convenient.
-First we add a signing key called `legacy-token-2-key` whose public key is `conf/public-2.pem`
+First we add a second signing key called `legacy-token-2-key` whose public key is `conf/public-2.pem`:
 ```
 docker exec -it rabbitmq rabbitmqctl add_uaa_key legacy-token-2-key --pem-file=/conf/public-2.pem
 Adding UAA signing key "legacy-token-2-key" filename: "/conf/public-2.pem"
 ```
 
-Then we issue a token using the corresponding private key and use it to access the management endpoint `/api/overview`.
+And then we issue a token using the corresponding private key and use it to access the management endpoint `/api/overview`.
 
 ```
 make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token legacy-token-2-key private-2.pem public-2.pem)
 ```
-
+> jwt_token searches for private and public key files under `conf` folder. 
 
 
 ### Use Case 7 Use external OAuth server https://auth0.com/
