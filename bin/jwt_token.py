@@ -16,9 +16,7 @@ JWT = """{
   "scope": [
 
   ],
-  "extra_scope": [
-    "rabbitmq.tag:management"
-  ],
+  "extra_scope": "rabbitmq.tag:management",
   "aud": [
     "rabbitmq"
   ]

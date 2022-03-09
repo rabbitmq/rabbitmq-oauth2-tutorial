@@ -282,22 +282,24 @@ validate which is:
 This scenario demonstrates the situation where RabbitMQ may be presented with tokens signed with
 different signing keys. In particular, asymmetrical signing keys.
 
-There are 2 alternatives. We can either statically configure RabbitMQ with as many signing keys
+There are 2 alternatives:
+- We can either **statically** configure RabbitMQ with as many signing keys
 as needed via the `rabbitmq.conf` file as shown in the [plugin documentation page](https://github.com/rabbitmq/rabbitmq-server/tree/master/deps/rabbitmq_auth_backend_oauth2#variables-configurable-in-rabbitmqconf).
-
-Or we can do it dynamically, i.e, add signing keys while RabbitMQ is running and without having to
+- Or we can do it **dynamically**, i.e, add signing keys while RabbitMQ is running and without having to
 restart it. This alternative is explained in more detail in the section [About rotating UAA signing key](#about-rotating-uaa-signing-key).
 However, we are going to demonstrate it here as well.
 
-We saw in the previous use case how to send a JWT token signed with signing key
-RabbitMQ is configured with. That is, the `conf/asymmetric_key/rabbitmq.config` is configured with a
- key called `legacy-token-key` and with a private key file `conf/private.pem`.
-And we build a token using the command `bin/jwt_token` specifying the name of the signing key, the private and the public key filenames.
-And we eventually use that token to access a management endpoint.
-
-Now, we are going to add a second key-pair:
+We are going to **dynamically** add a second signing key as it is very convenient.
+First we add a signing key called `legacy-token-2-key` whose public key is `conf/public-2.pem`
 ```
-docker exec -it rabbitmq rabbitmqctl add_uaa_key legacy-token-2-key conf/private-2.pem
+docker exec -it rabbitmq rabbitmqctl add_uaa_key legacy-token-2-key --pem-file=/conf/public-2.pem
+Adding UAA signing key "legacy-token-2-key" filename: "/conf/public-2.pem"
+```
+
+Then we issue a token using the corresponding private key and use it to access the management endpoint `/api/overview`.
+
+```
+make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token legacy-token-2-key private-2.pem public-2.pem)
 ```
 
 

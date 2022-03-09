@@ -99,3 +99,12 @@ start-jms-subscriber: ## start jms subscriber
 
 curl-with-token: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes url=http://localhost:15672/api/overview token=....
 	@curl -u :$(token) $(url)
+
+get-jwt-token: ## Get a JWT token from an authorzation server
+	@curl curl --request POST \
+  --url 'https://dev-prbc0gw4.us.auth0.com/oauth/token' \
+  --header 'content-type: application/x-www-form-urlencoded' \
+  --data grant_type=client_credentials \
+  --data client_id=ROts7Md4eIRue2BZTbGpFNoIrjO6gU0v \
+  --data client_secret=SaBbldyDiBguXT4ml55Pww58dUu0as8JwJBmudyYregMtedg5Oo3FzvpZx5j3OvQ \
+  --data audience="rabbitmq:15672"	
