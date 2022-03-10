@@ -21,7 +21,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 4 JMS application](#use-case-4-jms-application)
 	- [Use Case 5 Use custom scope field](#use-case-5-use-custom-scope-field)
 	- [Use Case 6 Use multiple asymmetrical signing keys](#use-case-6-use-multiple-asymmetrical-signing-keys)
-	- [Use Case 7 Use external OAuth server https://auth0.com/](#use-case-6-use-external-oauth-server-httpsauth0com)
+	- [Use Case 7 Use external OAuth server https://auth0.com/](#use-case-7-use-external-oauth-server-httpsauth0com)
 	- [Use Case 8 Federation & Shovel](#use-case-5-federation-shovel)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
