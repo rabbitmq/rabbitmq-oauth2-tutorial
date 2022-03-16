@@ -27,7 +27,7 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 
 download-uaa: 4.24.0.tar.gz extract-uaa
 
-start-uaa: download-uaa ## Install and run uaa
+start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/deploy-uaa0
 
 extract-uaa: 4.24.0.tar.gz
@@ -102,9 +102,13 @@ curl-with-token: ## Run curl with a JWT token. Syntax: make curl-with-extra-scop
 
 get-jwt-token: ## Get a JWT token from an authorzation server
 	@curl curl --request POST \
-  --url 'https://dev-prbc0gw4.us.auth0.com/oauth/token' \
+  --url 'https://<YOUR TOKEN ENDPOINT>' \
   --header 'content-type: application/x-www-form-urlencoded' \
   --data grant_type=client_credentials \
   --data client_id=<your-client-id> \
   --data client_secret=<your-client-secret> \
   --data audience="rabbitmq:15672"
+
+start-mqtt-publish: ## publish mqtt message . e.g. make start-mqtt-publish token=$(bin/jwt_token legacy-token-key private.pem public.pem)
+		@(docker run --rm -it --network rabbitmq_net ruimarinho/mosquitto mosquitto_pub \
+		  -h rabbitmq -u "" -P $(token) -t test -m hello-world)

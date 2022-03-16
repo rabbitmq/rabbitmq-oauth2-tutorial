@@ -21,8 +21,9 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 4 JMS application](#use-case-4-jms-application)
 	- [Use Case 5 Use custom scope field](#use-case-5-use-custom-scope-field)
 	- [Use Case 6 Use multiple asymmetrical signing keys](#use-case-6-use-multiple-asymmetrical-signing-keys)
-	- [Use Case 7 Use external OAuth server https://auth0.com/](#use-case-7-use-external-oauth-server-httpsauth0com)
-	- [Use Case 8 Federation & Shovel](#use-case-5-federation-shovel)
+	- [Use Case 7 MQTT protocol](#use-case-7-mqtt-protocol)
+	- [Use Case 8 Use external OAuth server https://auth0.com/](#use-case-8-use-external-oauth-server-httpsauth0com)
+	- [Use Case 9 Federation & Shovel](#use-case-9-federation-shovel)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -301,8 +302,42 @@ make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_tok
 ```
 > jwt_token searches for private and public key files under `conf` folder.
 
+### Use Case 7 MQTT protocol
 
-### Use Case 7 Use external OAuth server https://auth0.com/
+This scenario explores the use case where we authenticate with a JWT token to RabbitMQ MQTT port.
+
+> Note: RabbitMQ is already configured with `rabbitmq_mqtt` plugin.
+
+This is no different than using AMQP or JMS protocols, all that matters is to pass an empty username and a JWT token as password.
+However, **what it is really different** is how we encode the permissions. In this use case we are going to proceed as we did it in the previous use case where we handcrafted the JWT token rather than requesting it to UAA. Here is the the scopes required to publish
+a message to a mqtt topic.
+```
+  "scope": [
+    "rabbitmq.write:*/*/*",
+    "rabbitmq.configure:*/*/*",
+    "rabbitmq.read:*/*/*"
+
+  ],
+  "extra_scope": "rabbitmq.tag:management",
+  "aud": [
+    "rabbitmq"
+  ]
+}
+```
+
+`rabbitmq.write:*/*/*` means allow write operation on a any vhost, on any exchange and any topic. In fact,
+it is any "routing-key" because that is translated to a topic/queue.
+
+We are going to test publishing a mqtt message by running the following command.
+```
+make start-mqtt-publish token=$(bin/jwt_token legacy-token-key private.pem public.pem)
+```
+
+> IMPORTANT: If you try to access the management ui and authenticate with UAA using rabbit_admin you
+wont be able to do bind a queue with routing_key `test` to the `amq.topic` exchange because that user
+in UAA does not have the required permissions. In our handcrafted token, we have granted ourselves the right permissions/scopes.
+
+### Use Case 8 Use external OAuth server https://auth0.com/
 
 In order to follow this use case, we must first sign up for an account in https://auth0.com/.
 
@@ -332,7 +367,7 @@ We are done setting things up in Oauth0, now we can claim a token like this:
 ```
 
 
-### Use Case 8 Federation & Shovel
+### Use Case 9 Federation & Shovel
 
 Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages

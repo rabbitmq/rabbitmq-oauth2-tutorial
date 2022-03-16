@@ -14,6 +14,9 @@ client_id = sys.argv[4]
 
 JWT = """{
   "scope": [
+    "rabbitmq.write:*/*/*",
+    "rabbitmq.configure:*/*/*",
+    "rabbitmq.read:*/*/*"
 
   ],
   "extra_scope": "rabbitmq.tag:management",

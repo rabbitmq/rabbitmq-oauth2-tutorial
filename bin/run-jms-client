@@ -8,13 +8,13 @@ queue=${QUEUE:-q-test-queue}
 
 shift 1
 
-echo "Launching jms-client with a token for Oauth Client $CLIENT_ID "
+echo "Launching JMS-client with a token for Oauth Client $CLIENT_ID "
 echo "HOSTNAME: $hostname"
 echo "QUEUE: $queue"
 echo "TOKEN: $token"
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-docker rm -f $CLIENT_ID 2>/dev/null || echo "$CLIENT_ID was not running"
+docker rm -f jms-$CLIENT_ID 2>/dev/null || echo "$CLIENT_ID was not running"
 
 docker run --rm --name jms-$CLIENT_ID \
   --network rabbitmq_net \
