@@ -17,8 +17,8 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
 	- [Use Case 1 Management user accessing the Management UI](#use-case-1-management-user-accessing-the-management-ui)
 	- [Use Case 2 Monitoring agent accessing management REST api](#use-case-2-monitoring-agent-accessing-management-rest-api)
-	- [Use Case 3 Non-OAuth2 Application accessing the AMQP port](#use-case-3-non-oauth2-application-accessing-the-amqp-port)
-	- [Use Case 4 JMS application](#use-case-4-jms-application)
+	- [Use Case 3 AMQP protocol](#use-case-3-amqp-protocol)
+	- [Use Case 4 JMS protocol](#use-case-4-jms-protocol)
 	- [Use Case 5 Use custom scope field](#use-case-5-use-custom-scope-field)
 	- [Use Case 6 Use multiple asymmetrical signing keys](#use-case-6-use-multiple-asymmetrical-signing-keys)
 	- [Use Case 7 MQTT protocol](#use-case-7-mqtt-protocol)
@@ -150,7 +150,7 @@ make curl url=http://broker:15672/api/overview client_id=mgt_api_client secret=m
 ```
 
 
-### Use Case 3 Non-OAuth2 Application accessing the AMQP port
+### Use Case 3 AMQP Protocol
 
 **DL;DR:**
   In this section, we are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application we are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
@@ -203,7 +203,7 @@ make stop-all-apps
 ```
 
 
-### Use Case 4 JMS application
+### Use Case 4 JMS protocol
 
 In this use case we are demonstrating a basic JMS application which reads, via an environment variable (`TOKEN`),
 the JWT token that will use as password when authenticating with RabbitMQ.
