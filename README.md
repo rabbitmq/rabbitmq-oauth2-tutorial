@@ -1,6 +1,6 @@
-# RabbitMQ integration with OAuth 2.0
+# RabbitMQ OAuth2 Tutorial
 
-These are the two goals of this integration guide:
+These are the two goals of this guide:
 1. Explore how applications and end users can authenticate with RabbitMQ server using OAuth 2.0 protocol rather than the traditional username/password, or others.
 2. Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. Additionally we explore how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 Authorization Server and all the operations to create OAuth clients, users and obtain their tokens.
 
@@ -87,7 +87,7 @@ Run the following 4 commands to get the environment ready to see Oauth2 plugin i
 
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
-  1. `make build-uaa` to build a docker image of UAA
+  1. `make build-uaa` to build a docker image of UAA if you have not run this command before
   2. `MODE=asymmetric_key make start-uaa` to get UAA server running
   3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
