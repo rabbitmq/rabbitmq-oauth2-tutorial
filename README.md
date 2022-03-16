@@ -328,7 +328,8 @@ a message to a mqtt topic.
 `rabbitmq.write:*/*/*` means allow write operation on a any vhost, on any exchange and any topic. In fact,
 it is any "routing-key" because that is translated to a topic/queue.
 
-We are going to test publishing a mqtt message by running the following command.
+We are going to publish a mqtt message by running the following command. If you have not run any of the
+previous use cases, you need to launch rabbitmq first like this `MODE=asymmetric_key make start-uaa`.
 ```
 make start-mqtt-publish token=$(bin/jwt_token legacy-token-key private.pem public.pem)
 ```
