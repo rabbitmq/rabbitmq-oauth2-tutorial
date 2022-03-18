@@ -1,4 +1,5 @@
 uaa
+uaa-4.24.0/
 plugin
 rabbitmq-auth-backend-oauth2-*
 master-*.zip
