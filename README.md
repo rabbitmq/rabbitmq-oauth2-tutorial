@@ -24,6 +24,8 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 7 MQTT protocol](#use-case-7-mqtt-protocol)
 	- [Use Case 8 Use external OAuth server https://auth0.com/](#use-case-8-use-external-oauth-server-httpsauth0com)
 	- [Use Case 9 Federation & Shovel](#use-case-9-federation-shovel)
+	- [Use Case 10 Use external OAuth server keycloack](#use-case-10-use-external-oauth-server-keycloack)
+
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -374,7 +376,9 @@ Federation and Shovel are two AMQP clients running within RabbitMQ server. These
 only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
 between two RMQ Cluster we need to have at least another authentication backend in addition to Oauth2.
 
+### Use Case 10 Use external OAuth server keycloack
 
+TODO
 
 ## Understand the environment
 
