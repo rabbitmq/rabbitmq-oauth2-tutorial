@@ -2,7 +2,7 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-MODE=${MODE:-symmetric_key}
+MODE=${MODE:-asymmetric_key}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"

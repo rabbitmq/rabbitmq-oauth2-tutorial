@@ -15,7 +15,7 @@ help:
 
 install-uaac: ## Install UAA Client
 	@echo "Installing uaac client on your local machine "
-	@sudo gem install cf-uaac
+	@(gem list --local | grep cf-uaac || sudo gem install cf-uaac && echo "Already installed")
 
 setup-uaa-admin-client:
 	@uaac target  http://localhost:8080/uaa
@@ -28,7 +28,7 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 download-uaa: 4.24.0.tar.gz extract-uaa
 
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
-	@./bin/deploy-uaa0
+	@./bin/deploy-uaa
 
 extract-uaa: 4.24.0.tar.gz
 	@tar xvfz 4.24.0.tar.gz
@@ -87,7 +87,7 @@ build-jms-client: ## build jms client docker image
 	@(docker build jms-client/. -t jms-client)
 
 build-uaa: download-uaa ## build uaa docker image
-	@(docker build -f Dockerfile-for-uaa . -t uaa)
+	@(docker build -f Dockerfile-for-uaa . -t uaa:4.24.0)
 
 start-jms-publisher: ## start jms publisher that sends 1 message
 	@uaac token client get producer -s producer_secret

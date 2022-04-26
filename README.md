@@ -78,12 +78,12 @@ on the next section called [Use Asymmetrical digital singing keys](#use-asymmetr
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make build-uaa` to build a docker image of UAA
-  2. `make start-uaa` to get UAA server running
+  2. `MODE=symmetric_key make start-uaa` to get UAA server running
   3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  5. `make start-rabbitmq` to start RabbitMQ server
+  5. `MODE=symmetric_key make start-rabbitmq` to start RabbitMQ server
 
 
 #### Use Asymmetrical digital singing keys
@@ -91,12 +91,12 @@ Run the following 4 commands to get the environment ready to see Oauth2 plugin i
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make build-uaa` to build a docker image of UAA if you have not run this command before
-  2. `MODE=asymmetric_key make start-uaa` to get UAA server running
+  2. `make start-uaa` to get UAA server running
   3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  5. `MODE=asymmetric_key make start-rabbitmq` to start RabbitMQ server
+  5. `make start-rabbitmq` to start RabbitMQ server
 
 
 ### Use Case 1 Management user accessing the Management UI

@@ -2,19 +2,25 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-MODE=${MODE:-symmetric_key}
+MODE=${MODE:-asymmetric_key}
+UAA=${UAA:-4.24.0}  
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"
 
-docker run -d --name uaa --net rabbitmq_net \
-    -v ${SCRIPT}/../uaa:/uaa \
+docker run \
+		--detach \
+    --name uaa --net rabbitmq_net \
+		--publish 8080:8080 \
     -v ${SCRIPT}/../conf/${MODE}:/config \
-    -p 8080:8080 \
-    -w /uaa \
+    --env CLOUDFOUNDRY_CONFIG_PATH=/config \
     --env CLOUD_FOUNDRY_CONFIG_PATH=/config \
-    openjdk:8-jdk \
-    ./gradlew run
+    uaa:${UAA}
 
+#    --env LOGGING_CONFIG=/config/log4j2.properties \
+#		--env spring_profiles=default,hsqldb,logging \
+
+echo "Running uaa:${UAA} docker image with ${MODE}..."
+echo " "
 echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
 echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
