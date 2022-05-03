@@ -25,13 +25,6 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/deploy-uaa
-<<<<<<< HEAD
-
-extract-uaa: 4.24.0.tar.gz
-	@tar xvfz 4.24.0.tar.gz
-	@mv uaa-4.24.0 uaa
-=======
->>>>>>> Use Case 9 Use custom scopes
 
 stop-uaa:
 	@docker kill uaa
@@ -112,12 +105,6 @@ open: ## Open the browser and login the user with the JWT Token. e.g: make open 
 build-jms-client: ## build jms client docker image
 	@(docker build jms-client/. -t jms-client)
 
-<<<<<<< HEAD
-build-uaa: download-uaa ## build uaa docker image
-	@(docker build -f Dockerfile-for-uaa . -t uaa:4.24.0)
-
-=======
->>>>>>> Use Case 9 Use custom scopes
 start-jms-publisher: ## start jms publisher that sends 1 message
 	@uaac token client get jms_producer -s jms_producer_secret
 	@./bin/run-jms-client jms_producer pub
