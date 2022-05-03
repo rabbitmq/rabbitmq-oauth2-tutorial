@@ -2,8 +2,11 @@
 
 CLIENT_ID=${1:?First parameter must be client id}
 
-token=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
-url="amqp://ignore:$token@rabbitmq:5672/%2F"
+if [  -z "$TOKEN" ]; then
+  echo "Getting token from UAA ..."
+  TOKEN=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
+fi
+url="amqp://:$TOKEN@rabbitmq:5672/%2F"
 
 shift 1
 

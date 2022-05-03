@@ -1,0 +1,10 @@
+{
+  "sub" : "producer",
+  "scope": [
+    "api://rabbitmq:producer",
+    "api://rabbitmq:Administrator"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "extra_scope": [
+    "api://rabbitmq:producer",
+    "api://rabbitmq:Administrator.All"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}

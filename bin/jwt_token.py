@@ -7,17 +7,17 @@ import json
 from datetime import datetime
 from datetime import timedelta
 
-key_name = sys.argv[1]
-private_key = open(sys.argv[2], "r").read()
-public_key = open(sys.argv[3], "r").read()
-client_id = sys.argv[4]
+jwt_file_name = key_name = sys.argv[1]
+key_name = sys.argv[2]
+private_key = open(sys.argv[3], "r").read()
+public_key = open(sys.argv[4], "r").read()
+client_id = sys.argv[5]
 
 JWT = """{
   "scope": [
     "rabbitmq.write:*/*/*",
     "rabbitmq.configure:*/*/*",
     "rabbitmq.read:*/*/*"
-
   ],
   "extra_scope": "rabbitmq.tag:management",
   "aud": [
@@ -25,7 +25,10 @@ JWT = """{
   ]
 }"""
 
-decoded_jwt = json.loads(JWT)
+with open(jwt_file_name) as json_file:
+    decoded_jwt = json.load(json_file)
+
+#decoded_jwt = json.loads(JWT)
 #decoded_jwt["client_id"] = client_id
 #decoded_jwt["cid"] = client_id
 #decoded_jwt["sub"] = client_id

@@ -3,7 +3,7 @@
 # switch to admin so taht we can perform the next operations
 uaac context admin
 
-echo "Creating groups ...."
+echo "Creating groups for RabbitMQ supported scopes...."
 uaac group add "rabbitmq.read:*/*"
 uaac group add "rabbitmq.write:*/*"
 uaac group add "rabbitmq.configure:*/*"
@@ -12,8 +12,16 @@ uaac group add "rabbitmq.tag:monitoring"
 uaac group add "rabbitmq.tag:administrator"
 uaac group add "rabbitmq.write:%2F/*"
 
+echo "Creating groups for RabbitMQ supported scope's aliases ...."
+uaac group add "api://rabbitmq:read:*/*"
+uaac group add "api://rabbitmq:write:*/*"
+uaac group add "api://rabbitmq:configure:*/*"
+uaac group add "api://rabbitmq:management"
+uaac group add "api://rabbitmq:administrator"
+
 echo "Creating users ...."
 uaac user add rabbit_admin -p rabbit_admin --email rabbit_admin@example.com
+uaac user add rabbit_admin2 -p rabbit_admin2 --email rabbit_admin2@example.com
 uaac user add rabbit_monitor -p rabbit_monitor --email rabbit_monitor@example.com
 
 uaac member add "rabbitmq.read:*/*" rabbit_admin
@@ -21,27 +29,66 @@ uaac member add "rabbitmq.write:*/*" rabbit_admin
 uaac member add "rabbitmq.configure:*/*" rabbit_admin
 uaac member add "rabbitmq.tag:administrator" rabbit_admin
 
+uaac member add "api://rabbitmq:read:*/*" rabbit_admin2
+uaac member add "api://rabbitmq:write:*/*" rabbit_admin2
+uaac member add "api://rabbitmq:configure:*/*" rabbit_admin2
+uaac member add "api://rabbitmq:management" rabbit_admin2
+
 uaac member add "rabbitmq.tag:monitoring" rabbit_monitor
 
 echo "Adding rabbit_client OAuth client used to issue tokens for users and applications"
 echo "Hit enter when prompted for client secret. It should not have password"
-uaac client add rabbit_client --name rabbit_client \
+uaac client add rabbit_client_implicit --name rabbit_client_implicit \
   --scope 'rabbitmq.*,openid' \
-  --authorized_grant_types password,implicit,refresh_token  \
+  --authorized_grant_types implicit  \
   --authorities 'uaa.resource,rabbitmq' \
   --redirect_uri 'http://localhost:15672'
+
+uaac client add rabbit_client_code --name rabbit_client_code \
+  --scope 'rabbitmq.*,openid,profile' \
+  --authorized_grant_types authorization_code  \
+  --authorities 'uaa.resource,rabbitmq' \
+  --redirect_uri 'http://localhost:15672' \
+  --secret rabbit_client_code
 
 uaac client add mgt_api_client --name mgt_api_client \
     --authorized_grant_types client_credentials  \
     --authorities 'rabbitmq.tag:monitoring' \
     --secret mgt_api_client
-    
+
+uaac client add mgt_api_client_2 --name mgt_api_client_2 \
+    --authorized_grant_types client_credentials  \
+    --authorities 'api://rabbitmq:management' \
+    --secret mgt_api_client_2
+
 echo "Adding Oauth client for producer and consumer apps"
 uaac client add producer --name producer \
-    --authorities "rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/* rabbitmq.configure:*/jms.durable.queues rabbitmq.write:*/jms.durable.queues rabbitmq.read:*/jms.durable.queues" \
+    --authorities "rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/*" \
     --authorized_grant_types client_credentials \
     --secret producer_secret
 uaac client add consumer --name consumer \
-    --authorities "rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-* rabbitmq.write:*/jms.durable.queues" \
+    --authorities "rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-* " \
     --authorized_grant_types client_credentials \
     --secret consumer_secret
+
+uaac client add jms_producer --name jms_producer \
+    --authorities "rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/* rabbitmq.configure:*/jms.durable.queues rabbitmq.write:*/jms.durable.queues rabbitmq.read:*/jms.durable.queues" \
+    --authorized_grant_types client_credentials \
+    --secret jms_producer_secret
+uaac client add jms_consumer --name jms_consumer \
+    --authorities "rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-* rabbitmq.write:*/jms.durable.queues" \
+    --authorized_grant_types client_credentials \
+    --secret jms_consumer_secret
+
+uaac client add producer_with_roles --name producer_with_roles \
+    --authorities "rabbitmq.*,api://rabbitmq:producer,api://rabbitmq:Administrator" \
+    --authorized_grant_types client_credentials \
+    --secret producer_with_roles_secret
+uaac client add consumer_with_roles --name consumer_with_roles \
+    --authorities "rabbitmq.* api://rabbitmq:Read.All api://rabbitmq:Configure.All api://rabbitmq:Write.All" \
+    --authorized_grant_types client_credentials \
+    --secret consumer_with_roles_secret
+
+
+#uaac curl -H "Content-Type: application/json" -X POST /oauth/clients \
+# -d '{"autoapprove" : true, "client_id" : "test","client_secret": "test_secret","name" : "test", "resource_ids" :  ["rabbitmq","none"] ,"authorized_grant_types" : [ "client_credentials" ],"scope" :  "api://rabbitmq:producer" ,"authorities" : "api://rabbitmq:producer" }'

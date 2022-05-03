@@ -23,9 +23,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Case 6 Use multiple asymmetrical signing keys](#use-case-6-use-multiple-asymmetrical-signing-keys)
 	- [Use Case 7 MQTT protocol](#use-case-7-mqtt-protocol)
 	- [Use Case 8 Use external OAuth server https://auth0.com/](#use-case-8-use-external-oauth-server-httpsauth0com)
-	- [Use Case 9 Federation & Shovel](#use-case-9-federation-shovel)
-	- [Use Case 10 Use external OAuth server keycloack](#use-case-10-use-external-oauth-server-keycloack)
-
+	- [Use Case 9 Use custom scopes](#use-case-9-use-custom-scopes)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -69,34 +67,20 @@ There are two ways to set up OAuth2 in RabbitMQ. One uses symmetrical signing ke
 asymmetrical signing keys. The Authorization server is who digitally signs the JWT tokens and RabbitMQ
 has to be configured to validate any of the two types of digital signatures.
 
-If you want to test Oauth2 use cases that we will see in the next sections using
-symmetrical keys, follow the steps on the next section.  Instead follow the steps
-on the next section called [Use Asymmetrical digital singing keys](#use-asymmetrical-digital-singing-keys)
-
-#### Use Symmetrical digital singing keys
-
-Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
-
-  1. `make build-uaa` to build a docker image of UAA
-  2. `MODE=symmetric_key make start-uaa` to get UAA server running
-  3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
-  4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
-		> *IMPORTANT*: hit enter when prompted for client secret.
-
-  5. `MODE=symmetric_key make start-rabbitmq` to start RabbitMQ server
-
+Given that asymmetrical keys is the most widely used option, we are going to focus on how to
+configure RabbitMQ with them.
 
 #### Use Asymmetrical digital singing keys
 
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
-  1. `make build-uaa` to build a docker image of UAA if you have not run this command before
+  1. Build UAA docker image if you have not done it yet (see instructions in the previous section)
   2. `make start-uaa` to get UAA server running
   3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
   4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  5. `make start-rabbitmq` to start RabbitMQ server
+  5. `MODE=symmetric_key make start-rabbitmq` to start RabbitMQ server
 
 
 ### Use Case 1 Management user accessing the Management UI
@@ -148,7 +132,7 @@ UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a H
 
 The following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
 ```
-make curl url=http://broker:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
+make curl url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
 
 
@@ -262,8 +246,9 @@ To test this feature we are going to build a token, sign it and use it to hit on
 The command below allows us to hit any management endpoint, in this case it is the `overview`, with a token.
 
 ```
-make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token legacy-token-key private.pem public.pem)
+make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token scope-and-extra-scope.json legacy-token-key private.pem public.pem)
 ```
+
 
 We use the python script `bin/jwt_token.py` to build the minimal JWT token possible that RabbitMQ is able to
 validate which is:
@@ -300,9 +285,9 @@ Adding UAA signing key "legacy-token-2-key" filename: "/conf/public-2.pem"
 And then we issue a token using the corresponding private key and use it to access the management endpoint `/api/overview`.
 
 ```
-make curl-with-token url=http://localhost:15672/api/overview token=$(bin/jwt_token legacy-token-2-key private-2.pem public-2.pem)
+make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token scope-and-extra-scope.json legacy-token-2-key private-2.pem public-2.pem)
 ```
-> jwt_token searches for private and public key files under `conf` folder.
+> jwt_token searches for private and public key files under `conf` folder and jwt files under `jwts`.
 
 ### Use Case 7 MQTT protocol
 
@@ -312,8 +297,9 @@ This scenario explores the use case where we authenticate with a JWT token to Ra
 
 This is no different than using AMQP or JMS protocols, all that matters is to pass an empty username and a JWT token as password.
 However, **what it is really different** is how we encode the permissions. In this use case we are going to proceed as we did it in the previous use case where we handcrafted the JWT token rather than requesting it to UAA. Here is the the scopes required to publish
-a message to a mqtt topic.
+a message to a mqtt topic ([scopes-for-mqtt.json](jwts/scopes-for-mqtt.json))
 ```
+{
   "scope": [
     "rabbitmq.write:*/*/*",
     "rabbitmq.configure:*/*/*",
@@ -331,9 +317,9 @@ a message to a mqtt topic.
 it is any "routing-key" because that is translated to a topic/queue.
 
 We are going to publish a mqtt message by running the following command. If you have not run any of the
-previous use cases, you need to launch rabbitmq first like this `MODE=asymmetric_key make start-uaa`.
+previous use cases, you need to launch rabbitmq first like this `make start-uaa`.
 ```
-make start-mqtt-publish token=$(bin/jwt_token legacy-token-key private.pem public.pem)
+make start-mqtt-publish TOKEN=$(bin/jwt_token scopes-for-mqtt.json legacy-token-key private.pem public.pem)
 ```
 
 > IMPORTANT: If you try to access the management ui and authenticate with UAA using rabbit_admin you
@@ -370,15 +356,188 @@ We are done setting things up in Oauth0, now we can claim a token like this:
 ```
 
 
-### Use Case 9 Federation & Shovel
 
-Federation and Shovel are two AMQP clients running within RabbitMQ server. These clients do not support OAuth2
-only username/password or mutual TLS. Therefore, if we want to use Federation and/or Shovel to transfer messages
-between two RMQ Cluster we need to have at least another authentication backend in addition to Oauth2.
+### Use Case 9 Use custom scopes
 
-### Use Case 10 Use external OAuth server keycloack
+In this use case we are going to demonstrate how to configure RabbitMQ to handle
+*custom scopes*. But what are *custom scopes*? They are any
+scope whose format is not compliant with RabbitMQ format. For instance, `api://rabbitmq:Read.All`
+is one of the custom scopes we will use in this use case.
 
-TODO
+#### How to configure RabbitMQ with custom scope mapping
+
+Since RabbitMQ `3.10.0-rc.6`, we are able to map a custom scope to one or many RabbitMQ scopes.
+See below a sample RabbitMQ configuration where we map `api://rabbitmq:Read.All`
+custom scope to `rabbitmq.read:*/*` RabbitMQ scope.
+```
+{rabbitmq_auth_backend_oauth2, [
+ ...,
+	{scope_aliases, #{
+		<<"api://rabbitmq:Read.All">>      => [<<"rabbitmq.read:*/*">>],
+	  ...
+	},
+	...
+]}
+```
+
+Additionally, we can map a custom scope to many RabbitMQ scopes. For instance below we
+are mapping the role `api://rabbitmq:producer` to 3 RabbitMQ scopes which grants
+`read`, `write` and `configure` access on any resource and on any vhost:
+```
+{rabbitmq_auth_backend_oauth2, [
+ ...,
+
+	{scope_aliases, #{
+		<<"api://rabbitmq:producer">> => [
+			<<"rabbitmq.read:*/*">>,
+			<<"rabbitmq.write:*/*">>,
+			<<"rabbitmq.configure:*/*">>
+		]
+	}},
+	...
+]}
+```
+
+#### How custom scopes are carried in JWT tokens
+
+If we do not configure RabbitMQ OAuth2 plugin with `extra_scopes_source`, RabbitMQ
+expects the `scope` token's field to carry *custom scopes*. For instance, below we have a sample JWT
+token where the custom scopes are in the `scope` field :
+```
+{
+  "sub": "producer",
+  "scope": [
+    "api://rabbitmq:producer",
+    "api://rabbitmq:Administrator"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}
+```
+
+Now, let's say we do configure RabbitMQ OAuth2 plugin with `extra_scopes_source` as shown below:
+```
+  {rabbitmq_auth_backend_oauth2, [
+    {resource_server_id, <<"rabbitmq">>},
+    {extra_scopes_source, <<"roles">>},
+    ...
+```
+
+With this configuration, RabbitMQ expects *custom scopes* in the field `roles` and
+RabbitMQ's compliant scopes in the `scope` field as shown below. Never put *custom scopes* in the
+`scope` field if we have configured RabbitMQ with `extra_scopes_source`.
+```
+{
+  "sub": "rabbitmq-client-code",
+  "scope": [
+    "rabbitmq.write:*/*/*",
+    "rabbitmq.configure:*/*/*",
+    "rabbitmq.read:*/*/*"
+  ],
+  "roles": "api://rabbitmq:Administrator.All",
+  "aud": [
+    "rabbitmq"
+  ]
+}
+```
+
+#### UAA configuration
+
+To demonstrate this new capability we have configured UAA with two Oauth2 clients. One
+called `producer_with_roles` with the *custom scope* `api://rabbitmq:producer` and `consumer_with_roles` with
+`api://rabbitmq:Read:All,api://rabbitmq:Configure:All,api://rabbitmq:Write:All`.
+> we are granting configure and write permissions to the consumer because we have configured perf-test to declare
+resources regardless whether it is a producer or consumer application.
+
+These two uaac commands declare the two oauth2 clients above. We are adding an extra scope called `rabbitmq.*` so
+that UAA populates the JWT claim `aud` with the value `rabbitmq`. RabbitMQ expects `aud` to match the value we
+configure RabbitMQ with in the `resource_server_id` field.
+
+```
+uaac client add producer_with_roles --name producer_with_roles \
+    --authorities "rabbitmq.*,api://rabbitmq:producer,api://rabbitmq:Administrator" \
+    --authorized_grant_types client_credentials \
+    --secret producer_with_roles_secret
+uaac client add consumer_with_roles --name consumer_with_roles \
+    --authorities "rabbitmq.* api://rabbitmq:read:All" \
+    --authorized_grant_types client_credentials \
+    --secret consumer_with_roles_secret
+```
+
+
+#### RabbitMQ configuration
+
+There are two configuration files ready to use to launch RabbitMQ:
+- [conf/asymmetric_key/rabbitmq-scope-aliases.config](conf/asymmetric_key/rabbitmq-scope-aliases.config) - which configures scope mappings.
+- [conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config](conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config) - which configures `extra_scopes_source` and scope mappings.
+
+
+#### Launch RabbitMQ with custom scopes in scope field
+
+To launch RabbitMq with scope mappings and with *custom scopes* in the `scope` field we run the following command:
+```
+CONFIG=rabbitmq-scope-aliases.config make start-rabbitmq
+```
+> This command will stop RabbitMQ if it is already running
+
+
+Launch a producer application with the client `producer_with_roles`
+```
+make start-perftest-producer PRODUCER=producer_with_roles
+```
+> To check the logs : docker logs producer_with_roles -f  
+
+Launch a consumer application with the client `consumer_with_roles`
+```
+make start-perftest-consumer CONSUMER=consumer_with_roles
+```
+> To check the logs : docker logs consumer_with_roles -f  
+
+Access management api with the client `producer_with_roles`
+```
+make curl url=http://localhost:15672/api/overview client_id=producer_with_roles secret=producer_with_roles_secret
+```
+
+To stop the perf-test applications run :
+```
+make stop-perftest-producer PRODUCER=producer_with_roles
+make stop-perftest-consumer CONSUMER=consumer_with_roles
+```
+
+#### Launch RabbitMQ with custom scopes in extra scope field
+
+To launch RabbitMq with scope mappings and with *custom scopes* in the `extra_scope` we run the following command:
+```
+CONFIG=rabbitmq-scope-aliases-and-extra-scope.config make start-rabbitmq
+```
+> This command will stop RabbitMQ if it is already running
+
+We cannot use UAA to issue the tokens because we cannot configure UAA to use a custom field for scopes.
+Instead we are going to issue the token ourselves with the command `bin/jwt_token`.
+
+Launch a producer application with the token [producer-role-in-scope.json](jwts/producer-roles-in-extra-scope.json):
+```
+make start-perftest-producer-with-token PRODUCER=producer_with_roles TOKEN=$(bin/jwt_token producer-role-in-extra-scope.json legacy-token-key private.pem public.pem)
+```
+> To check the logs :  docker logs producer_with_roles -f
+
+Launch a consumer application with the token [consumer-roles-in-extra-scope.json](jwts/consumer-roles-in-extra-scope.json):
+```
+make start-perftest-consumer-with-token CONSUMER=consumer_with_roles TOKEN=$(bin/jwt_token consumer-roles-in-extra-scope.json legacy-token-key private.pem public.pem)
+```
+
+Access management api with the token [producer-roles-in-extra-scope.json](jwts/producer-roles-in-extra-scope.json)
+```
+make curl-with-token URL="http://localhost:15672/api/overview" TOKEN=$(bin/jwt_token producer-roles-in-extra-scope.json legacy-token-key private.pem public.pem)
+```
+
+To stop the perf-test applications run :
+```
+make stop-perftest-producer PRODUCER=producer_with_roles
+make stop-perftest-consumer CONSUMER=consumer_with_roles
+```
+
 
 ## Understand the environment
 
@@ -435,6 +594,11 @@ To check that UAA is running fine:
 ```
 curl -k  -H 'Accept: application/json' http://localhost:8080/uaa/info | jq .
 ```
+
+Currently RabbitMQ Management plugin does not support latest version of UAA. That is
+why in order to run the use cases we use the image built from the folder `uaa-4.24`. This has to do
+with the javascript library that comes with the management plugin.
+
 
 ### UAA client
 

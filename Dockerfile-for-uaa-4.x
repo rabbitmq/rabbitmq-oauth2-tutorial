@@ -2,7 +2,7 @@
 # STEP 1 build executable binary
 ############################
 
-FROM openjdk:11
+FROM openjdk:8
 
 WORKDIR /uaa
 

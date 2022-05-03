@@ -1,0 +1,10 @@
+{
+  "extra_scope": [
+    "api://rabbitmq:Read.All",
+    "api://rabbitmq:Configure.All",
+    "api://rabbitmq:Write.All"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}

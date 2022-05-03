@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+  RabbitMQ <span id="user-id"></span>
+  with scopes <span id="user-scopes"></span>
+  <button id="logout">Logout</button>
+
+  <script src="/scripts/oidc-client-ts/oidc-client-ts.js" ></script>
+  <script src="./common.js"></script>
+  <script type="text/javascript">
+    isLoggedIn().then( status => {
+      if (!status.loggedIn) redirectToLogin()
+      else {
+        document.getElementById("user-id").innerHTML=status.user.profile["user_name"]
+        document.getElementById("user-scopes").innerHTML=status.user.scope
+        document.getElementById("logout").addEventListener("click", initiateLogout, false)
+      }
+    });
+  </script>
+
+</body>
+</html>
