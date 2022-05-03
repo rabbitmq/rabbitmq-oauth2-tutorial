@@ -74,13 +74,13 @@ configure RabbitMQ with them.
 
 Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
 
-  1. Build UAA docker image if you have not done it yet (see instructions in the previous section)
+  1. Build UAA docker image if you have not done it yet (see instructions in the previous section)  
+	   `make build-uaa`
   2. `make start-uaa` to get UAA server running
-  3. `docker logs uaa -f` and wait until you see it `> :cargoRunLocal`. It takes time to start.
-  4. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+  3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  5. `MODE=symmetric_key make start-rabbitmq` to start RabbitMQ server
+  4. `make start-rabbitmq` to start RabbitMQ server
 
 
 ### Use Case 1 Management user accessing the Management UI
@@ -172,16 +172,14 @@ To launch the consumer application invoke the following command:
 ```
 make start-perftest-consumer
 ```
+> To check the logs : docker logs consumer -f
 
 To launch the producer application invoke the following command:
 ```
 make start-perftest-producer
 ```
+> To check the logs : docker logs producer -f
 
-To launch a Spring boot application as if it were running in CloudFoundry (i.e `VCAP_SERVICES` provides the RabbitMQ credentials including the auth-client).
-```
-make start-spring-demo-oauth-cf
-```
 
 To stop all the applications call the following command:
 ```

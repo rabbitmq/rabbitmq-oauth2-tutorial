@@ -26,6 +26,9 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/deploy-uaa
 
+build-uaa: ## Build uaa image
+	@(cd uaa-latest; make build-uaa; cd ..)
+	
 stop-uaa:
 	@docker kill uaa
 
@@ -91,7 +94,7 @@ start-spring-demo-oauth-cf: demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar
 	@./bin/run-demo-oauth-cf consumer consumer_secret
 
 stop-all-apps: ## Stop all appications we can start with this Makefile
-	@docker kill consumer producer spring-demo-oauth 2>/dev/null
+	@docker kill consumer producer 2>/dev/null
 
 pivotalrabbitmq/perf-test:latest
 

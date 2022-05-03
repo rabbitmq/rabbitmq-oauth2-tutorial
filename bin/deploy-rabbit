@@ -3,14 +3,9 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-asymmetric_key}
-<<<<<<< HEAD
-=======
 CONFIG=${CONFIG:-rabbitmq.config}
 IMAGE_TAG=${IMAGE_TAG:-3.10.0-rc.6-management}
 IMAGE=${IMAGE:-rabbitmq}
-#IMAGE_TAG=${IMAGE_TAG:-c1b6d03ae578c00141d152894fc7a1e45100b328-otp-max}
-#IMAGE=pivotalrabbitmq/rabbitmq:
->>>>>>> Use Case 9 Use custom scopes
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
