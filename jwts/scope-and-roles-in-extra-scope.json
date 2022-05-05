@@ -1,11 +1,6 @@
 {
   "sub": "rabbitmq-client-code",
-  "scope": [
-    "rabbitmq.write:*/*/*",
-    "rabbitmq.configure:*/*/*",
-    "rabbitmq.read:*/*/*"
-  ],
-  "extra_scope": "api://rabbitmq:Administrator.All",
+  "extra_scope": ["api://rabbitmq:Administrator"],
   "aud": [
     "rabbitmq"
   ]

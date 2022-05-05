@@ -1,7 +1,7 @@
 {
   "extra_scope": [
     "api://rabbitmq:producer",
-    "api://rabbitmq:Administrator.All"
+    "api://rabbitmq:Administrator"
   ],
   "aud": [
     "rabbitmq"

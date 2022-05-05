@@ -423,16 +423,10 @@ Now, let's say we do configure RabbitMQ OAuth2 plugin with `extra_scopes_source`
 ```
 
 With this configuration, RabbitMQ expects *custom scopes* in the field `roles` and
-RabbitMQ's compliant scopes in the `scope` field as shown below. Never put *custom scopes* in the
-`scope` field if we have configured RabbitMQ with `extra_scopes_source`.
+the `scope` field is ignored.
 ```
 {
   "sub": "rabbitmq-client-code",
-  "scope": [
-    "rabbitmq.write:*/*/*",
-    "rabbitmq.configure:*/*/*",
-    "rabbitmq.read:*/*/*"
-  ],
   "roles": "api://rabbitmq:Administrator.All",
   "aud": [
     "rabbitmq"
@@ -471,7 +465,7 @@ There are two configuration files ready to use to launch RabbitMQ:
 - [conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config](conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config) - which configures `extra_scopes_source` and scope mappings.
 
 
-#### Launch RabbitMQ with custom scopes in scope field
+#### Demo 1 - Launch RabbitMQ with custom scopes in scope field
 
 To launch RabbitMq with scope mappings and with *custom scopes* in the `scope` field we run the following command:
 ```
@@ -503,7 +497,7 @@ make stop-perftest-producer PRODUCER=producer_with_roles
 make stop-perftest-consumer CONSUMER=consumer_with_roles
 ```
 
-#### Launch RabbitMQ with custom scopes in extra scope field
+#### Demo 2 - Launch RabbitMQ with custom scopes in extra scope field
 
 To launch RabbitMq with scope mappings and with *custom scopes* in the `extra_scope` we run the following command:
 ```

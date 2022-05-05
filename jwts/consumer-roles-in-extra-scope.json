@@ -1,4 +1,5 @@
 {
+  
   "extra_scope": [
     "api://rabbitmq:Read.All",
     "api://rabbitmq:Configure.All",
