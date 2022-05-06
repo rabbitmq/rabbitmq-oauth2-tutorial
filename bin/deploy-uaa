@@ -3,7 +3,7 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-asymmetric_key}
-UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest} 
+UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"

@@ -26,9 +26,12 @@ setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/deploy-uaa
 
+start-keycloak: ## Start keycloak
+	@./bin/deploy-keycloak
+
 build-uaa: ## Build uaa image
 	@(cd uaa-latest; make build-uaa; cd ..)
-	
+
 stop-uaa:
 	@docker kill uaa
 
