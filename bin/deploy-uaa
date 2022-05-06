@@ -3,12 +3,10 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-asymmetric_key}
-UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest}  # 4.24.0
+UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest} 
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"
-
-cp ${SCRIPT}/../conf/${MODE}/uaa-${UAA_IMAGE_TAG}.yml ${SCRIPT}/../conf/${MODE}/uaa.yml
 
 echo "Running uaa:${UAA_IMAGE_TAG} docker image with ${MODE}..."
 
@@ -19,8 +17,3 @@ docker run \
 		--mount type=bind,source=${SCRIPT}/../conf/${MODE}/uaa,target=/etc/uaa \
 		--env JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
     uaa:${UAA_IMAGE_TAG}
-
-
-echo " "
-echo "Monitor the logs (docker logs uaa -f). UAA will be ready when you see 'Task :cargoRunLocal' "
-echo "Once UAA is ready; run 'make setup-users-and-tokens' before starting any application and/or rabbitmq"
