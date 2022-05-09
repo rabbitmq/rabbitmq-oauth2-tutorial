@@ -33,7 +33,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [About Users and Clients](#about-users-and-clients)
 	- [About Permissions](#about-permissions)
 	- [About signing key required to configure RabbitMQ](#about-signing-key-required-to-configure-rabbitmq)
-	- [About rotating UAA signing key](#about-rotating-uaa-signing-key)
+	- [About rotating JWT signing key](#about-rotating-uaa-signing-key)
 	- [Understanding how an AMQP application access RabbitMQ using Oauth2](#understanding-how-an-amqp-application-access-rabbitmq-using-oauth2)
 	- [AMQP access via Spring and Spring Cloud Services using OAuth Client Credentials grant type](#amqp-access-via-spring-and-spring-cloud-services-using-oauth-client-credentials-grant-type)
 	- [Understanding Access tokens and how RabbitMQ uses it](#understanding-access-tokens-and-how-rabbitmq-uses-it)
@@ -271,7 +271,7 @@ This scenario explores the use case where JWT tokens may be signed by different 
 There are 2 ways to configure RabbitMQ with multiple signing keys:
 - We can either **statically** configure them via `rabbitmq.conf` as shown in the [plugin documentation page](https://github.com/rabbitmq/rabbitmq-server/tree/master/deps/rabbitmq_auth_backend_oauth2#variables-configurable-in-rabbitmqconf).
 - Or we can do it **dynamically**, i.e, add signing keys while RabbitMQ is running and without having to
-restart it. This alternative is explained in more detail in the section [About rotating UAA signing key](#about-rotating-uaa-signing-key).
+restart it. This alternative is explained in more detail in the section [About rotating JWT signing key](#about-rotating-jwt-signing-key).
 However, we are going to demonstrate it here as well.
 
 First we add a second signing key called `legacy-token-2-key` whose public key is `conf/public-2.pem`:
@@ -530,6 +530,40 @@ make stop-perftest-producer PRODUCER=producer_with_roles
 make stop-perftest-consumer CONSUMER=consumer_with_roles
 ```
 
+### Use Case 10 Support Key Cloak
+
+#### Deploy Key Cloak
+First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+```
+make start-keycloak
+```
+And add JWT [signing key](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers/rsa/66a592ec-8657-4f53-8870-1e1693ff266c) used by **Key Cloak**:
+```
+docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk --pem-file=conf/public.pem
+```
+> Do not mind the fact that the command is called `add_uaa_key`, you can read it as `add_jwt_key`
+
+#### Start RabbitMQ
+
+Next, launch RabbitMQ with the configuration of your choice as we have learnt from previous use cases.
+With the most basic setup, launch it as follows:
+```
+CONFIG=keycloak/rabbitmq.conf make start-rabbitmq
+```
+
+#### Access Management api
+
+Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8080/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
+```
+	make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
+```
+
+#### Access AMQP protocol
+
+```
+make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
+```
+
 
 ## Understand the environment
 
@@ -674,9 +708,9 @@ kid: legacy-token-key
 > `curl 'http://localhost:8080/uaa/token_key' -i  -H 'Accept: application/json' -u admin:adminsecret`
 
 
-### About rotating UAA signing key
+### About rotating JWT signing key
 
-When UAA rotates the signing key we need to reconfigure RabbitMQ with that key. We don't need to edit the configuration and restart RabbitMQ.
+When UAA -or any other OAuth2 server- rotates the signing key we need to reconfigure RabbitMQ with that key. We don't need to edit the configuration and restart RabbitMQ.
 
 Instead, thru the `rabbitmqctl add_uaa_key` command we can add more keys. This is more or less what could happen.
 
@@ -694,7 +728,6 @@ Instead, thru the `rabbitmqctl add_uaa_key` command we can add more keys. This i
 One way to keep RabbitMQ up-to-date is to periodically check with [token keys endpoint](https://docs.cloudfoundry.org/api/uaa/version/4.28.0/index.html#token-keys) (using the `E-tag` header). When the list of active tokens key has changed, we retrieve them and add them using `rabbitmqctl add_uaa_key`.
 
 > We are probably missing the ability to remove deprecated/obsolete signing keys. The [function](https://github.com/rabbitmq/rabbitmq-auth-backend-oauth2/blob/master/src/uaa_jwt.erl) is there so we could potentially invoke it via `rabbitmqctl eval` command.
-
 
 
 ### Understanding how an AMQP application access RabbitMQ using Oauth2
@@ -947,6 +980,42 @@ These are the fields relevant for RabbitMQ:
  zid: uaa
  aud: scim clients uaa admin
  ```
+
+## Notes about setting up KeyCloak
+
+### Configure JWT signing Keys
+
+At the realm level, we go to `Keys > Providers` tab and create one of type `rsa` and we enter the
+private key and certificate of the public key. In this repository we do not have yet the certificate
+for the public key but it is easy to generate. Give it priority `101` or greater than the rest of
+available keys so that it is picked up when we request a token.
+
+IMPORTANT: We cannot hard code the **kid** hence we have to add the key to rabbitmq via the command
+```
+docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk --pem-file=conf/public.pem
+```
+or we have to modify the RabbitMQ configuration so that it says `Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk`
+rather than `legacy-token-key`.
+
+### Configure Client
+
+For backend applications which uses **Client Credentials flow** we create a **Client** with:
+- **Access Type** : `confidential`
+- With all the other flows disabled: Standard Flow, Implicit Flow, Direct Access Grants
+- With **Service Accounts Enabled** on. If it is not enabled we do not have the tab `Credentials`
+- In tab `Credentials` we have the client id secret
+
+
+### Configure Client scopes
+
+> *Default Client Scope* are scopes automatically granted to every token. Whereas *Optional Client Scope* are
+scopes which are only granted if they are explicitly requested during the authorization/token request flow.
+
+
+### Include appropriate aud claim
+
+We must configure a **Token Mapper** of type **Hardcoded claim** with the value of rabbitmq's *resource_server_id**.
+We can configure **Token Mapper** either to a **Client scope** or to a **Client**.
 
 ## Findings
 
