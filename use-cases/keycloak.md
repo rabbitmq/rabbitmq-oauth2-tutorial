@@ -30,13 +30,7 @@ management api and `producer` to access via AMQP protocol.
 
 ## Start RabbitMQ
 
-Next, launch RabbitMQ configured to use **Key Cloak** as its Oauth2 server:
-```
-CONFIG=keycloak/rabbitmq.conf make start-rabbitmq
-```
-> CONFIG is relative to conf folder
-
-**NOTE**: To run RabbitMQ directly from source:
+Supporting new types of OAuth 2 servers is currently under development. Therefore, we need to run RabbitMQ directly from source:
 1. git clone rabbitmq/rabbitmq-server
 2. git checkout oidc-integration
 3. `gmake run-broker PLUGINS="rabbitmq_management rabbitmq_auth_backend_oauth2" RABBITMQ_CONFIG_FILE=<root folder of the tutorial>/conf/keycloak/rabbitmq.config`
