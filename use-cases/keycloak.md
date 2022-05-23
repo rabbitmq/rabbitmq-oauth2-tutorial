@@ -11,16 +11,13 @@ First, deploy **Key Cloak**. It comes preconfigured with all the required scopes
 ```
 make start-keycloak
 ```
-And add JWT [signing key](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers/rsa/66a592ec-8657-4f53-8870-1e1693ff266c) used by **Key Cloak**:
-```
-docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk --pem-file=conf/public.pem
-```
-> Do not mind the fact that the command is called `add_uaa_key`, you can read it as `add_jwt_key`
+**Key Cloak** comes configured with its own signing key. And the [rabbitmq.config](conf/keycloak/rabbitmq.config)
+used by `make start-keycloak` is also configured with the same signing key.
+
 
 ## Start RabbitMQ
 
-Next, launch RabbitMQ with the configuration of your choice as we have learnt from previous use cases.
-With the most basic setup, launch it as follows:
+Next, launch RabbitMQ configured to use **Key Cloak** as its Oauth2 server:
 ```
 CONFIG=keycloak/rabbitmq.conf make start-rabbitmq
 ```
@@ -42,3 +39,6 @@ make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/t
 ```
 
 ## Access Management UI
+
+Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
+Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
