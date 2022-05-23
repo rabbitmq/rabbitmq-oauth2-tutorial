@@ -1,4 +1,9 @@
-# Use KeyCloak as OAuth 2.0 nserver
+# Use KeyCloak as OAuth 2.0 server
+
+We are going to test 3 OAuth flows:
+1. Access management ui via a browser
+2. Access management rest api
+3. Access AMQP protocol 
 
 ## Prerequisites to follow this guide
 
@@ -50,3 +55,8 @@ make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/t
 
 Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
+
+
+## Stop keycloak
+
+`make stop-keycloak`
