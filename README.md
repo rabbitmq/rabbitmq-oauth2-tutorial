@@ -15,19 +15,19 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
 - [OAuth2 plugin in action](#oauth2-plugin-in-action)
 	- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
-- [Use OAuth 2.0 to access RabbitMQ]
+- Use OAuth 2.0 to access RabbitMQ
 	- [Management user accessing the Management UI](#management-user-accessing-the-management-ui)
 	- [Monitoring agent accessing management REST api](#monitoring-agent-accessing-management-rest-api)
 	- [AMQP protocol](#amqp-protocol)
 	- [JMS protocol](#jms-protocol)
 	- [MQTT protocol](#mqtt-protocol)
-- [Use advanced OAuth 2.0 configuration]
-	- [Use Case 5 Use custom scope field](#use-custom-scope-field)
-	- [Use Case 6 Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
-	- [Use Case 9 Use custom scopes](#use-custom-scopes)
-- [Use different OAuth 2.0 servers]
+- Use advanced OAuth 2.0 configuration
+	- [Use custom scope field](#use-custom-scope-field)
+	- [Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
+	- [Use custom scopes](#use-custom-scopes)
+- Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
-	- [https://auth0.com/](#use-cases/oauth0.md)
+	- [https://auth0.com/](use-cases/oauth0.md)
 
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
