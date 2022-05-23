@@ -32,8 +32,11 @@ start-keycloak: ## Start keycloak
 build-uaa: ## Build uaa image
 	@(cd uaa-latest; make build-uaa; cd ..)
 
-stop-uaa:
+stop-uaa: ## Stop uaa
 	@docker kill uaa
+
+stop-keycloak: ## Stop keycloak
+	@docker kill keycloak
 
 start-rabbitmq:  ## Run RabbitMQ Server
 	@./bin/deploy-rabbit
