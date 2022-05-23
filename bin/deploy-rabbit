@@ -2,16 +2,16 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-MODE=${MODE:-asymmetric_key}
 CONFIG=${CONFIG:-rabbitmq.config}
 IMAGE_TAG=${IMAGE_TAG:-3.10.0-rc.6-management}
 IMAGE=${IMAGE:-rabbitmq}
+OAUTH2_SERVER=${OAUTH2_SERVER:-uaa}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
 echo "running RabbitMQ with mode $MODE"
 docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 \
-    -v $SCRIPT/../conf/${MODE}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro \
+    -v $SCRIPT/../conf/${OAUTH2_SERVER}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro \
     -v $SCRIPT/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \
     -v $SCRIPT/../conf:/conf ${IMAGE}:${IMAGE_TAG}

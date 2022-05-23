@@ -2,18 +2,18 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-MODE=${MODE:-asymmetric_key}
-UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest} 
+ROOT=$SCRIPT/..
+UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-latest}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"
 
-echo "Running uaa:${UAA_IMAGE_TAG} docker image with ${MODE}..."
+echo "Running uaa:${UAA_IMAGE_TAG} docker image with .."
 
 docker run \
 		--detach \
     --name uaa --net rabbitmq_net \
 		--publish 8080:8080 \
-		--mount type=bind,source=${SCRIPT}/../conf/${MODE}/uaa,target=/etc/uaa \
+		--mount type=bind,source=${ROOT}/conf/uaa,target=/etc/uaa \
 		--env JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
     uaa:${UAA_IMAGE_TAG}
