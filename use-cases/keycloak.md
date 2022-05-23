@@ -3,7 +3,7 @@
 We are going to test 3 OAuth flows:
 1. Access management ui via a browser
 2. Access management rest api
-3. Access AMQP protocol 
+3. Access AMQP protocol
 
 ## Prerequisites to follow this guide
 
@@ -36,6 +36,10 @@ CONFIG=keycloak/rabbitmq.conf make start-rabbitmq
 ```
 > CONFIG is relative to conf folder
 
+**NOTE**: To run RabbitMQ directly from source:
+1. git clone rabbitmq/rabbitmq-server
+2. git checkout oidc-integration
+3. `gmake run-broker PLUGINS="rabbitmq_management rabbitmq_auth_backend_oauth2" RABBITMQ_CONFIG_FILE=<root folder of the tutorial>/conf/keycloak/rabbitmq.config`
 
 ## Access Management api
 
