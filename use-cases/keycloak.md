@@ -21,7 +21,7 @@ used by `make start-keycloak` is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
 
-There is a dedicated **KeyCloak realm** called `Test` for this use case configured as follows:
+There is a dedicated **KeyCloak realm** called `Test` configured as follows:
 - We configured an [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
 - And a [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
 - And three clients: `rabbitmq-client-code` for the rabbitmq managament ui, `mgt_api_client` to access via the
