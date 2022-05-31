@@ -95,11 +95,15 @@ CwIDAQAB
 
 ## Start RabbitMQ
 
-At the moment, we need to run RabbitMQ directly from source:
-1. git clone rabbitmq/rabbitmq-server
-2. git checkout oidc-integration
-3. `gmake run-broker PLUGINS="rabbitmq_management rabbitmq_auth_backend_oauth2" RABBITMQ_CONFIG_FILE=<root folder of the tutorial>/conf/oauth0/rabbitmq.config`
+Run the following commands to run RabbitMQ docker image with the latest changes
+from `oidc-integration` branch with commit tag `69a4159f3482e5212d364f499b2ca2e05bede0ca`.
 
+```
+export IMAGE_TAG=69a4159f3482e5212d364f499b2ca2e05bede0ca-otp-min
+export IMAGE=pivotalrabbitmq/rabbitmq
+export MODE=oauth0
+make start-rabbitmq 
+```
 
 ## Verify Management UI flows
 
