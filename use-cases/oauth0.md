@@ -10,15 +10,16 @@ We are going to test 3 OAuth flows:
 - Have an account in https://auth0.com/.
 - Docker
 
-## Set up OAuth0
-
-### Create RabbitMQ Resource
+## Create rabbitmq API
 
 In OAuth0, resources are mapped to Application APIs. Once you have logged onto your account in https://auth0.com/, go to dashboard > Applications > APIs > Create an API.
 
-Give it the name `rabbitmq`. The important thing here is the `identifier` which must have the name of the *resource_server_id* we configured in RabbitMQ. This `identifier` goes into the `audience` JWT field. In our case, it is called `rabbitmq`. And we choose `RS256` as the signing algorithm.
+- Give it the name `rabbitmq`. The important thing here is the `identifier` which must have the name of the *resource_server_id* we configured in RabbitMQ. This `identifier` goes into the `audience` JWT field. In our case, it is called `rabbitmq`
+- Choose `RS256` as the signing algorithm
+- Enable **RBAC**
+- Enable **Add Permissions in the Access Token**
 
-### Configure which scopes the RabbitMQ Resource supports
+### Configure permissions in rabbitmq API
 
 Edit the API we just created with the name `rabbitmq`. Go into Permissions and add the permissions (scope) this api can grant.
 We are going to add the following scopes:
@@ -34,15 +35,32 @@ An *Application* requests an **OAuth client**.
 
 Go to dashboard > Applications, and you should see your application listed. An application gives us a *client_id*, a *client_secret* and a http endpoint called *Domain* where to claim a token.
 
-### Grant our OAuth client permission to use RabbitMQ resource
+## Create Application rabbitmq-management
 
-Go into dashboard > Applications > rabbitmq > APIs, you will see a list of all the APIs including the one we just created. Along with each API there is a toggle to authorize the Application to use the API. Once you "authorize" the Application to use an API, you can pick which scopes you want to grant to the Application from the list of scopes allowed by the API.
+An application gives us the client-id and client-secret for the management ui to authenticate on behalf
+of the end user.
 
-### Set up a user
+In setting we choose:
+- Application type : `Single Page applications`
+- Token Endpoint Authentication Method:  `None`
+- Allowed Callback URLs: `http://localhost:15672/js/oidc-oauth/login-callback.html`
+- Allowed Web Origins: `http://localhost:15672`
+- Allowed Origins (CORS): `http://localhost:15672`
 
-We are going to use the user it was created when signed up in Oauth0.
 
-Go to User Management > select our user > go to Permissions > click on "Assign Permissions". And choose "rabbitmq" API and grant all permissions.
+## Create a new user
+
+You can use your current OAuth0 user to login to RabbitMq or create a dedicated user for that. Up to you.
+
+### Authorize rabbitmq-management application
+
+Go to "Authorized Applications", click on "Authorize" and select all the scopes.
+
+### Create permissions and grant them
+
+Go to "Roles", create the role called `rabbitmq.tag:administrator`. Go to "Permissions" and
+select all the permissions. Go to "Users" and make sure our user is listed else add our user to the
+list of users which have this role.
 
 
 ## Configure RabbitMQ with OAuth0 signing key
@@ -83,15 +101,33 @@ At the moment, we need to run RabbitMQ directly from source:
 3. `gmake run-broker PLUGINS="rabbitmq_management rabbitmq_auth_backend_oauth2" RABBITMQ_CONFIG_FILE=<root folder of the tutorial>/conf/oauth0/rabbitmq.config`
 
 
-## Quickly verify that set up OAuth0 application correctly
+## Verify Management UI flows
 
-Run the following command from the command line
+Go to management ui `http://localhost:15672`, click on the single button, authenticate
+with your secondary OAuth0 user. You should be redirected back to the management ui.
+
+OAuth0 issues an access token like this one below. Where we receive in the `scope` claim
+the requested scopes, and in the `permissions` claim the permissions. We have configured
+RabbitMQ with `{extra_scopes_source, <<"permissions">>},` which means RabbitMQ uses
+the scopes in the `permissions` claim too.
+
 ```
-curl curl --request POST \
---url 'https://<copy the domain from the Application settings>/oauth/token' \
---header 'content-type: application/x-www-form-urlencoded' \
---data grant_type=client_credentials \
---data client_id=<copy the client ID field from the Application settings> \
---data client_secret=<copy the client secret field from the Application settings> \
---data audience=rabbitmq
+{
+  "iss": "https://dev-prbc0gw4.us.auth0.com/",
+  "sub": "auth0|6294e0afdc4dea0068d780a7",
+  "aud": [
+    "rabbitmq",
+    "https://dev-prbc0gw4.us.auth0.com/userinfo"
+  ],
+  "iat": 1654002181,
+  "exp": 1654088581,
+  "azp": "ffxcvJb6byeNG1Qr6us0Mg0Jp5HyzwwV",
+  "scope": "openid profile rabbitmq.tag:administrator",
+  "permissions": [
+    "rabbitmq.configure:*/*",
+    "rabbitmq.read:*/*",
+    "rabbitmq.tag:administrator",
+    "rabbitmq.write:*/*"
+  ]
+}
 ```
