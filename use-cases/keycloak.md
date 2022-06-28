@@ -77,7 +77,7 @@ def new_access_token():
 credentials = pika.PlainCredentials('', new_access_token())
 ```
 
-If you set the `Access Token Lifespan` you can refresh the secret using `update_secret`
+If you set the `Access Token Lifespan` you can refresh the secret using `update_secret` </b>
 Starting from Pika 1.3 is available the `connection.update_secret` feature to refresh the token:
 ```python
 connection.update_secret(new_access_token(), 'secret')
