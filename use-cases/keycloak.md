@@ -54,11 +54,35 @@ Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/
 make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
 ```
 
-## Access AMQP protocol
+## Access AMQP protocol perf-test
 
 ```
 make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
 ```
+
+## Access AMQP protocol with Pika
+
+To establish a connection you need to retrieve the access token:
+```python
+def new_access_token():
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    r = requests.post('http://localhost:8080/realms/test/protocol/openid-connect/token', headers=headers,
+                      data={'client_id': 'producer', 'client_secret': 'kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn',
+                            'grant_type': 'client_credentials'})
+
+    dictionary = r.json()
+    return dictionary["access_token"]
+
+
+credentials = pika.PlainCredentials('', new_access_token())
+```
+
+If you set the `Access Token Lifespan` you can refresh the secret using `update_secret`
+Starting from Pika 1.3 is available the `connection.update_secret` feature to refresh the token:
+```python
+connection.update_secret(new_access_token(), 'secret')
+```
+
 
 ## Access Management UI
 
