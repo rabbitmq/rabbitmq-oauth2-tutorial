@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ROOT=$SCRIPT/../..
+
+echo "Generate SSL Certificate and Key for localhost"
+echo "--------------------------------"
+echo "Generate root key"
+echo "--------------------------------"
+openssl genrsa 2048 > ${ROOT}/conf/azure/rabbitmq-ca.key
+echo ""
+echo "--------------------------------"
+echo "Create and self-sign root certificate"
+echo "--------------------------------"
+openssl req -new -x509 -nodes -days 365 \
+   -key ${ROOT}/conf/azure/rabbitmq-ca.key \
+   -out ${ROOT}/conf/azure/rabbitmq-ca.crt \
+   -subj "/C=US/ST=California/L=San Francisco/O=RabbitMQ/OU=OAuth 2.0 Tutorial/CN=RootCA"
+echo ""
+echo "--------------------------------"
+echo "Create Certificate Signing Request and associated private key for localhost"
+echo "--------------------------------"
+openssl req -newkey rsa:2048 -nodes \
+   -keyout ${ROOT}/conf/azure/rabbitmq.key \
+   -out ${ROOT}/conf/azure/rabbitmq.csr \
+   -subj "/C=US/ST=California/L=San Francisco/O=RabbitMQ/OU=OAuth 2.0 Tutorial/CN=localhost"
+echo ""
+echo "--------------------------------"
+echo "Create certificate for localhost"
+echo "--------------------------------"
+openssl x509 -req -days 365 \
+   -in ${ROOT}/conf/azure/rabbitmq.csr \
+   -out ${ROOT}/conf/azure/rabbitmq.crt \
+   -CA ${ROOT}/conf/azure/rabbitmq-ca.crt \
+   -CAkey ${ROOT}/conf/azure/rabbitmq-ca.key \
+   -CAcreateserial
+echo ""
+echo "--------------------------------"
+echo "Configure SSL cert/key ownership"
+echo "--------------------------------"
+chown 999:999 ${ROOT}/conf/azure/rabbitmq-ca.crt \
+              ${ROOT}/conf/azure/rabbitmq.crt \
+              ${ROOT}/conf/azure/rabbitmq-ca.key
+

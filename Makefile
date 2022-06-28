@@ -29,6 +29,9 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
+build-azure: ##  Generate SSL files for Azure AD
+	@./bin/azure/deploy
+
 build-uaa: ## Build uaa image
 	@(cd uaa-latest; make build-uaa; cd ..)
 
