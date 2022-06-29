@@ -76,8 +76,6 @@ Run the following 3 commands to get the environment ready to see Oauth2 plugin i
 
   1. `make start-uaa` to get UAA server running
   2. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
-		> *IMPORTANT*: hit enter when prompted for client secret.
-
   3. `make start-rabbitmq` to start RabbitMQ server
 
 
@@ -88,7 +86,7 @@ In this section, we are going to explore how to use OAuth2 with all those protoc
 
 ### Management user accessing the Management UI
 
-The first time an end user arrives to the management ui (`1`), they are redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identify the user and its permissions from the JWT token.
+The first time an end user arrives to the management ui (`1`), they are redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
 
 ```
     [ UAA ] <----2. auth----    [ RabbitMQ ]
@@ -107,9 +105,6 @@ We have previously configured UAA with 2 users:
  - and `rabbit_monitor:rabbit_monitor`
 
 Go to http://localhost:15672 and login using any of those two users.
-
-> TL;DR the user displayed by the management ui is not the user name but `rabbitmq_client` which is the
-identity of RabbitMQ to work on half of the user
 
 This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow we just saw above.
 It was signed with the symmetric key.
@@ -142,12 +137,11 @@ make curl url=http://localhost:15672/api/overview client_id=mgt_api_client secre
 ### AMQP Protocol
 
 **DL;DR:**
-  In this section, we are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application we are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
+In this section, we are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application we are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
 
-  Instead we are launching the application with a token that we have previously obtained from UAA. This is just to probe AMQP access with a JWT Token. Needless to say that the application should instead obtain the JWT Token prior to connecting to RabbitMQ and it should also be able to refresh it before reconnecting. RabbitMQ validates the token before accepting it. If the token has expired, RabbitMQ will reject the connection.
+We are launching PerfTest with a token that we have previously obtained from UAA. This is just to probe AMQP access with a JWT Token. Needless to say that the application should instead obtain the JWT Token prior to connecting to RabbitMQ and it should also be able to refresh it before reconnecting. RabbitMQ validates the token before accepting it. If the token has expired, RabbitMQ will reject the connection.
 
-
-First of all, an application which wants to connect to RabbitMQ using Oauth2 must present a
+First of all, an application which wants to connect to RabbitMQ using OAuth2 must present a
 valid JWT token. To obtain the token, the application must first authenticate (`1.`) with UAA. In case of a successful
 authentication, it gets back a JWT token (`2.`) which uses it to connect (`3.`) to RabbitMQ.  
 
