@@ -77,9 +77,9 @@ To run this sample code proceed as follows:
 python3 --version
 pip install pika
 pip install requests
-python3 pika_keycloak/pika_producer.py
+python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 ```
-> Ensure you install pika 1.3 
+> Ensure you install pika 1.3
 
 ## Access Management UI
 

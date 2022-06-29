@@ -4,14 +4,16 @@ import datetime
 import time
 import pika
 import requests
+import sys
 
 print('pika version: %s' % pika.__version__)
+
 # You need Pika 1.3
 # Get the access token
 def new_access_token():
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     r = requests.post('http://localhost:8080/realms/test/protocol/openid-connect/token', headers=headers,
-                      data={'client_id': 'producer', 'client_secret': 'kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn',
+                      data={'client_id': sys.argv[1], 'client_secret': sys.argv[2],
                             'grant_type': 'client_credentials'})
 
     dictionary = r.json()
