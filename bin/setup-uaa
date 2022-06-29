@@ -37,7 +37,6 @@ uaac member add "api://rabbitmq:management" rabbit_admin2
 uaac member add "rabbitmq.tag:monitoring" rabbit_monitor
 
 echo "Adding rabbit_client OAuth client used to issue tokens for users and applications"
-echo "Hit enter when prompted for client secret. It should not have password"
 
 uaac client add test_client --name test_client \
   --secret test_client \
@@ -48,6 +47,7 @@ uaac client add test_client --name test_client \
 
 uaac client add rabbit_client_implicit --name rabbit_client_implicit \
   --scope 'rabbitmq.*,openid' \
+  --secret '' \
   --authorized_grant_types implicit  \
   --authorities 'uaa.resource,rabbitmq' \
   --redirect_uri 'http://localhost:15672'

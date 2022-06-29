@@ -794,9 +794,13 @@ First of all, lets quickly go thru how RabbitMQ uses the OAuth Access Tokens; ho
 
 RabbitMQ expects a [JWS](https://tools.ietf.org/html/rfc7515) in the `password` field.
 
-For end users, the best way to come to the management ui is by the following url, replacing `<token>` by the actual JWT. This is how `make open` command is able to open the browser and login the user using a JWT.
+For end users, the best way to come to the management ui is by the following url, replacing `<token>` by the actual JWT.
 ```
-http://localhost:15672/#/login//<token>
+http://localhost:15672/#/login/?&access_token=<token>
+```
+This is how `make open` command is able to open the browser and login the user using a JWT.
+```
+make open username=rabbit_admin password=rabbit_admin
 ```
 
 **RabbitMQ expects a signed token**
