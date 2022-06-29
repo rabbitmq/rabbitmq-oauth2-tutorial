@@ -3,6 +3,7 @@
 conf/asymmetric_key/uaa.yml
 conf/symmetric_key/uaa.yml
 conf/azure/*
+bin/azure/.srl
 !conf/azure/rabbitmq.config
 plugin
 rabbitmq-auth-backend-oauth2-*
