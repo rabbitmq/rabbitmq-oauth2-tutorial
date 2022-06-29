@@ -62,27 +62,7 @@ make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/t
 
 ## Access AMQP protocol with Pika
 
-To establish a connection you need to retrieve the access token:
-```python
-def new_access_token():
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    r = requests.post('http://localhost:8080/realms/test/protocol/openid-connect/token', headers=headers,
-                      data={'client_id': 'producer', 'client_secret': 'kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn',
-                            'grant_type': 'client_credentials'})
-
-    dictionary = r.json()
-    return dictionary["access_token"]
-
-
-credentials = pika.PlainCredentials('', new_access_token())
-```
-
-If you set the `Access Token Lifespan` you can refresh the secret using `update_secret` </b>
-Starting from Pika 1.3 is available the `connection.update_secret` feature to refresh the token:
-```python
-connection.update_secret(new_access_token(), 'secret')
-```
-
+See the [pika_keycloak](../pika_keycloak) example
 
 ## Access Management UI
 
