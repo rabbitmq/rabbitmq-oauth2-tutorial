@@ -3,7 +3,7 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 CONFIG=${CONFIG:-rabbitmq.config}
-IMAGE_TAG=${IMAGE_TAG:-3.10.0-rc.6-management}
+IMAGE_TAG=${IMAGE_TAG:-3.10-management}
 IMAGE=${IMAGE:-rabbitmq}
 OAUTH2_SERVER=${OAUTH2_SERVER:-uaa}
 
