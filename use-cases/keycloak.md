@@ -41,7 +41,7 @@ Or from docker:
 ```
 export IMAGE_TAG=69a4159f3482e5212d364f499b2ca2e05bede0ca-otp-min
 export IMAGE=pivotalrabbitmq/rabbitmq
-export MODE=oauth0
+export MODE=keycloak
 make start-rabbitmq
 ```
 
@@ -54,7 +54,10 @@ Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/
 make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
 ```
 
-## Access AMQP protocol
+## Access AMQP protocol with PerfTest
+
+To test OAuth2 authentication with AMQP protocol we are going to use RabbitMQ PerfTest tool which uses RabbitMQ Java Client.
+First we obtain the token and pass it as a parameter to the make target `start-perftest-producer-with-token`.
 
 ```
 make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
