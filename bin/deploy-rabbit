@@ -9,7 +9,7 @@ OAUTH2_SERVER=${OAUTH2_SERVER:-uaa}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-echo "running RabbitMQ with mode $MODE"
+echo "running RabbitMQ with oauth2 server ${OAUTH2_SERVER} ... "
 docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 \
     -v $SCRIPT/../conf/${OAUTH2_SERVER}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro \

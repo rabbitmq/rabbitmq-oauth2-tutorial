@@ -54,7 +54,6 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 ## OAuth2 plugin in action
 
 First of all, let's bring up RabbitMQ fully configured with Oauth2 plugin and UAA as an OAuth2 Authorization Server.
-> RabbitMQ has to be configured with facts about the Authorization server hence the arrow from RabbitMQ to UAA.
 
 ```
     [ UAA ]    <-------------    [ RabbitMQ ]
@@ -72,15 +71,13 @@ configure RabbitMQ with them.
 
 #### Use Asymmetrical digital singing keys
 
-Run the following 4 commands to get the environment ready to see Oauth2 plugin in action:
+Run the following 3 commands to get the environment ready to see OAuth2 plugin in action:
 
-  1. Build UAA docker image if you have not done it yet (see instructions in the previous section)  
-	   `make build-uaa`
-  2. `make start-uaa` to get UAA server running
-  3. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+  1. `make start-uaa` to get UAA server running
+  2. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
 		> *IMPORTANT*: hit enter when prompted for client secret.
 
-  4. `make start-rabbitmq` to start RabbitMQ server
+  3. `make start-rabbitmq` to start RabbitMQ server
 
 
 ### Use Case 1 Management user accessing the Management UI
