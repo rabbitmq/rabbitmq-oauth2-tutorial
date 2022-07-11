@@ -433,8 +433,8 @@ uaac client add consumer_with_roles --name consumer_with_roles \
 #### RabbitMQ configuration
 
 There are two configuration files ready to use to launch RabbitMQ:
-- [conf/asymmetric_key/rabbitmq-scope-aliases.config](conf/asymmetric_key/rabbitmq-scope-aliases.config) - which configures scope mappings.
-- [conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config](conf/asymmetric_key/rabbitmq-scope-aliases-and-extra-scope.config) - which configures `extra_scopes_source` and scope mappings.
+- [conf/uaa/rabbitmq-scope-aliases.config](conf/uaa/rabbitmq-scope-aliases.config) - which configures scope mappings.
+- [conf/uaa/rabbitmq-scope-aliases-and-extra-scope.config](conf/uaa/rabbitmq-scope-aliases-and-extra-scope.config) - which configures `extra_scopes_source` and scope mappings.
 
 
 #### Demo 1 - Launch RabbitMQ with custom scopes in scope field
