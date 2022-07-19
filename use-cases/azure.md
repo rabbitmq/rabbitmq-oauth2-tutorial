@@ -36,10 +36,10 @@ Click on **Register**.
 ![Azure AD OAuth2 App](../assets/azure-ad-oauth-registered-app.png)
 
 Note the following values, as we will need it later to configure the `rabbitmq_auth_backend_oauth2` on RabbitMQ side:
-- Directory (tenant ID) 
+- Directory (tenant ID)
 - Application (client) ID
 
-Click on the **Endpoints** tab and, on the right pane that has just opened, copy the value of **OpenID Connect metadata document** (ex: `https://login.microsoftonline.com/{TENANT_ID}/v2.0/.well-known/openid-configuration`) and open it in your browser. 
+Click on the **Endpoints** tab and, on the right pane that has just opened, copy the value of **OpenID Connect metadata document** (ex: `https://login.microsoftonline.com/{TENANT_ID}/v2.0/.well-known/openid-configuration`) and open it in your browser.
 
 Note the value of the `jwks_uri` key (ex: `https://login.microsoftonline.com/{TENANT_ID}/discovery/v2.0/keys`), as you will also need it later to configure the `rabbitmq_auth_backend_oauth2` on RabbitMQ side
 
@@ -181,19 +181,19 @@ Run the following commands to run RabbitMQ docker image with the latest changes 
 > :bulb: All the commits associated to `oidc_integration` branch are available [here](https://github.com/rabbitmq/rabbitmq-server/commits/oidc-integration). Don't hesitate to have a look a it to get the very last commit, as the one advertised in this tutorial may not stay the last one forever!   
 
 ```
-export IMAGE_TAG=69a4159f3482e5212d364f499b2ca2e05bede0ca-otp-min
+export IMAGE_TAG=oidc-integration-otp-max
 export IMAGE=pivotalrabbitmq/rabbitmq
 export MODE=azure
-make start-rabbitmq 
+make start-rabbitmq
 ```
 :arrow_right: This starts a docker container named `rabbitmq`, with RabbitMQ Management UI/API with HTTPS enabled, and configured to use your Azure AD as OAuth2 Authentication Backend, based on the information you provided in `rabbitmq.config` in the previsous steps of this tutorial.
 
 ## Verify RabbitMQ Management UI access
 
-Go to RabbitMQ Management UI `https://localhost:15671`. Depending on your browser, ignore the security warnings (raised by the fact that we are using a self-signed certificate) to proceed. 
+Go to RabbitMQ Management UI `https://localhost:15671`. Depending on your browser, ignore the security warnings (raised by the fact that we are using a self-signed certificate) to proceed.
 
-Once on the RabbitMQ Management UI page, click on the **Click here to log in** button, 
-authenticate with your **Azure AD user**. The first time, you are likely going to have to give your 
+Once on the RabbitMQ Management UI page, click on the **Click here to log in** button,
+authenticate with your **Azure AD user**. The first time, you are likely going to have to give your
 consent (it depends on the policies applied to Azure AD on your side).
 
 > :warning: At first login, you may face the `AADSTS90008` error: just click on **Click here to log in** button
@@ -201,7 +201,7 @@ again and it will disappear (this issue seems to be known, as illustrated [here]
 
 At the end, you should be redirected back to the RabbitMQ Management UI.
 
-Azure AD issues an access token like this one below. The permissions are managed in the `roles` claim. 
+Azure AD issues an access token like this one below. The permissions are managed in the `roles` claim.
 We have configured RabbitMQ with `{extra_scopes_source, <<"roles">>},` which means RabbitMQ uses
 the scopes in the `roles` claim to define permissions for a logged-in user.
 

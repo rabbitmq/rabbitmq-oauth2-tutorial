@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+set -x
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
 CONFIG=${CONFIG:-rabbitmq.config}
-IMAGE_TAG=${IMAGE_TAG:-3.10.0-rc.6-management}
-IMAGE=${IMAGE:-rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-oidc-integration-otp-max}
+IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 
 if [ "${MODE}" == "azure" ]; then
   EXTRA_PORTS="-p 15671:15671"
@@ -16,7 +18,7 @@ fi
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-echo "running RabbitMQ with Idp $MODE and configuration file $MODE/$CONFIG"
+echo "running RabbitMQ with Idp $MODE and configuration file conf/$MODE/$CONFIG"
 docker run -d --name rabbitmq --net rabbitmq_net \
     -p 15672:15672 -p 5672:5672 ${EXTRA_PORTS}\
     -v ${SCRIPT}/../conf/${MODE}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro \
