@@ -76,7 +76,7 @@ configure RabbitMQ with them.
 Run the following 3 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make start-uaa` to get UAA server running
-  2. `make setup-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
+  2. `make setup-uaa-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
   3. `make start-rabbitmq` to start RabbitMQ server
 
 
@@ -131,7 +131,7 @@ UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a H
 
 The following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
 ```
-make curl url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
+make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
 
 
