@@ -55,12 +55,10 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 ## OAuth2 plugin in action
 
-First of all, let's bring up RabbitMQ fully configured with Oauth2 plugin and UAA as an OAuth2 Authorization Server.
-
-```
-    [ UAA ]    <-------------    [ RabbitMQ ]
-
-```
+In order see the OAuth2 plugin in action we need an OAuth2 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we
+will see how to set up UAA and RabbitMQ. If you are new to OAuth2, it is a good starting point. If you already know OAuth2
+and you want to learn how to configure RabbitMQ to talk to your Oauth2 server of your choice, you can go straight to the
+section [Use different OAuth 2.0 servers](). 
 
 ### Set up UAA and RabbitMQ
 
@@ -539,18 +537,18 @@ authenticate users with UAA and the URL of UAA (`http://localhost:8080/uaa`)
 ```
 [
   {rabbitmq_management, [
-       {enable_uaa, true},
-       {uaa_client_id, "rabbit_client"},
-       {uaa_location, "http://localhost:8080/uaa"}
+		  {enable_uaa, true},
+      {oauth_enable, true},
+      {oauth_client_id, "rabbit_client_code"},
+      {oauth_client_secret, "rabbit_client_code"},
+      {oauth_provider_url, "http://uaa:8080/uaa"}
   ]},
 ].
 ```
-- check out the full [conf/rabbitmq.config.symmetrical](conf/rabbitmq.config.symmetrical)
-
 
 ### UAA server
 
-Standalone OAuth2 server (https://github.com/cloudfoundry/uaa). Its primary role is as an OAuth2 provider, issuing tokens for client applications to use when they act on behalf of Cloud Foundry users. It can also authenticate users with their Cloud Foundry credentials, and can act as an SSO service using those credentials. It has endpoints for managing user accounts and for registering OAuth2 clients, as well as various other management functions
+Standalone OAuth2 server (https://github.com/cloudfoundry/uaa). Its primary role is to serve as an OAuth2 provider, issuing tokens for client applications. It can also authenticate users with their Cloud Foundry credentials. It has endpoints for managing user accounts and for registering OAuth2 clients, as well as various other management functions
 
 **IMPORTANT**:
 - UAA can run with an external database. But for the purposes of this exploration, the internal database is sufficient
