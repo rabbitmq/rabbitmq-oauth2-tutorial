@@ -91,7 +91,7 @@ jwt:
 scim:
   users:
     - rabbit_admin|rabbit_admin|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:administrator
-    - rabbit_admin2|rabbit_admin2|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:management
+    - rabbitmq_management|rabbitmq_management|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:management
     - rabbit_monitor|rabbit_monitor|scim.read,openid,rabbitmq.tag:monitoring
   groups:
     'rabbitmq.read:*/*': Read all
@@ -113,7 +113,7 @@ oauth:
       secret: adminsecret
       authorized-grant-types: client_credentials
       scope: none
-      authorities: uaa.admin,clients.admin,clients.read,clients.write,clients.secret,scim.write,scim.read,uaa.resource      
+      authorities: uaa.admin,clients.admin,clients.read,clients.write,clients.secret,scim.write,scim.read,uaa.resource
     mgt_api_client:
       id: mgt_api_client
       secret: mgt_api_client
