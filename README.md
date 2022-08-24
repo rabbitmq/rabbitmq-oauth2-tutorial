@@ -84,7 +84,7 @@ In this section, we are going to explore how to use OAuth2 with all those protoc
 
 ### Management user accessing the Management UI
 
-The first time an end user arrives to the management ui (`1`), they are redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
+The first time an end user arrives to the management ui (`1`), The user clicks on the button `Click here to login` and it is redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
 
 ```
     [ UAA ] <----2. auth----    [ RabbitMQ ]
