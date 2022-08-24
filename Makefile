@@ -11,18 +11,6 @@ CONSUMER := consumer
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-install-uaac: ## Install UAA Client
-	@echo "Installing uaac client on your local machine "
-	@(gem list --local | grep cf-uaac || sudo gem install cf-uaac && echo "Already installed")
-
-setup-uaa-admin-client:
-	@uaac target  http://localhost:8080/uaa
-	@uaac token client get admin -s adminsecret
-	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
-
-setup-uaa-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients
-	@./bin/uaa/setup
-
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/uaa/deploy
 
@@ -31,9 +19,6 @@ start-keycloak: ## Start keycloak
 
 build-azure: ##  Generate SSL files for Azure AD
 	@./bin/azure/deploy
-
-build-uaa: ## Build uaa image
-	@(cd uaa-latest; make build-uaa; cd ..)
 
 stop-uaa: ## Stop uaa
 	@docker kill uaa
