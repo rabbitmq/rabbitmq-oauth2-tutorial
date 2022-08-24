@@ -99,10 +99,10 @@ authorize RabbitMQ application as shown on the screenshot below.
 > ![authorize application](assets/authorize-app.png)
 
 We have previously configured UAA with 2 users:
- - `rabbit_admin:rabbit_admin`
- - and `rabbit_monitor:rabbit_monitor`
+ - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
+ - and `rabbit_admin2:rabbit_admin2` with just `management` user-tag
 
-Go to http://localhost:15672 and login using any of those two users.
+Go to http://localhost:15672 and login using any of those two users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
 
 This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow we just saw above.
 It was signed with the symmetric key.
