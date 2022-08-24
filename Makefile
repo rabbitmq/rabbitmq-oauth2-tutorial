@@ -11,6 +11,10 @@ CONSUMER := consumer
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+install-uaac: ## Install UAA Client
+	@echo "Installing uaac client on your local machine "
+	@(gem list --local | grep cf-uaac || sudo gem install cf-uaac && echo "Already installed")
+
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 	@./bin/uaa/deploy
 

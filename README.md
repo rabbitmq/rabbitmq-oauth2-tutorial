@@ -57,7 +57,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 In order see the OAuth2 plugin in action we need an OAuth2 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we
 will see how to set up UAA and RabbitMQ. If you are new to OAuth2, it is a good starting point. If you already know OAuth2
 and you want to learn how to configure RabbitMQ to talk to your Oauth2 server of your choice, you can go straight to the
-section [Use different OAuth 2.0 servers](). 
+section [Use different OAuth 2.0 servers]().
 
 ### Set up UAA and RabbitMQ
 
@@ -73,8 +73,7 @@ configure RabbitMQ with them.
 Run the following 3 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make start-uaa` to get UAA server running
-  2. `make setup-uaa-users-and-clients` to install uaac client; connect to UAA server and set ups users, group, clients and permissions
-  3. `make start-rabbitmq` to start RabbitMQ server
+  2. `make start-rabbitmq` to start RabbitMQ server
 
 
 ## Use OAuth 2.0 to access RabbitMQ
@@ -573,16 +572,14 @@ make install-uaac
 
 ### Clients, Users & Permissions in UAA
 
-When we ran the command `make setup-users-and-clients` we achieved the following:
+When we run `make start-uaa` we start up UAA with a [uaa.yaml](conf/uaa/uaa.yml) configured with all the clients, users
+and permissions required by this tutorial. For instance:
 
-- Created `rabbit_client` client -in UAA- who is going to be used by RabbitMQ server to authenticate management users coming to the management ui.
-- Created `rabbit_admin` user -in UAA- who is going to be the full administrator user with full access
-- Created `rabbit_monitor` user -in UAA- who is going to be the monitoring user with just the *monitoring* *user tag*
-- Created `consumer` client -in UAA- who is going to be the RabbitMQ User for the consumer application
-- Created `producer` client -in UAA- who is going to be the RabbitMQ User for the producer application
-- Obtained tokens -from UAA- for the 2 end users and for the 2 clients
-
-
+- `rabbit_client`: client who is going to be used by RabbitMQ server to authenticate management users coming to the management ui.
+- `rabbit_admin`: user who is going to be the full administrator user with full access
+- `rabbit_monitor`: user who is going to be the monitoring user with just the *monitoring* *user tag*
+- `consumer`: client who is going to be the RabbitMQ User for the consumer application
+- `producer`: client who is going to be the RabbitMQ User for the producer application
 
 ## Understand a bit more about OAuth in the context of RabbitMQ
 
@@ -620,16 +617,10 @@ Sample *scope*(s):
 
 ### About signing key required to configure RabbitMQ
 
-This section is only to explain one of things we need to take care to configure RabbitMQ with OAuth2 auth-backend. Do not run any of the commands explained on this section. They are all included in the `make` commands we will cover in the following sections.
+This is the signing key UAA uses to sign the tokens. RabbitMQ is already configured with this key.
 
-To configure Oauth plugin in RabbitMQ we need to obtain the JWT signing key used by UAA when it issues JWT tokens.
-But our `admin` client does not have yet the right *authority* (`uaa.resource`) to get that signing key. We are going to "auto" grant it ourselves:
 ```
-uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
-```
-
-And now we retrieve the signing key:
-```
+uaac target  http://localhost:8080
 uaac signing key -c admin -s adminsecret
 ```
 It prints out:
@@ -776,54 +767,6 @@ These are the fields relevant for RabbitMQ:
    > Implementers MAY provide for some small leeway, usually no more than
    a few minutes, to account for clock skew. However, RabbitMQ does not add any leeway.
 
-
-### Useful uaac commands
-
- `uaac` allows us to generate or obtain many tokens for different users and/or clients. However, only one of them is treated as the **current** token. This **current** token is only relevant when we interact with `uaac`, say to create/delete users, and/or obtain further tokens.
-
- To know all the tokens we have generated so far we run:
- ```
- uaac contexts
- ```
-
- To know what the current context is, we run:
- ```
- uaac context
- ```
- It prints out :
- ```
- 0]*[http://localhost:8080/uaa]
-
-   [0]*[admin]
-       client_id: admin
-       access_token: eyJhbGciOiJIUzI1NiIsImprdSI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAvdWFhL3Rva2VuX2tleXMiLCJraWQiOiJsZWdhY3ktdG9rZW4ta2V5IiwidHlwIjoiSldUIn0.eyJqdGkiOiIxODkyY2ZmMmRmNjc0ZmRiYmYwMWIyM2I2ZWU4MjlkZCIsInN1YiI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwic2NvcGUiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwiY2xpZW50X2lkIjoiYWRtaW4iLCJjaWQiOiJhZG1pbiIsImF6cCI6ImFkbWluIiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsInJldl9zaWciOiI4Yzg2YjcyOCIsImlhdCI6MTU1MDc1OTI0OCwiZXhwIjoxNTUwODAyNDQ4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvdWFhL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbInNjaW0iLCJjbGllbnRzIiwidWFhIiwiYWRtaW4iXX0._d9UPkdDNTYsCjf1NemWIBfv0v8S4u0wzjrBmP4S11U
-       token_type: bearer
-       expires_in: 43199
-       scope: clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read
-       jti: 1892cff2df674fdbbf01b23b6ee829dd
-
- ```
- We can decode the jwt token above:
- ```
- uaac token decode eyJhbGciOiJIUzI1NiIsImprdSI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAvdWFhL3Rva2VuX2tleXMiLCJraWQiOiJsZWdhY3ktdG9rZW4ta2V5IiwidHlwIjoiSldUIn0.eyJqdGkiOiIxODkyY2ZmMmRmNjc0ZmRiYmYwMWIyM2I2ZWU4MjlkZCIsInN1YiI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwic2NvcGUiOlsiY2xpZW50cy5yZWFkIiwiY2xpZW50cy5zZWNyZXQiLCJjbGllbnRzLndyaXRlIiwidWFhLmFkbWluIiwiY2xpZW50cy5hZG1pbiIsInNjaW0ud3JpdGUiLCJzY2ltLnJlYWQiXSwiY2xpZW50X2lkIjoiYWRtaW4iLCJjaWQiOiJhZG1pbiIsImF6cCI6ImFkbWluIiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsInJldl9zaWciOiI4Yzg2YjcyOCIsImlhdCI6MTU1MDc1OTI0OCwiZXhwIjoxNTUwODAyNDQ4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvdWFhL29hdXRoL3Rva2VuIiwiemlkIjoidWFhIiwiYXVkIjpbInNjaW0iLCJjbGllbnRzIiwidWFhIiwiYWRtaW4iXX0._d9UPkdDNTYsCjf1NemWIBfv0v8S4u0wzjrBmP4S11U
- ```
- It prints out:
- ```
- jti: 1892cff2df674fdbbf01b23b6ee829dd
- sub: admin
- authorities: clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read
- scope: clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read
- client_id: admin
- cid: admin
- azp: admin
- grant_type: client_credentials
- rev_sig: 8c86b728
- iat: 1550759248
- exp: 1550802448
- iss: http://localhost:8080/uaa/oauth/token
- zid: uaa
- aud: scim clients uaa admin
- ```
 
 ## Notes about setting up KeyCloak
 
