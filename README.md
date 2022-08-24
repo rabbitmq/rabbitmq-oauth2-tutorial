@@ -56,8 +56,9 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 In order see the OAuth2 plugin in action we need an OAuth2 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we
 will see how to set up UAA and RabbitMQ. If you are new to OAuth2, it is a good starting point. If you already know OAuth2
-and you want to learn how to configure RabbitMQ to talk to your Oauth2 server of your choice, you can go straight to the
-section [Use different OAuth 2.0 servers]().
+and you want to learn how to configure RabbitMQ to talk to one of Oauth2 server tested on this tutorial, you can jump
+straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/oauth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which we will use it in the next sections.
+
 
 ### Set up UAA and RabbitMQ
 
@@ -70,7 +71,7 @@ configure RabbitMQ with them.
 
 #### Use Asymmetrical digital singing keys
 
-Run the following 3 commands to get the environment ready to see Oauth2 plugin in action:
+Run the following 2 commands to get the environment ready to see Oauth2 plugin in action:
 
   1. `make start-uaa` to get UAA server running
   2. `make start-rabbitmq` to start RabbitMQ server
@@ -766,40 +767,3 @@ These are the fields relevant for RabbitMQ:
    or after which the JWT MUST NOT be accepted for processing. RabbitMQ uses this field to validate the token if it is present.
    > Implementers MAY provide for some small leeway, usually no more than
    a few minutes, to account for clock skew. However, RabbitMQ does not add any leeway.
-
-
-## Notes about setting up KeyCloak
-
-### Configure JWT signing Keys
-
-At the realm level, we go to `Keys > Providers` tab and create one of type `rsa` and we enter the
-private key and certificate of the public key. In this repository we do not have yet the certificate
-for the public key but it is easy to generate. Give it priority `101` or greater than the rest of
-available keys so that it is picked up when we request a token.
-
-IMPORTANT: We cannot hard code the **kid** hence we have to add the key to rabbitmq via the command
-```
-docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk --pem-file=conf/public.pem
-```
-or we have to modify the RabbitMQ configuration so that it says `Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk`
-rather than `legacy-token-key`.
-
-### Configure Client
-
-For backend applications which uses **Client Credentials flow** we create a **Client** with:
-- **Access Type** : `confidential`
-- With all the other flows disabled: Standard Flow, Implicit Flow, Direct Access Grants
-- With **Service Accounts Enabled** on. If it is not enabled we do not have the tab `Credentials`
-- In tab `Credentials` we have the client id secret
-
-
-### Configure Client scopes
-
-> *Default Client Scope* are scopes automatically granted to every token. Whereas *Optional Client Scope* are
-scopes which are only granted if they are explicitly requested during the authorization/token request flow.
-
-
-### Include appropriate aud claim
-
-We must configure a **Token Mapper** of type **Hardcoded claim** with the value of rabbitmq's *resource_server_id**.
-We can configure **Token Mapper** either to a **Client scope** or to a **Client**.

@@ -72,3 +72,40 @@ Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to Rab
 ## Stop keycloak
 
 `make stop-keycloak`
+
+
+## Notes about setting up KeyCloak
+
+### Configure JWT signing Keys
+
+At the realm level, we go to `Keys > Providers` tab and create one of type `rsa` and we enter the
+private key and certificate of the public key. In this repository we do not have yet the certificate
+for the public key but it is easy to generate. Give it priority `101` or greater than the rest of
+available keys so that it is picked up when we request a token.
+
+IMPORTANT: We cannot hard code the **kid** hence we have to add the key to rabbitmq via the command
+```
+docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk --pem-file=conf/public.pem
+```
+or we have to modify the RabbitMQ configuration so that it says `Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk`
+rather than `legacy-token-key`.
+
+### Configure Client
+
+For backend applications which uses **Client Credentials flow** we create a **Client** with:
+- **Access Type** : `confidential`
+- With all the other flows disabled: Standard Flow, Implicit Flow, Direct Access Grants
+- With **Service Accounts Enabled** on. If it is not enabled we do not have the tab `Credentials`
+- In tab `Credentials` we have the client id secret
+
+
+### Configure Client scopes
+
+> *Default Client Scope* are scopes automatically granted to every token. Whereas *Optional Client Scope* are
+scopes which are only granted if they are explicitly requested during the authorization/token request flow.
+
+
+### Include appropriate aud claim
+
+We must configure a **Token Mapper** of type **Hardcoded claim** with the value of rabbitmq's *resource_server_id**.
+We can configure **Token Mapper** either to a **Client scope** or to a **Client**.
