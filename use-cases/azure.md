@@ -140,7 +140,7 @@ $ vi rabbitmq.config
    {auth_backends, [rabbit_auth_backend_oauth2, rabbit_auth_backend_internal]}
   ]},
   {rabbitmq_management, [
-     {oauth_enable, true},
+     {oauth_enabled, true},
      {oauth_client_id, "PUT YOUR AZURE AD APPLICATION ID"},
      {oauth_client_secret, "PUT YOUR AZURE AD APPLICATION SECRET"},
      {oauth_provider_url, "https://login.microsoftonline.com/AZURE_AD_TENANT_ID"}

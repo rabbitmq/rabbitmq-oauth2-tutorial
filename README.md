@@ -537,7 +537,7 @@ authenticate users with UAA and the URL of UAA (`http://localhost:8080/uaa`)
 [
   {rabbitmq_management, [
 		  {enable_uaa, true},
-      {oauth_enable, true},
+      {oauth_enabled, true},
       {oauth_client_id, "rabbit_client_code"},
       {oauth_client_secret, "rabbit_client_code"},
       {oauth_provider_url, "http://uaa:8080/uaa"}
