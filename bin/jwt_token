@@ -2,5 +2,6 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$SCRIPT/jwt_token.py $SCRIPT/../jwts/${1:?jwt token json file} ${2:?key name} $SCRIPT/../conf/${3:?name of the private key file} \
-    $SCRIPT/../conf/${4:?name of the public key file} ${5:-some-client}
+ROOT=$SCRIPT/../
+$SCRIPT/jwt_token.py $ROOT/jwts/${1:?jwt token json file} ${2:?key name} $ROOT/conf/${3:?name of the private key file} \
+    $ROOT/conf/${4:?name of the public key file} ${5:-some-client}

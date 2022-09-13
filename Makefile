@@ -15,22 +15,20 @@ install-uaac: ## Install UAA Client
 	@echo "Installing uaac client on your local machine "
 	@(gem list --local | grep cf-uaac || sudo gem install cf-uaac && echo "Already installed")
 
-setup-uaa-admin-client:
-	@uaac target  http://localhost:8080/uaa
-	@uaac token client get admin -s adminsecret
-	@uaac client update admin --authorities "clients.read clients.secret clients.write uaa.admin clients.admin scim.write scim.read uaa.resource"
-
-setup-users-and-clients: install-uaac setup-uaa-admin-client ## create users and clients
-	@./bin/setup-uaa
-
 start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
-	@./bin/deploy-uaa
+	@./bin/uaa/deploy
 
-build-uaa: ## Build uaa image
-	@(cd uaa-latest; make build-uaa; cd ..)
-	
-stop-uaa:
+start-keycloak: ## Start keycloak
+	@./bin/keycloak/deploy
+
+build-azure: ##  Generate SSL files for Azure AD
+	@./bin/azure/deploy
+
+stop-uaa: ## Stop uaa
 	@docker kill uaa
+
+stop-keycloak: ## Stop keycloak
+	@docker kill keycloak
 
 start-rabbitmq:  ## Run RabbitMQ Server
 	@./bin/deploy-rabbit
@@ -98,9 +96,12 @@ stop-all-apps: ## Stop all appications we can start with this Makefile
 
 pivotalrabbitmq/perf-test:latest
 
-curl: ## Run curl with a JWT token. Syntax: make curl url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+curl-uaa: ## Run curl with a JWT token. Syntax: make curl-uaa url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
 	@uaac token client get $(client_id) -s $(secret)
-	@./bin/curl_url $(client_id) $(url)
+	@./bin/uaa/curl_url $(client_id) $(url)
+
+curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@./bin/keycloak/curl $(url) $(client_id) $(secret)
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)

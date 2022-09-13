@@ -1,0 +1,8 @@
+{
+  "authorization_details": [
+    { "type" : "rabbitmq",
+      "locations": ["cluster:rabbitmq"],
+      "actions": ["tag:administrator", "read", "write", "configure"  ]
+    }
+  ]
+}
