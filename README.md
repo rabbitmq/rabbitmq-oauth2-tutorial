@@ -8,10 +8,6 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 
 If you want to understand the details of how to configure RabbitMQ with Oauth2 go straight to [Understand the environment](#understand-the-environment) section.
 
-
-**IMPORTANT**: This repository relies on RabbitMQ 3.11 (docker image [pivotalrabbitmq/rabbitmq:v3.11.x-otp-max](https://hub.docker.com/layers/pivotalrabbitmq/rabbitmq/v3.11.x-otp-max/images/sha256-c6c694b1b41762f5c97bfb2172ad62d905451c50e2c8d892906d128bec78ee9e?context=explore)) which is not yet officially released.
-This is because this image contains the latest changes to the management ui to support various types of OAuth 2.0 servers)
-
 **Table of Content**
 
 <!-- TOC depthFrom:2 depthTo:3 withLinks:1 updateOnSave:1 orderedList:0 -->

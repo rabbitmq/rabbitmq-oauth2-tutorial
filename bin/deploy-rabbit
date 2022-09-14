@@ -5,8 +5,8 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
 CONFIG=${CONFIG:-rabbitmq.config}
-IMAGE_TAG=${IMAGE_TAG:-v3.11.x-otp-max}
-IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-3.11-rc}
+IMAGE=${IMAGE:-rabbitmq}
 
 if [ "${MODE}" == "azure" ]; then
   EXTRA_PORTS="-p 15671:15671"
