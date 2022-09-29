@@ -28,7 +28,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
 - Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
-	- [https://auth0.com/](use-cases/oauth0.md)
+	- [https://auth0.com/](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
 
 - [Understand the environment](#understand-the-environment)
@@ -42,7 +42,6 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [About signing key required to configure RabbitMQ](#about-signing-key-required-to-configure-rabbitmq)
 	- [About rotating JWT signing key](#about-rotating-uaa-signing-key)
 	- [Understanding Access tokens and how RabbitMQ uses it](#understanding-access-tokens-and-how-rabbitmq-uses-it)
-	- [Useful uaac commands](#useful-uaac-commands)
 
 <!-- /TOC -->
 
@@ -58,7 +57,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 In order see the OAuth2 plugin in action we need an OAuth2 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we
 will see how to set up UAA and RabbitMQ. If you are new to OAuth2, it is a good starting point. If you already know OAuth2
 and you want to learn how to configure RabbitMQ to talk to one of Oauth2 server tested on this tutorial, you can jump
-straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/oauth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which we will use it in the next sections.
+straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/auth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which we will use it in the next sections.
 
 
 ### Set up UAA and RabbitMQ

@@ -85,12 +85,6 @@ stop-perftest-consumer: ## Stop perfTest consumer
 	@docker stop $(CONSUMER)
 
 
-demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar:
-	@cd demo-oauth-rabbitmq; mvn clean package
-
-start-spring-demo-oauth-cf: demo-oauth-rabbitmq/target/demo-oauth-rabbitmq-*.jar ## Start the spring-demo-auth-rabbitmq application simulating CloudFoundry env
-	@./bin/run-demo-oauth-cf consumer consumer_secret
-
 stop-all-apps: ## Stop all appications we can start with this Makefile
 	@docker kill consumer producer 2>/dev/null
 
