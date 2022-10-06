@@ -30,21 +30,12 @@ management api and `producer` to access via AMQP protocol.
 
 ## Start RabbitMQ
 
-Supporting new types of OAuth 2 servers is currently under development.
-There are two alternatives. You can run directly from source:
-1. git clone rabbitmq/rabbitmq-server
-2. git checkout oidc-integration
-3. `gmake run-broker PLUGINS="rabbitmq_management rabbitmq_auth_backend_oauth2" RABBITMQ_CONFIG_FILE=<root folder of the tutorial>/conf/keycloak/rabbitmq.config`
-
-Or from docker:
-
+To start RabbitMQ run the following two commands. The first one tells RabbitMQ to pick up the
+rabbit.config found under [conf/keycloak/rabbitmq.config](conf/keycloak/rabbitmq.config)
 ```
-export IMAGE_TAG=oidc-integration-otp-max
-export IMAGE=pivotalrabbitmq/rabbitmq
 export MODE=keycloak
 make start-rabbitmq
 ```
-
 
 ## Access Management api
 
