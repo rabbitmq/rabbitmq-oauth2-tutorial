@@ -15,8 +15,10 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
 - [OAuth2 plugin in action](#oauth2-plugin-in-action)
 	- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
-- Use OAuth 2.0 to access RabbitMQ
-	- [Management user accessing the Management UI](#management-user-accessing-the-management-ui)
+-	[Access Management UI using OAuth 2.0 tokens](#access-management-ui)
+	- [Service-Provider initiated logon](#service-provider-initiated-logon)
+ 	- [Identity-Provider initiated logon](#identity-provider-initiated-logon)
+- [Access other protocols using OAuth 2.0 tokens](#access-other-protocols)
 	- [Monitoring agent accessing management REST api](#monitoring-agent-accessing-management-rest-api)
 	- [AMQP protocol](#amqp-protocol)
 	- [JMS protocol](#jms-protocol)
@@ -77,12 +79,14 @@ Run the following 2 commands to get the environment ready to see Oauth2 plugin i
   2. `make start-rabbitmq` to start RabbitMQ server
 
 
-## Use OAuth 2.0 to access RabbitMQ
+## Access Management UI using OAuth 2.0 tokens
 
-We can access RabbitMQ via different protocols, being via the management ui, or its rest api, or AMQP protocol, etc.
-In this section, we are going to explore how to use OAuth2 with all those protocols.
+The Management UI can be configured with one of these two login modes:
 
-### Management user accessing the Management UI
+* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. The user comes to the Management UI and clicks on the button "Click here to logon" which initiates the logon. The logon process starts in RabbitMQ, the Service Provider.
+* [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This is a logon mode meant for web portals. Users navigate to RabbitMQ with a token already obtained by the web portal on behalf of the user.
+
+### Service-Provider initiated logon
 
 The first time an end user arrives to the management ui (`1`), The user clicks on the button `Click here to login` and it is redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
 
@@ -108,6 +112,52 @@ This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow
 It was signed with the symmetric key.
 
 ![JWT token](assets/admin-token-signed-sym-key.png)
+
+To configure RabbitMQ Management UI with OAuth 2.0 we need the following configuration entries:
+```
+ ...
+ {rabbitmq_management, [
+    {oauth_enabled, true},
+    {oauth_client_id, "rabbit_client_code"},
+    {oauth_client_secret, "rabbit_client_code"},
+    {oauth_provider_url, "http://localhost:8080"},      
+    ...
+  ]},
+```
+
+### Identity-Provider initiated logon
+
+When RabbitMQ is offered as a service from a web portal, it is more convenient to navigate to RabbitMQ Management UI with a single click. The web portal is responsible for getting a token before taking the user to the RabbitMQ Management UI web page.
+
+```
+    [ Idp | WebPortal ] ----> 2. /#/login?access_token=<TOKEN>----   [ RabbitMQ Cluster ]            
+              /|\                                                        |       /|\
+               |                                                         +--------+
+      1. rabbit_admin from a browser                                   3. validate token        
+```
+
+At step 1, `rabbit_admin` user navigates to the web portal and clicks on the hyperlink associated to a RabbitMQ cluster. At step2, the web portal obtains a token and redirects the user to RabbitMQ. And at step 3, RabbitMQ validates the token in the http request and if it is valid, it redirects the user to the overview page.
+
+By default, RabbitMQ Management UI is configured with service-provider initiated logon. We have to configure the Management plugin by adding just one entry to the configuration as shown below:
+
+```
+ ...
+ {rabbitmq_management, [
+    {oauth_enabled, true},
+    {oauth_client_id, "rabbit_client_code"},
+    {oauth_client_secret, "rabbit_client_code"},
+    {oauth_provider_url, "http://localhost:8080"},      
+    {oauth_initiated_logon_type, idp_initiated},
+    ...
+  ]},
+```
+
+**NOTE**: When the user logs out, or its RabbitMQ session expired, or the token expired, the user is directed to the Management landing page which presents the user with a button labeled Click here to login. The user is never redirected back to the url configured in `oauth_provider_url`.
+
+## Access other protocols using OAuth 2.0 tokens
+
+The following subsections demonstrate how to use access tokens with any messaging protocol and also to access the management rest api.
+
 
 ### Monitoring agent accessing management REST api
 
