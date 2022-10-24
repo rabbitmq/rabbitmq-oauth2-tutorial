@@ -35,7 +35,7 @@ function generate-ca-server-client-kpi {
 
 function deploy {
   if [ "${MODE}" == "azure" ]; then
-    generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
+#    generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
     EXTRA_PORTS="-p 15671:15671"
     EXTRA_MOUNTS="-v $SCRIPT/../conf/${MODE}/certs/basic/testca/cacert.pem:/etc/rabbitmq/rabbitmq-ca.crt \
                   -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/key.pem:/etc/rabbitmq/rabbitmq.key \
