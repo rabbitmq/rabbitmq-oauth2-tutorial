@@ -56,22 +56,18 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 ## OAuth2 plugin in action
 
-In order see the OAuth2 plugin in action we need an OAuth2 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we
-will see how to set up UAA and RabbitMQ. If you are new to OAuth2, it is a good starting point. If you already know OAuth2
-and you want to learn how to configure RabbitMQ to talk to one of Oauth2 server tested on this tutorial, you can jump
-straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/auth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which we will use it in the next sections.
+In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_auth_backend_oauth2) plugin in action we need an OAuth 2.0 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, we are going to use UAA as Authorization Server. In the next section, we will see how to set up UAA and RabbitMQ. If you are new to OAuth 2.0, it is a good starting point. If you already know OAuth 2.0 and you want to learn how to configure RabbitMQ to talk to one of OAuth 2.0 server tested on this tutorial, you can jump straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/auth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which we will use it in the next sections.
 
 
 ### Set up UAA and RabbitMQ
 
-There are two ways to set up OAuth2 in RabbitMQ. One uses symmetrical signing keys. And the other uses
-asymmetrical signing keys. The Authorization server is who digitally signs the JWT tokens and RabbitMQ
-has to be configured to validate any of the two types of digital signatures.
+RabbitMQ support two types of two signing keys used to digitally sign the JWT tokens.
+The two types are **symmetrical** and **asymmetrical** signing keys. The Authorization server is who digitally signs the JWT tokens and RabbitMQ has to be configured to validate any of the two types of digital signatures.
 
-Given that asymmetrical keys is the most widely used option, we are going to focus on how to
+Given that asymmetrical keys are the most widely used option, we are going to focus on how to
 configure RabbitMQ with them.
 
-#### Use Asymmetrical digital singing keys
+#### Use Asymmetrical digital signing keys
 
 Run the following 2 commands to get the environment ready to see Oauth2 plugin in action:
 
@@ -85,6 +81,16 @@ The Management UI can be configured with one of these two login modes:
 
 * [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. The user comes to the Management UI and clicks on the button "Click here to logon" which initiates the logon. The logon process starts in RabbitMQ, the Service Provider.
 * [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This is a logon mode meant for web portals. Users navigate to RabbitMQ with a token already obtained by the web portal on behalf of the user.
+
+### Supported OAuth 2.0 flow
+
+Since RabbitMQ 3.10 the Management UI uses *Authorization Code flow with PKCE**. Because RabbitMQ is a single-page
+web application, it cannot safely store credentials such as the `client_id` and `client_secret` required by
+RabbitMQ to authenticate with the Authorization Server in order to get a token for the end-user. Therefore, we
+should configure the RabbitMQ OAuth client in the Authorization Server so that it does not require `client_secret`.
+This type of OAuth clients/applications are known as **public** or **non-confidential**. In UAA they are configured as `allowpublic: true`.
+
+Nevertheless, should your Authorization Server require a `client_secret` , we can configure it via `management.oauth_client_secret`.
 
 ### Service-Provider initiated logon
 
@@ -119,13 +125,15 @@ To configure RabbitMQ Management UI with OAuth 2.0 we need the following configu
  {rabbitmq_management, [
     {oauth_enabled, true},
     {oauth_client_id, "rabbit_client_code"},
-    {oauth_client_secret, "rabbit_client_code"},
     {oauth_provider_url, "http://localhost:8080"},      
     ...
   ]},
 ```
 
 ### Identity-Provider initiated logon
+
+**Note**: **This feature has not been released yet. It is only available in the development docker image
+pivotalrabbitmq/rabbitmq:oidc_idp_initiated_login-otp-max-bazel **
 
 When RabbitMQ is offered as a service from a web portal, it is more convenient to navigate to RabbitMQ Management UI with a single click. The web portal is responsible for getting a token before taking the user to the RabbitMQ Management UI web page.
 
@@ -145,7 +153,6 @@ By default, RabbitMQ Management UI is configured with service-provider initiated
  {rabbitmq_management, [
     {oauth_enabled, true},
     {oauth_client_id, "rabbit_client_code"},
-    {oauth_client_secret, "rabbit_client_code"},
     {oauth_provider_url, "http://localhost:8080"},      
     {oauth_initiated_logon_type, idp_initiated},
     ...
@@ -649,7 +656,6 @@ authenticate users with UAA and the URL of UAA (`http://localhost:8080/uaa`)
 		  {enable_uaa, true},
       {oauth_enabled, true},
       {oauth_client_id, "rabbit_client_code"},
-      {oauth_client_secret, "rabbit_client_code"},
       {oauth_provider_url, "http://uaa:8080/uaa"}
   ]},
 ].
