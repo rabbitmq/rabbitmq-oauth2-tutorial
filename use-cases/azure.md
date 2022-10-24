@@ -176,13 +176,9 @@ This generates the following files in `conf/azure`:
 
 ## Start RabbitMQ
 
-Run the following commands to run RabbitMQ docker image with the latest changes from `oidc-integration` branch with commit tag `69a4159f3482e5212d364f499b2ca2e05bede0ca`.
-
-> :bulb: All the commits associated to `oidc_integration` branch are available [here](https://github.com/rabbitmq/rabbitmq-server/commits/oidc-integration). Don't hesitate to have a look a it to get the very last commit, as the one advertised in this tutorial may not stay the last one forever!   
+Run the following commands to run RabbitMQ docker image:
 
 ```
-export IMAGE_TAG=oidc-integration-otp-max
-export IMAGE=pivotalrabbitmq/rabbitmq
 export MODE=azure
 make start-rabbitmq
 ```
