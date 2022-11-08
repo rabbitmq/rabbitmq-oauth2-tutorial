@@ -27,6 +27,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use custom scope field](#use-custom-scope-field)
 	- [Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
 	- [Use custom scopes](#use-custom-scopes)
+	- [Preferred username claims](#preferred-username-claims)
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
 - Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
@@ -555,6 +556,23 @@ To stop the perf-test applications run :
 make stop-perftest-producer PRODUCER=producer_with_roles
 make stop-perftest-consumer CONSUMER=consumer_with_roles
 ```
+
+### <a id="preferred-username-claims" class="anchor" href="#preferred-username-claims">Preferred username claims</a>
+
+RabbitMQ needs to figure out the username associated to the token so that it can display it in the management ui.
+By default, RabbitMQ will first look for the `sub` claim and if it is not found it uses the `client_id`.
+
+Most authorization servers return the user's GUID in the `sub` claim rather than the actual user's username or email address, anything the user can relate to. When the `sub` claim does not carry a *user-friendly username*, you can configure one or several claims to extract the username from the token.
+
+Given this configuration;
+```
+  ...
+  {rabbitmq_auth_backend_oauth2, [
+    {resource_server_id, <<"rabbitmq">>},
+    {preferred_username_claims, [<<"user_name">>,<<"email">>]},
+  ...
+```
+RabbitMQ would first look for the `user_name` claim and if it is not found it looks for `email`. Else it uses its default lookup mechanism which first looks for `sub` and then `client_id`.
 
 
 ### Use Rich Authorization Request Tokens
