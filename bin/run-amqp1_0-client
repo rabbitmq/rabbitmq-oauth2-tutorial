@@ -16,7 +16,7 @@ docker rm -f amqp1_0-$CLIENT_ID 2>/dev/null || echo "amqp1_0-$CLIENT_ID was not 
 
 docker run --rm --name amqp1_0-$CLIENT_ID \
   --network rabbitmq_net \
-  --env USERNAME=$token \
+  --env USERNAME="" \
   --env PASSWOORD=$token \
   --env QUEUE=$queue \
   amqp1_0-client $@

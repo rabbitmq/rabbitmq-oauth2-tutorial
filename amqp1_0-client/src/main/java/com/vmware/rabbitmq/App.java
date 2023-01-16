@@ -92,6 +92,7 @@ public class App {
             System.exit(1);
         }
     }
+
     private void sendMessage() {
         try {
             // The configuration for the Qpid InitialContextFactory has been supplied in
