@@ -115,12 +115,12 @@ build-amqp1_0-client: ## build amqp1_0 client docker image
 	@(docker build amqp1_0-client/. -t amqp1_0-client)
 
 start-amqp1_0-publisher: ## start amqp publisher that sends 1 message
-	@uaac token client get jms_producer -s jms_producer_secret
-	@./bin/run-amqp1_0-client jms_producer pub
+	@uaac token client get producer -s producer_secret
+	@./bin/run-amqp1_0-client producer pub
 
 start-amqp1_0-subscriber: ## start amqp subscriber
-	@uaac token client get jms_consumer -s jms_consumer_secret
-	@./bin/run-amqp1_0-client jms_consumer sub
+	@uaac token client get consumer -s consumer_secret
+	@./bin/run-amqp1_0-client consumer sub
 
 curl-with-token: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes URL=http://localhost:15672/api/overview TOKEN=....
 	@curl -u :$(TOKEN) $(URL)
