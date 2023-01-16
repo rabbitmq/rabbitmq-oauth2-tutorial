@@ -9,7 +9,7 @@ CONSUMER := consumer
 ### TARGETS ###
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 install-uaac: ## Install UAA Client
 	@echo "Installing uaac client on your local machine "
@@ -110,6 +110,17 @@ start-jms-publisher: ## start jms publisher that sends 1 message
 start-jms-subscriber: ## start jms subscriber
 	@uaac token client get jms_consumer -s jms_consumer_secret
 	@./bin/run-jms-client jms_consumer sub
+
+build-amqp1_0-client: ## build amqp1_0 client docker image
+	@(docker build amqp1_0-client/. -t amqp1_0-client)
+
+start-amqp1_0-publisher: ## start amqp publisher that sends 1 message
+	@uaac token client get jms_producer -s jms_producer_secret
+	@./bin/run-amqp1_0-client jms_producer pub
+
+start-amqp1_0-subscriber: ## start amqp subscriber
+	@uaac token client get jms_consumer -s jms_consumer_secret
+	@./bin/run-amqp1_0-client jms_consumer sub
 
 curl-with-token: ## Run curl with a JWT token. Syntax: make curl-with-extra-scopes URL=http://localhost:15672/api/overview TOKEN=....
 	@curl -u :$(TOKEN) $(URL)

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+CLIENT_ID=${1:?First parameter must be client id}
+
+token=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
+queue=${QUEUE:-q-test-queue}
+
+shift 1
+
+echo "Launching AMQP1.0-client with a token for Oauth Client $CLIENT_ID "
+echo "QUEUE: $queue"
+echo "TOKEN: $token"
+
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f amqp1_0-$CLIENT_ID 2>/dev/null || echo "amqp1_0-$CLIENT_ID was not running"
+
+docker run --rm --name amqp1_0-$CLIENT_ID \
+  --network rabbitmq_net \
+  --env USERNAME=$token \
+  --env PASSWOORD=$token \
+  --env QUEUE=$queue \
+  amqp1_0-client $@
