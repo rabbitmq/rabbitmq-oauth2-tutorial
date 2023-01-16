@@ -23,6 +23,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [AMQP protocol](#amqp-protocol)
 	- [JMS protocol](#jms-protocol)
 	- [MQTT protocol](#mqtt-protocol)
+	- [AMQP 1.0 protocol](#amqp-10-protocol)
 - Use advanced OAuth 2.0 configuration
 	- [Use custom scope field](#use-custom-scope-field)
 	- [Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
@@ -310,6 +311,11 @@ make start-mqtt-publish TOKEN=$(bin/jwt_token scopes-for-mqtt.json legacy-token-
 > IMPORTANT: If you try to access the management ui and authenticate with UAA using rabbit_admin you
 wont be able to do bind a queue with routing_key `test` to the `amq.topic` exchange because that user
 in UAA does not have the required permissions. In our handcrafted token, you have granted ourselves the right permissions/scopes.
+
+### AMQP 1.0 protocol
+
+Work in progress.
+
 
 ## Use advanced OAuth 2.0 configuration
 
