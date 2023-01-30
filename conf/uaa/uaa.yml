@@ -142,7 +142,7 @@ oauth:
     producer:
       id: producer
       secret: producer_secret
-      authorities: rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/*
+      authorities: rabbitmq.write:*/*,rabbitmq.read:*/*,rabbitmq.configure:*/*
       authorized-grant-types: client_credentials
     consumer:
       id: consumer
@@ -152,7 +152,7 @@ oauth:
     jms_producer:
       id: jms_producer
       secret: jms_producer_secret
-      authorities: rabbitmq.write:%2F/x-* rabbitmq.write:%2F/q-* rabbitmq.read:%2F/x-* rabbitmq.configure:%2F/* rabbitmq.configure:*/jms.durable.queues rabbitmq.write:*/jms.durable.queues rabbitmq.read:*/jms.durable.queues
+      authorities: rabbitmq.write:%2F/*,rabbitmq.read:%2F/*,rabbitmq.configure:%2F/*,rabbitmq.configure:*/jms.durable.queues,rabbitmq.write:*/jms.durable.queues,rabbitmq.read:*/jms.durable.queues
       authorized-grant-types: client_credentials
     jms_consumer:
       id: jms_consumer

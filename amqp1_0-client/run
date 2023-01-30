@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+CLIENT_ID=${1:?First parameter must be client id}
+
+token=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
+queue=${QUEUE:-q-test-queue}
+
+shift 1
+
+echo "Launching AMQP1.0-client with a token for Oauth Client $CLIENT_ID "
+echo "QUEUE: $queue"
+echo "TOKEN: $token"
+
+USERNAME=" " PASSWORD=$token QUEUE=$queue  java -jar target/amqp1_0-client-1.0-SNAPSHOT-jar-with-dependencies.jar $@
