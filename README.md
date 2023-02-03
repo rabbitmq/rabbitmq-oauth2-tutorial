@@ -192,7 +192,6 @@ make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client s
 
 ### AMQP Protocol
 
-**DL;DR:**
 In this section, you are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application you are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
 
 You are launching PerfTest with a token that you have previously obtained from UAA. This is just to probe AMQP access with a JWT Token. Needless to say that the application should instead obtain the JWT Token prior to connecting to RabbitMQ and it should also be able to refresh it before reconnecting. RabbitMQ validates the token before accepting it. If the token has expired, RabbitMQ will reject the connection.
