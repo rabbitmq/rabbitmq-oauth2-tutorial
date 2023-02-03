@@ -37,6 +37,12 @@ export MODE=keycloak
 make start-rabbitmq
 ```
 
+## Access Management ui
+
+Go to http://localhost:15672/#/, click on `Click here to log in` button, and enter the credentials
+`rabbit_admin` as username and `rabbit_admin` as password. This is the single user created in keycloak with the
+appropriate scopes to access the management ui. 
+
 ## Access Management api
 
 Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8080/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
