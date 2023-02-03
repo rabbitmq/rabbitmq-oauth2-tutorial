@@ -160,7 +160,7 @@ By default, RabbitMQ Management UI is configured with service-provider initiated
   ]},
 ```
 
-**NOTE**: When the user logs out, or its RabbitMQ session expired, or the token expired, the user is directed to the Management landing page which presents the user with a button labeled `Click here to login`. The user is never redirected automatically back to the url configured in `oauth_provider_url`. Only when the user clicks on the button, it is redirected to the configured in `oauth_provider_url`.
+**NOTE**: When the user logs out, or its RabbitMQ session expired, or the token expired, the user is directed to the Management landing page which presents the user with a button labeled `Click here to login`. The user is never redirected automatically back to the url configured in `oauth_provider_url`. Only when the user clicks on the `logout` button, it is redirected to the configured in `oauth_provider_url`.
 
 ## Access other protocols using OAuth 2.0 tokens
 
