@@ -41,7 +41,7 @@ make start-rabbitmq
 
 Go to http://localhost:15672/#/, click on `Click here to log in` button, and enter the credentials
 `rabbit_admin` as username and `rabbit_admin` as password. This is the single user created in keycloak with the
-appropriate scopes to access the management ui. 
+appropriate scopes to access the management ui.
 
 ## Access Management api
 
@@ -108,8 +108,8 @@ rather than `legacy-token-key`.
 ### Configure Client
 
 For backend applications which uses **Client Credentials flow** you create a **Client** with:
-- **Access Type** : `confidential`
-- With all the other flows disabled: Standard Flow, Implicit Flow, Direct Access Grants
+- **Access Type** : `public`
+- **Authentication flow** : `Standard Flow`
 - With **Service Accounts Enabled** on. If it is not enabled you do not have the tab `Credentials`
 - In tab `Credentials` you have the client id secret
 

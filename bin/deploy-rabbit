@@ -5,7 +5,7 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
 CONFIG=${CONFIG:-rabbitmq.config}
-IMAGE_TAG=${IMAGE_TAG:-3.11.7}
+IMAGE_TAG=${IMAGE_TAG:-3.11.9}
 IMAGE=${IMAGE:-rabbitmq}
 
 function generate-ca-server-client-kpi {
