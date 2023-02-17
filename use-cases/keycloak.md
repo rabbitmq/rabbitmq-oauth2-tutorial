@@ -124,3 +124,26 @@ scopes which are only granted if they are explicitly requested during the author
 
 You must configure a **Token Mapper** of type **Hardcoded claim** with the value of rabbitmq's *resource_server_id**.
 You can configure **Token Mapper** either to a **Client scope** or to a **Client**.
+
+### Export Keycloak configuration
+For testing purposes, once you modified keycloak configuration, you would want to export keycloak configuration.
+When done, connect to the keycloak container and export your configuration before removing the container
+> The following command overrides the default configuration provided with this repository
+```shell
+docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/ --users realm_file
+```
+
+### Possible issue on MacOS
+
+If you want to run this configuration on MacOS, you could have problem reaching keycloak pointing to 0.0.0.0:8080.
+
+1. add `keycloak` entry in your `hosts` file
+```shell
+echo "127.0.0.1 keycloak" > /etc/hosts
+```
+1. modify the [rabbitmq.config](../conf/keycloak/rabbitmq.config) configuration to appropriately point to `keycloak` host
+```shell
+...
+{oauth_provider_url, "http://keycloak:8080/realms/test"}
+...
+```
