@@ -16,7 +16,7 @@ First, deploy **Key Cloak**. It comes preconfigured with all the required scopes
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.config](conf/keycloak/rabbitmq.config)
+**Key Cloak** comes configured with its own signing key. And the [rabbitmq.config](../conf/keycloak/rabbitmq.config)
 used by `make start-keycloak` is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
@@ -31,7 +31,7 @@ management api and `producer` to access via AMQP protocol.
 ## Start RabbitMQ
 
 To start RabbitMQ run the following two commands. The first one tells RabbitMQ to pick up the
-rabbit.config found under [conf/keycloak/rabbitmq.config](conf/keycloak/rabbitmq.config)
+rabbit.config found under [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config)
 ```
 export MODE=keycloak
 make start-rabbitmq
@@ -64,10 +64,10 @@ make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/t
 
 ## Access AMQP protocol with Pika
 
-This section is about testing Oauth2 authentication with AMQP protocol and with Pika library. And more specifically, you
+This section is about testing OAuth 2.0 authentication with AMQP protocol and with Pika library. And more specifically, you
 are demonstrating how to refresh a token on a live AMQP connections.
 
-You can see the Python sample application [here](../pika_keycloak).
+You can see the Python sample application [here](../pika_client/producer.py).
 
 To run this sample code proceed as follows:
 ```
