@@ -15,5 +15,5 @@ docker run \
 		--publish 8080:8080 \
 		--env KEYCLOAK_ADMIN=admin \
 		--env KEYCLOAK_ADMIN_PASSWORD=admin \
-		--mount type=bind,source=${ROOT}/conf/keycloak/h2,target=/opt/keycloak/data/h2 \
-		quay.io/keycloak/keycloak:18.0.0 start-dev
+		--mount type=bind,source=${ROOT}/conf/keycloak/import/,target=/opt/keycloak/data/import/ \
+		quay.io/keycloak/keycloak:20.0 start-dev --import-realm
