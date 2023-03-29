@@ -35,7 +35,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [KeyCloak](use-cases/keycloak.md)
 	- [https://auth0.com/](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
-	- [Oauth2 proxy](use-cases/oauth2-proxy.md)
+	- [Oauth2 proxy](use-cases/oauth2-proxy.md) **Coming soon. Not releesed yet**
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
