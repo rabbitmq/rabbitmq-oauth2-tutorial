@@ -24,6 +24,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [JMS protocol](#jms-protocol)
 	- [MQTT protocol](#mqtt-protocol)
 	- [AMQP 1.0 protocol](#amqp-10-protocol)
+- [Messaging on Topic Exchanges](#messaging-on-topic-exchanges)
 - Use advanced OAuth 2.0 configuration
 	- [Use custom scope field](#use-custom-scope-field)
 	- [Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
@@ -34,7 +35,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [KeyCloak](use-cases/keycloak.md)
 	- [https://auth0.com/](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
-
+	- [Oauth2 proxy](use-cases/oauth2-proxy.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -337,6 +338,26 @@ And send a message. It uses the *client_id*  `jms_producer`, declared in UAA, to
 make start-amqp1_0-publisher
 ```
 
+## Messaging on Topic Exchanges
+
+This section has been dedicated exclusively to explain what scopes you need in order to operate on **Topic Exchanges**.
+
+**NOTE**: None of the users and/or clients declared in any of Authorization servers provided by this tutorial have the
+appropriate scopes to operate on **Topic Exchanges**. In the [MQTT Protocol](#mqtt-protocol) section, the application
+used a hand-crafted token with the scopes to operate on **Topic Exchanges**.
+
+To bind and/or unbind a queue to/from a **Topic Exchange**, you need to have the following scopes:
+
+- **write** permission on the queue and routing key -> `rabbitmq.write:<vhost>/<queue>/<routingkey>`
+> e.g. `rabbitmq.write:*/*/*`
+
+- **read** permission on the exchange and routing key -> `rabbitmq.write:<vhost>/<exchange>/<routingkey>`
+> e.g. `rabbitmq.read:*/*/*`
+
+To publish to a **Topic Exchange**, you need to have the following scope:
+
+- **write** permission on the exchange and routing key -> `rabbitmq.write:<vhost>/<exchange>/<routingkey>`
+> e.g. `rabbitmq.write:*/*/*`
 
 
 ## Use advanced OAuth 2.0 configuration

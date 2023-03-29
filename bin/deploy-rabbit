@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
-
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
-CONFIG=${CONFIG:-rabbitmq.config}
-IMAGE_TAG=${IMAGE_TAG:-3.11.9-management}
+CONFIG=${CONFIG:-rabbitmq.conf}
+IMAGE_TAG=${IMAGE_TAG:-3.11-management}
 IMAGE=${IMAGE:-rabbitmq}
 
 function generate-ca-server-client-kpi {
@@ -42,12 +41,24 @@ function deploy {
                   -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/cert.pem:/etc/rabbitmq/rabbitmq.crt"
   fi
 
+  SIGNING_KEY_FILE=$SCRIPT/../conf/${MODE}/signing-key/signing-key.pem
+  if [ -f "$SIGNING_KEY_FILE" ]; then
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
+  fi
+
+  MOUNT_RABBITMQ_CONFIG="/etc/rabbitmq/rabbitmq.config"
+
+  if [[ "$CONFIG" == *.conf ]]
+  then
+    MOUNT_RABBITMQ_CONFIG="/etc/rabbitmq/rabbitmq.conf"
+  fi
+
   docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
   docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-  echo "running RabbitMQ with Idp $MODE and configuration file conf/$MODE/$CONFIG"
+  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file conf/$MODE/$CONFIG"
   docker run -d --name rabbitmq --net rabbitmq_net \
       -p 15672:15672 -p 5672:5672 ${EXTRA_PORTS}\
-      -v ${SCRIPT}/../conf/${MODE}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro \
+      -v ${SCRIPT}/../conf/${MODE}/${CONFIG}:${MOUNT_RABBITMQ_CONFIG}:ro \
       -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \
       -v ${SCRIPT}/../conf:/conf ${EXTRA_MOUNTS} ${IMAGE}:${IMAGE_TAG}
 }

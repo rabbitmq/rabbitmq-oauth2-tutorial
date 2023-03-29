@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ROOT=$SCRIPT/../..
+
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
+
+echo "Running oauth2-proxy docker image ..."
+
+export OAUTH2_PROXY_COOKIE_SECRET=`python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))'`
+docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml up
