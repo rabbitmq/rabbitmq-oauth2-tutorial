@@ -30,6 +30,12 @@ stop-uaa: ## Stop uaa
 stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
 
+start-oauth2-proxy: ## Start oauth2-proxy
+	@bin/oauth2-proxy/deploy
+
+stop-oauth2-proxy: ## Stop oauth2-proxy
+	@docker-compose -f conf/oauth2-proxy/compose.yml down
+
 start-rabbitmq:  ## Run RabbitMQ Server
 	@./bin/deploy-rabbit
 

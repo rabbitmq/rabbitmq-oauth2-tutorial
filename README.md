@@ -35,7 +35,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [KeyCloak](use-cases/keycloak.md)
 	- [https://auth0.com/](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
-
+	- [Oauth2 proxy](use-cases/oauth2-proxy.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -343,8 +343,7 @@ make start-amqp1_0-publisher
 This section has been dedicated exclusively to explain what scopes you need in order to operate on **Topic Exchanges**.
 
 **NOTE**: None of the users and/or clients declared in any of Authorization servers provided by this tutorial have the
-appropriate scopes to operate on **Topic Exchanges**. In the [MQTT Protocol](#mqtt-protocol) section, the application
-used a hand-crafted token with the scopes to operate on **Topic Exchanges**. 
+appropriate scopes to operate on **Topic Exchanges**. In the [MQTT Protocol](#mqtt-protocol) section, the application used a hand-crafted token with the scopes to operate on **Topic Exchanges**. 
 
 To bind and/or unbind a queue to/from a **Topic Exchange**, you need to have the following scopes:
 

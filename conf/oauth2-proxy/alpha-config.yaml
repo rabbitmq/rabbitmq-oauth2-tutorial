@@ -1,0 +1,26 @@
+server:
+  BindAddress: 0.0.0.0:4180
+upstreamConfig:
+  upstreams:
+  - id: rabbitmq
+    path: /
+    uri: http://rabbitmq:15672
+injectRequestHeaders:
+- name: Authorization
+  values:
+  - claim: access_token
+    prefix: 'Bearer '
+providers:
+- provider: keycloak-oidc
+  id: keycloak-oidc
+  clientSecret: nt6pmZMeyrgzYgkg2MLgZQZxLveRMW5M
+  clientID: rabbitmq-proxy-client
+  code_challenge_method: S256
+  scope: openid profile email rabbitmq.tag:administrator
+  oidcConfig:
+    issuerURL: http://keycloak:8080/realms/test
+    insecureSkipNonce: true
+    audienceClaims:
+        - aud
+    emailClaim: email
+    userIDClaim: email
