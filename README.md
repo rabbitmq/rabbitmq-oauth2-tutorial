@@ -33,9 +33,9 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
 - Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
-	- [https://auth0.com/](use-cases/auth0.md)
+	- [Auth0](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
-	- [Oauth2 proxy](use-cases/oauth2-proxy.md) **Coming soon. Not releesed yet**
+	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -138,7 +138,7 @@ To configure RabbitMQ Management UI with OAuth 2.0 you need the following config
 Alike Service-Provider initiated logon, with Idp-initiated logon users land to RabbitMQ management ui with a valid token.
 These two scenarios below are examples of Idp-initiated logon:
 
-* RabbitMQ is behind a web portal which conveniently allow users to navigate directly to RabbitMQ fully authenticated
+* RabbitMQ is behind a web portal which conveniently allow users to navigate directly to RabbitMQ management ui already authenticated
 * There is an OAuth2 proxy in between users and RabbitMQ which intercepts their requests and forwards them to RabbitMQ injecting the token into the HTTP `Authorization` header  
 
 The latter scenario is demonstrated [here](oauth2-examples-proxy.html). The former scenario is covered in the following section.
