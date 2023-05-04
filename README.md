@@ -70,6 +70,20 @@ The two types are **symmetrical** and **asymmetrical** signing keys. The Authori
 Given that asymmetrical keys are the most widely used option, you are going to focus on how to
 configure RabbitMQ with them.
 
+#### Use Symmetrical digital signing keys
+
+Run the following 2 commands to get the environment ready to see Oauth2 plugin in action:
+
+  1. `UAA_MODE="uaa-symmetrical" make start-uaa` to get UAA server running
+  2. `CONFIG=rabbitmq.config MODE="uaa-symmetrical" make start-rabbitmq` to start RabbitMQ server
+
+To validate this configuration very quickly, run the following command which accesses the Management Rest endpoint
+ `/api/overview` with a token obtained from UAA using `mgt_api_client` OAuth2 client:
+ 
+```
+make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
+```
+
 #### Use Asymmetrical digital signing keys
 
 Run the following 2 commands to get the environment ready to see Oauth2 plugin in action:
@@ -369,6 +383,15 @@ To publish to a **Topic Exchange**, you need to have the following scope:
 - **write** permission on the exchange and routing key -> `rabbitmq.write:<vhost>/<exchange>/<routingkey>`
 > e.g. `rabbitmq.write:*/*/*`
 
+
+OAuth 2.0 authorisation backend supports variable expansion when checking permission on topics. It supports any JWT claim whose value is a plain string and the `vhost` variable. For example, if a user has connected with the token below against the vhost `prod` should have write permission to send to any exchanged starting with `x-prod-` and any routing key starting with `u-bob-`:
+
+<pre class="json">
+{
+  "sub" : "bob",
+  "scope" : [ "rabbitmq.write:*/q-{vhost}-*/u-{sub}-*" ]
+}
+</pre>
 
 ## Use advanced OAuth 2.0 configuration
 

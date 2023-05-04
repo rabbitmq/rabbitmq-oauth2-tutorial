@@ -5,6 +5,7 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT=$SCRIPT/../..
 UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-75.21.0}
 UAA_IMAGE_NAME=${UAA_IMAGE_NAME:-cloudfoundry/uaa}
+UAA_MODE=${UAA_MODE:-"uaa"}
 
 docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
 docker rm -f uaa 2>/dev/null || echo "uaa was not running"
@@ -15,7 +16,7 @@ docker run \
 		--detach \
     --name uaa --net rabbitmq_net \
 		--publish 8080:8080 \
-		--mount "type=bind,source=${ROOT}/conf/uaa,target=/uaa" \
+		--mount "type=bind,source=${ROOT}/conf/${UAA_MODE},target=/uaa" \
 		--env UAA_CONFIG_PATH="/uaa" \
 		--env JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
     "${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
