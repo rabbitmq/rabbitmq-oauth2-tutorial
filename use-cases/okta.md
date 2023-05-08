@@ -48,19 +48,7 @@ Click on **Save**.
 
 Note the following values, as you will need it later to configure the `rabbitmq_auth_backend_oauth2` on RabbitMQ side:
 - ClientID.
-
-
-## Create a secret for your app
-
-Your application needs a **client secret** to prove its identity when requesting a token.
-
-Still on the **App registrations** page, in the left-hand menu, click on **Certificates & Secrets**, then select the **Client secrets** tab.
-
-In the **Certificates & Secrets** pane, click on **New Client Secret** and, on the right pane that has just opened, enter a description for the secret and choose an expiration time.
-
-Click on **Add**.
-
-> :warning: **IMPORTANT**: you can note the value of the clientID, you will need it to configure the `rabbitmq_auth_backend_oauth2` on RabbitMQ side.
+- Okta domain name
 
 ## Create Okta OAuth 2.0 authorization server, scopes and claims for your app
 
