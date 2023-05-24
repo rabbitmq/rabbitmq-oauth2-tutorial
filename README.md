@@ -31,6 +31,8 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use custom scopes](#use-custom-scopes)
 	- [Preferred username claims](#preferred-username-claims)
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
+- [Combine OAuth 2.0 authentication with other mechanism](#oauth2-and-other-mechanism)
+	- [Basic Authentication](#basic-authentication)
 - Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
 	- [Auth0](use-cases/auth0.md)
@@ -79,7 +81,7 @@ Run the following 2 commands to get the environment ready to see Oauth2 plugin i
 
 To validate this configuration very quickly, run the following command which accesses the Management Rest endpoint
  `/api/overview` with a token obtained from UAA using `mgt_api_client` OAuth2 client:
- 
+
 ```
 make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
@@ -715,6 +717,56 @@ docker logs producer_with_roles -f
 ```
 
 For more information on this new capability check out the [plugin's documentation](https://github.com/rabbitmq/rabbitmq-server/tree/rich_auth_request/deps/rabbitmq_auth_backend_oauth2#rich-authorization-request).
+
+
+## <a id="oauth2-and-other-mechanism" class="anchor" href="#oauth2-and-other-mechanism">Combine OAuth 2.0 authentication with other mechanism</a>
+
+So far we have seen RabbitMQ configured with just OAuth authentication backend. This set up works for
+production environments where OAuth is the only authentication mechanism allowed.
+
+However, there are environments where some users may authenticate with basic authentication and others
+via OAuth.
+
+### <a id="basic-authentication" class="anchor" href="#basic-authentication">Basic Authentication</a>
+
+In this section we demonstrate RabbitMQ configured with two authentication backends. Here are the two
+backends configured in [rabbitmq-with-basic-auth.conf](conf/uaa/rabbitmq-with-basic-auth.conf) file:
+```
+auth_backends.1 = rabbit_auth_backend_oauth2
+auth_backends.2 = rabbit_auth_backend_internal
+```
+We do not need any additional configuration to enable both authentication mechanisms, be it JWT and basic authentication.
+
+1. Launch RabbitMQ with the above configuration file:
+```
+export CONFIG=rabbitmq-with-basic-auth.conf
+make start-rabbitmq
+```
+
+2. Test basic authentication over the management rest api:
+```
+curl -u guest:guest localhost:15672/api/overview
+```
+
+If you want to disable basic authentication for the management rest api, you can do it by adding the following
+line to the configuration:
+```
+management.disable_basic_auth = true
+```
+
+If you try to access the rest api again, you will get
+```
+{"error":"not_authorised","reason":"HTTP access denied: basic auth disabled"}
+```
+
+3. Test OAuth2 authentication:
+```
+make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token mgt-api-client.json legacy-token-key private.pem public.pem)
+```
+
+4. Test Management UI
+
+The Management UI though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment. 
 
 
 ## Understand the environment

@@ -1,0 +1,12 @@
+{
+  "sub": "mgt-api-client",
+  "scope": [
+    "rabbitmq.write:*/*/*",
+    "rabbitmq.configure:*/*/*",
+    "rabbitmq.read:*/*/*",
+    "rabbitmq.tag:management"
+  ],
+  "aud": [
+    "rabbitmq"
+  ]
+}
