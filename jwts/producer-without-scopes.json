@@ -1,0 +1,6 @@
+{
+  "sub" : "producer",
+  "aud": [
+    "rabbitmq"
+  ]
+}

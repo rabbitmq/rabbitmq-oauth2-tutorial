@@ -33,6 +33,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
 - [Combine OAuth 2.0 authentication with other mechanism](#oauth2-and-other-mechanism)
 	- [Basic Authentication](#basic-authentication)
+	- [Authn with OAuth 2 and Authz with internal](#authn-with-oauth-authz-with-internal)
 - Use different OAuth 2.0 servers
 	- [KeyCloak](use-cases/keycloak.md)
 	- [Auth0](use-cases/auth0.md)
@@ -721,7 +722,7 @@ For more information on this new capability check out the [plugin's documentatio
 
 ## <a id="oauth2-and-other-mechanism" class="anchor" href="#oauth2-and-other-mechanism">Combine OAuth 2.0 authentication with other mechanism</a>
 
-So far we have seen RabbitMQ configured with just OAuth authentication backend. This set up works for
+So far you have seen RabbitMQ configured with just OAuth authentication backend. This set up works for
 production environments where OAuth is the only authentication mechanism allowed.
 
 However, there are environments where some users may authenticate with basic authentication and others
@@ -729,19 +730,21 @@ via OAuth.
 
 ### <a id="basic-authentication" class="anchor" href="#basic-authentication">Basic Authentication</a>
 
-In this section we demonstrate RabbitMQ configured with two authentication backends. Here are the two
+In this section you demonstrate RabbitMQ configured with two authentication backends. Here are the two
 backends configured in [rabbitmq-with-basic-auth.conf](conf/uaa/rabbitmq-with-basic-auth.conf) file:
 ```
 auth_backends.1 = rabbit_auth_backend_oauth2
 auth_backends.2 = rabbit_auth_backend_internal
 ```
-We do not need any additional configuration to enable both authentication mechanisms, be it JWT and basic authentication.
+You do not need any additional configuration to enable both authentication mechanisms, be it JWT and basic authentication.
 
 1. Launch RabbitMQ with the above configuration file:
 ```
 export CONFIG=rabbitmq-with-basic-auth.conf
 make start-rabbitmq
 ```
+> Unless you declare MODE env variable, the default value is uaa which means the
+rabbitmq-with-basic-auth.conf is loaded from conf/uaa folder
 
 2. Test basic authentication over the management rest api:
 ```
@@ -766,8 +769,47 @@ make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_tok
 
 4. Test Management UI
 
-The Management UI though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment. 
+The Management UI though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment.
 
+
+## <a id="authn-with-oauth-authz-with-internal" class="anchor" href="#authn-with-oauth-authz-with-internal">Authn with OAuth 2 and Authz with internal</a>
+
+**Note**: Available in development image only.
+
+Typically OAuth 2.0 is used for authorization and implicitly for authentication in RabbitMQ. However,
+there could be scenarios where you only want to the use OAuth token for authentication, i.e. extract the
+username from the token, provided the token is valid. And authorize the user based on the permissions associated to the username in the internal RabbitMQ database.
+
+First, you configure the appropriate authentication and authorization backends.
+backends configured in [rabbitmq-with-oauth2-and-internal-backends.conf](conf/uaa/rabbitmq-with-oauth2-and-internal-backends.conf) file:
+```
+auth_backends.1 = rabbit_auth_backend_oauth2
+auth_backends.2 = rabbit_auth_backend_internal
+```
+
+1. Launch RabbitMQ with the above configuration file:
+```
+export CONFIG=rabbitmq-with-oauth2-and-internal-backends.conf
+IMAGE=pivotalrabbitmq/rabbitmq IMAGE_TAG=08778bfbf4f65f6e702bc2e44053aa37786e0fc1-otp-min-bazel make start-rabbitmq
+```
+> You do not need to launch UAA because the script automatically issues and signs the token
+using the same private key UAA uses
+
+2. Add the user `producer` to RabbitMQ internal database
+```
+docker exec -it rabbitmq rabbitmqctl add_user producer producer
+docker exec -it rabbitmq rabbitmqctl set_permissions -p "/" "producer" ".*" ".*" ".*"
+docker exec -it rabbitmq rabbitmqctl set_user_tags producer administrator
+```
+
+3. Test OAuth2 authentication + Internal authorization:
+```
+make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token producer-without-scopes.json legacy-token-key private.pem public.pem)
+```
+
+4. Test Management UI
+
+The Management UI though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment.
 
 ## Understand the environment
 
