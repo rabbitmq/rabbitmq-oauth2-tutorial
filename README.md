@@ -39,6 +39,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Auth0](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
 	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
+	- [Okta](use-cases/okta.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
