@@ -16,7 +16,7 @@ First, deploy **Key Cloak**. It comes preconfigured with all the required scopes
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.config](../conf/keycloak/rabbitmq.config)
+**Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
@@ -31,11 +31,13 @@ management api and `producer` to access via AMQP protocol.
 ## Start RabbitMQ
 
 To start RabbitMQ run the following two commands. The first one tells RabbitMQ to pick up the
-rabbit.config found under [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config)
+rabbit.config found under [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 ```
 export MODE=keycloak
 make start-rabbitmq
 ```
+**Note**: [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config) is also available but just for
+reference. By default, `make start-rabbitmq` will choose the new style. 
 
 ## Access Management ui
 

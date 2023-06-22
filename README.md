@@ -40,6 +40,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [Azure Active Directory](use-cases/azure.md)
 	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
 	- [Okta](use-cases/okta.md)
+	- [Google](use-cases/google.md) **NOT SUPPORTED**
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -741,8 +742,7 @@ You do not need any additional configuration to enable both authentication mecha
 
 1. Launch RabbitMQ with the above configuration file:
 ```
-export CONFIG=rabbitmq-with-basic-auth.conf
-make start-rabbitmq
+CONF=rabbitmq-with-basic-auth.conf make start-rabbitmq
 ```
 > Unless you declare MODE env variable, the default value is uaa which means the
 rabbitmq-with-basic-auth.conf is loaded from conf/uaa folder
@@ -775,10 +775,6 @@ The Management UI though only accepts OAuth 2 authentication if you have OAuth 2
 
 ## <a id="authn-with-oauth-authz-with-internal" class="anchor" href="#authn-with-oauth-authz-with-internal">Authn with OAuth 2 and Authz with internal</a>
 
-**Note**: This use case requires a RabbitMQ development docker image. This use case works with practically any recent release on 3.12 or 3.11 provided the token has a *scope* claim. If your identity provider issued tokens
-which do not have *scope* claim then this use case will only work with the RabbitMq Docker image
-`pivotalrabbitmq/rabbitmq:08778bfbf4f65f6e702bc2e44053aa37786e0fc1-otp-min-bazel`.  
-
 Typically RabbitMQ uses OAuth 2.0 tokens for authorization and implicitly for authentication. However,
 there could be scenarios where you only want to the use OAuth token for authentication, i.e. extract the
 username from the token, provided the token is valid. And authorize the user based on the permissions associated to the username in the internal RabbitMQ database.
@@ -792,7 +788,7 @@ auth_backends.1.authz = internal
 
 1. Launch RabbitMQ with the above configuration file:
 ```
-export CONFIG=rabbitmq-with-oauth2-and-internal-backends.conf
+export CONF=rabbitmq-with-oauth2-and-internal-backends.conf
 IMAGE=pivotalrabbitmq/rabbitmq \
 IMAGE_TAG=08778bfbf4f65f6e702bc2e44053aa37786e0fc1-otp-min-bazel \
 make start-rabbitmq
