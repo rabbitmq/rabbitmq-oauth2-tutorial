@@ -775,10 +775,6 @@ The Management UI though only accepts OAuth 2 authentication if you have OAuth 2
 
 ## <a id="authn-with-oauth-authz-with-internal" class="anchor" href="#authn-with-oauth-authz-with-internal">Authn with OAuth 2 and Authz with internal</a>
 
-**Note**: This use case requires a RabbitMQ development docker image. This use case works with practically any recent release on 3.12 or 3.11 provided the token has a *scope* claim. If your identity provider issued tokens
-which do not have *scope* claim then this use case will only work with the RabbitMq Docker image
-`pivotalrabbitmq/rabbitmq:08778bfbf4f65f6e702bc2e44053aa37786e0fc1-otp-min-bazel`.  
-
 Typically RabbitMQ uses OAuth 2.0 tokens for authorization and implicitly for authentication. However,
 there could be scenarios where you only want to the use OAuth token for authentication, i.e. extract the
 username from the token, provided the token is valid. And authorize the user based on the permissions associated to the username in the internal RabbitMQ database.
