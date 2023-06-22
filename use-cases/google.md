@@ -1,29 +1,14 @@
 # Use Google as OAuth 2.0 server
 
-You are going to test 3 OAuth flows:
-1. Access management ui via a browser :construction:
-2. Access management rest api :construction:
-3. Access AMQP protocol :construction:
+**Google is not supported**
 
-## Prerequisites to follow this guide
+The main reason is because it does not issue JWT access tokens
+but opaques access tokens. In order to support opaque access tokens, RabbitMQ would have to issue an
+external HTTP request to convert the opaque access token into a JWT access token.
 
-- Have an account in Google.
-- Docker
-- Openssl
+Under `/conf/google` folder you can find the configuration used to connect the
+RabbitMQ management ui with Google OAuth 2.0 endpoints. With this configuration,
+you can get to a point where the user is authenticated by Google, and eventually
+you get the error message in the RabbitMQ Management UI "Not Authorized".
 
-## Register your app
-
-WIP
-
-**NOTE**: There is a blocker issue: Google access token is not a JWT token but an opaque one.
-RabbitMQ has to download the actual JWT token thru the `tokeninfo` endpoint. More info [here](https://cloud.google.com/docs/authentication/token-types#access).
-
-
-## Start RabbitMQ
-
-Run the following commands to run RabbitMQ docker image:
-
-```
-export MODE=google
-make start-rabbitmq
-```
+The reason is because RabbitMQ cannot validate the access token as it is invalid.
