@@ -189,7 +189,7 @@ Run the following commands to run RabbitMQ docker image:
 export MODE=azure
 make start-rabbitmq
 ```
-:arrow_right: This starts a docker container named `rabbitmq`, with RabbitMQ Management UI/API with HTTPS enabled, and configured to use your Azure AD as OAuth2 Authentication Backend, based on the information you provided in `rabbitmq.config` in the previsous steps of this tutorial.
+:arrow_right: This starts a docker container named `rabbitmq`, with RabbitMQ Management UI/API with HTTPS enabled, and configured to use your Azure AD as OAuth2 Authentication Backend, based on the information you provided in `rabbitmq.conf` in the previous steps of this tutorial. There is also a `rabbitmq.config` but it is there just for reference should you wanted to use the old style. 
 
 ## Verify RabbitMQ Management UI access
 

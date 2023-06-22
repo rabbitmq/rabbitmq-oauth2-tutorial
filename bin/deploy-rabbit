@@ -3,8 +3,9 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
-CONF=${CONF:-rabbitmq.conf}
-CONFIG=${CONFIG:-rabbitmq.config}
+#CONF=${CONF:-rabbitmq.conf}
+#CONFIG=${CONFIG:-rabbitmq.config}
+ADVANCED=${ADVANCED:-advanced.config}
 IMAGE_TAG=${IMAGE_TAG:-3.12}
 IMAGE=${IMAGE:-rabbitmq}
 
@@ -47,20 +48,25 @@ function deploy {
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
   fi
 
-  if [ -f "$SCRIPT/../conf/${MODE}/${CONFIG}" ]; then
+  USED_CONFIG=""
+
+  if [[ -n "${CONFIG}"  &&  -f "$SCRIPT/../conf/${MODE}/${CONFIG}" ]]; then
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
+    USED_CONFIG="${SCRIPT}/../conf/${MODE}/${CONFIG}"
+  elif [ -f "$SCRIPT/../conf/${MODE}/${CONF:-rabbitmq.conf}" ]; then
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${CONF:-rabbitmq.conf}:/etc/rabbitmq/rabbitmq.conf:ro "
+    USED_CONFIG="${SCRIPT}/../conf/${MODE}/${CONF:-rabbitmq.conf}"
   fi
-  if [ -f "$SCRIPT/../conf/${MODE}/${CONF}" ]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${CONF}:/etc/rabbitmq/rabbitmq.conf:ro "
-  fi
-  if [ -f "$SCRIPT/../conf/${MODE}/advanced.config" ]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/advanced.config:/etc/rabbitmq/advanced.config:ro "
+
+  if [[ -n "${ADVANCED}"  && -f "$SCRIPT/../conf/${MODE}/${ADVANCED}"  ]]; then
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
+    USED_CONFIG="${USED_CONFIG} ${SCRIPT}/../conf/${MODE}/${ADVANCED}"
   fi
 
 
   docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
   docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file conf/$MODE/$CONFIG"
+  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
   docker run -d --name rabbitmq --net rabbitmq_net \
       -p 15672:15672 -p 5672:5672 ${EXTRA_PORTS}\
       -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \

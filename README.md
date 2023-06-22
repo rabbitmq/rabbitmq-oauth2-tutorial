@@ -742,8 +742,7 @@ You do not need any additional configuration to enable both authentication mecha
 
 1. Launch RabbitMQ with the above configuration file:
 ```
-export CONFIG=rabbitmq-with-basic-auth.conf
-make start-rabbitmq
+CONF=rabbitmq-with-basic-auth.conf make start-rabbitmq
 ```
 > Unless you declare MODE env variable, the default value is uaa which means the
 rabbitmq-with-basic-auth.conf is loaded from conf/uaa folder
@@ -793,7 +792,7 @@ auth_backends.1.authz = internal
 
 1. Launch RabbitMQ with the above configuration file:
 ```
-export CONFIG=rabbitmq-with-oauth2-and-internal-backends.conf
+export CONF=rabbitmq-with-oauth2-and-internal-backends.conf
 IMAGE=pivotalrabbitmq/rabbitmq \
 IMAGE_TAG=08778bfbf4f65f6e702bc2e44053aa37786e0fc1-otp-min-bazel \
 make start-rabbitmq

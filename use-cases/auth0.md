@@ -102,6 +102,10 @@ export MODE=oauth0
 make start-rabbitmq
 ```
 
+**Note**: The above command launches RabbitMQ with the [conf/auth0/rabbitmq.conf](conf/auth0/rabbitmq.conf) file.
+But [conf/auth0/rabbitmq.config](conf/auth0/rabbitmq.config) is also there just for reference should you preferred
+the old config style. 
+
 ## Verify Management UI flows
 
 Go to management ui `http://localhost:15672`, click on the single button, authenticate

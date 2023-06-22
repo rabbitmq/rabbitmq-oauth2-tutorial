@@ -52,6 +52,8 @@ the setting below which disables validation of the audience claim.
 auth_oauth2.verify_aud = false
 ```
 
+**NOTE**: [rabbitmq.config](../conf/oauth2-proxy/rabbitmq.config) file is only for reference. It is not used
+by `make start-rabbitmq` unless we explicitly ask for it. 
 
 ## Start OAuth2 Proxy
 
