@@ -2,7 +2,7 @@ logging:
   config: /uaa/log4j2.properties
 
 issuer:
-  uri: http://local:8080/
+  uri: https://localhost:8443/
 
 encryption:
   active_key_label: CHANGE-THIS-KEY
@@ -95,11 +95,16 @@ jwt:
             8XSfaPiTyQwWpzbFNZzzemlTsIDiF3UqwkHvWaMYPDf4Ng3cokPPxw==
             -----END RSA PRIVATE KEY-----
 
+requires_https: true
+
 scim:
   users:
     - rabbit_admin|rabbit_admin|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:administrator
     - rabbitmq_management|rabbitmq_management|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:management
     - rabbit_monitor|rabbit_monitor|scim.read,openid,rabbitmq.tag:monitoring
+    - rabbit_prod_1|rabbit_prod_1|scim.read,openid,rabbit_prod.read:*/*,rabbit_prod.write:*/*,rabbit_prod.configure:*/*,rabbit_prod.tag:administrator
+    - rabbit_dev_1|rabbit_dev_1|scim.read,openid,rabbit_dev.read:*/*,rabbit_dev.write:*/*,rabbit_dev.configure:*/*,rabbit_dev.tag:administrator
+
   groups:
     'rabbitmq.read:*/*': Read all
     'rabbitmq.write:*/*': Write all
@@ -107,6 +112,18 @@ scim:
     'rabbitmq.tag:management': Management
     'rabbitmq.tag:monitoring': Monitoring
     'rabbitmq.tag:administrator': Administrator
+    'rabbit_dev.read:*/*': Read all
+    'rabbit_dev.write:*/*': Write all
+    'rabbit_dev.configure:*/*': Configure all
+    'rabbit_dev.tag:management': Management
+    'rabbit_dev.tag:monitoring': Monitoring
+    'rabbit_dev.tag:administrator': Administrator
+    'rabbit_prod.read:*/*': Read all
+    'rabbit_prod.write:*/*': Write all
+    'rabbit_prod.configure:*/*': Configure all
+    'rabbit_prod.tag:management': Management
+    'rabbit_prod.tag:monitoring': Monitoring
+    'rabbit_prod.tag:administrator': Administrator
 
 oauth:
   # Always override clients on startup
@@ -144,10 +161,36 @@ oauth:
       secret: producer_secret
       authorities: rabbitmq.write:*/*,rabbitmq.read:*/*,rabbitmq.configure:*/*
       authorized-grant-types: client_credentials
+    prod_producer:
+      id: prod_producer
+      secret: prod_producer
+      authorities: rabbit_prod.write:*/*,rabbit_prod.read:*/*,rabbit_prod.configure:*/*
+      authorized-grant-types: client_credentials
+    rabbit_prod_1:
+      id: rabbit_prod_1
+      secret: rabbit_prod_1
+      scope: rabbit_prod.*,openid,profile
+      authorities: uaa.resource,rabbit_prod
+      authorized-grant-types: authorization_code
+      redirect-uri: http://localhost:15672
+      allowpublic: true
+    rabbit_dev_1:
+      id: rabbit_dev_1
+      secret: rabbit_dev_1
+      scope: rabbit_dev.*,openid,profile
+      authorities: uaa.resource,rabbit_dev
+      authorized-grant-types: authorization_code
+      redirect-uri: http://localhost:15672
+      allowpublic: true
+    uaa_producer:
+      id: uaa_producer
+      secret: uaa_producer_secret
+      authorities: rabbitmq-4-uaa.write:*/*,rabbitmq-4-uaa.read:*/*,rabbitmq-4-uaa.configure:*/*
+      authorized-grant-types: client_credentials
     consumer:
       id: consumer
       secret: consumer_secret
-      authorities: rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-*
+      authorities: rabbitmq.read:*/*,rabbitmq.configure:*/*,rabbitmq.write:*/x-*,rabbitmq.write:*/q-*
       authorized-grant-types: client_credentials
     jms_producer:
       id: jms_producer
@@ -157,7 +200,7 @@ oauth:
     jms_consumer:
       id: jms_consumer
       secret: jms_consumer_secret
-      authorities: rabbitmq.read:*/* rabbitmq.configure:*/* rabbitmq.write:*/x-* rabbitmq.write:*/q-* rabbitmq.write:*/jms.durable.queues
+      authorities: rabbitmq.read:*/*,rabbitmq.configure:*/*,rabbitmq.write:*/x-*,rabbitmq.write:*/q-*,rabbitmq.write:*/jms.durable.queues
       authorized-grant-types: client_credentials
     producer_with_roles:
       id: producer_with_roles

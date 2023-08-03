@@ -41,6 +41,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
 	- [Okta](use-cases/okta.md)
 	- [Google](use-cases/google.md) **NOT SUPPORTED**
+	- [Multiple](use-cases/multiresource.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
@@ -722,6 +723,7 @@ docker logs producer_with_roles -f
 For more information on this new capability check out the [plugin's documentation](https://github.com/rabbitmq/rabbitmq-server/tree/rich_auth_request/deps/rabbitmq_auth_backend_oauth2#rich-authorization-request).
 
 
+
 ## <a id="oauth2-and-other-mechanism" class="anchor" href="#oauth2-and-other-mechanism">Combine OAuth 2.0 authentication with other mechanism</a>
 
 So far you have seen RabbitMQ configured with just OAuth authentication backend. This set up works for
@@ -810,6 +812,7 @@ make curl-with-token URL=http://localhost:15672/api/overview \
 ```
 
 > Check out the token [here](jwts/producer-without-scopes.json)
+
 
 ## Understand the environment
 

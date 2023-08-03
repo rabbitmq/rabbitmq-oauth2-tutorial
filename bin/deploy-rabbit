@@ -6,8 +6,8 @@ MODE=${MODE:-uaa}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-3.12}
-IMAGE=${IMAGE:-rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-3.13.0-beta.3.25.g698c6d0.dirty}
+IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 
 function generate-ca-server-client-kpi {
   NAME=$1
@@ -21,22 +21,24 @@ function generate-ca-server-client-kpi {
     git clone https://github.com/michaelklishin/tls-gen $SCRIPT/tls-gen
   fi
 
-  echo "Generating CA and Server PKI under $NAMER ..."
+  echo "Generating CA and Server PKI under $NAME ..."
   mkdir -p $NAME
   cp -r $SCRIPT/tls-gen/* $NAME
 
   CUR_DIR=$(pwd)
   cd $NAME/basic
-  make CN=localhost
-  make PASSWORD=$PASSWORD
+  make CN=$NAME
+  #make PASSWORD=$PASSWORD
   make verify
   make info
   cd $CUR_DIR
 }
 
 function deploy {
+  if [ "${GENERATE_SSL_CERTS:-false}" == "true" ]; then
+      generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
+  fi
   if [ "${MODE}" == "azure" ]; then
-#    generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
     EXTRA_PORTS="-p 15671:15671"
     EXTRA_MOUNTS="-v $SCRIPT/../conf/${MODE}/certs/basic/testca/cacert.pem:/etc/rabbitmq/rabbitmq-ca.crt \
                   -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/key.pem:/etc/rabbitmq/rabbitmq.key \
@@ -46,6 +48,11 @@ function deploy {
   SIGNING_KEY_FILE=$SCRIPT/../conf/${MODE}/signing-key/signing-key.pem
   if [ -f "$SIGNING_KEY_FILE" ]; then
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
+  fi
+
+  KEYCLOAK_CA_CERT_FILE=$SCRIPT/../conf/keycloak/certs/ca_certificate.pem
+  if [ -f "$KEYCLOAK_CA_CERT_FILE" ]; then
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${KEYCLOAK_CA_CERT_FILE}:/etc/rabbitmq/keycloak-cacert.pem"
   fi
 
   USED_CONFIG=""
