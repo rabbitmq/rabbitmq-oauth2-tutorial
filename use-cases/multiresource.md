@@ -147,4 +147,4 @@ The setup:
 
 Now, logout and repeat the same steps for `dev_user` user. For this user, RabbitMQ has been configured to request only `rabbitmq.tag:management` scope.
 
-**Note**: If on step 2, you select `RabbitMQ Development` and on step 3 you login as `dev_user`, RabbitMQ will not authorize the user because the resource associated to `RabbitMQ Development` requests the scope `rabbitmq.tag:administrator` however the `dev_user` does not have that scope, but `rabbitmq.tag:management`.
+**Note**: If on step 3, you login as `dev_user`, RabbitMQ will not authorize the user because RabbitMQ has been configured to request the scope `rabbitmq.tag:administrator` for `RabbitMQ Production` however the `dev_user` does not have that scope, but `rabbitmq.tag:management`. Therefore, the user gets a token which has none of the scopes RabbitMQ supports.
