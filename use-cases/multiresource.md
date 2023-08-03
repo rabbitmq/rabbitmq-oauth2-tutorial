@@ -54,7 +54,7 @@ The setup: (This is the [rabbitmq.conf](../conf/multi-keycloak/rabbitmq.conf) us
 
 Follow these steps to deploy Keycloak and RabbitMQ:
 
-1. Launch Keycloak (http://localhost:8081/admin/master/console/#/test)
+1. Launch Keycloak (http://localhost:8081/admin/master/console/#/test credentials `admin`:`admin`)
 ```
 make start-keycloak
 ```
