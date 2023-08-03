@@ -146,3 +146,5 @@ The setup:
 5. You should now get redirected to the Management UI as `prod_user` user
 
 Now, logout and repeat the same steps for `dev_user` user. For this user, RabbitMQ has been configured to request only `rabbitmq.tag:management` scope.
+
+**Note**: If on step 2, you select `RabbitMQ Development` and on step 3 you login as `dev_user`, RabbitMQ will not authorize the user because the resource associated to `RabbitMQ Development` requests the scope `rabbitmq.tag:administrator` however the `dev_user` does not have that scope, but `rabbitmq.tag:management`.
