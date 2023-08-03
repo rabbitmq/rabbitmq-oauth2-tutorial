@@ -19,11 +19,11 @@ make start-keycloak
 **Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
-To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
+To access KeyCloak management interface go to http://0.0.0.0:8081/ and enter `admin` as username and password.
 
 There is a dedicated **KeyCloak realm** called `Test` configured as follows:
-- You configured an [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
-- And a [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
+- You configured an [rsa](http://0.0.0.0:8081/admin/master/console/#/realms/test/keys) signing key
+- And a [rsa provider](http://0.0.0.0:8081/admin/master/console/#/realms/test/keys/providers)
 - And three clients: `rabbitmq-client-code` for the rabbitmq managament ui, `mgt_api_client` to access via the
 management api and `producer` to access via AMQP protocol.
 
@@ -37,7 +37,7 @@ export MODE=keycloak
 make start-rabbitmq
 ```
 **Note**: [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config) is also available but just for
-reference. By default, `make start-rabbitmq` will choose the new style. 
+reference. By default, `make start-rabbitmq` will choose the new style.
 
 ## Access Management ui
 
@@ -47,7 +47,7 @@ appropriate scopes to access the management ui.
 
 ## Access Management api
 
-Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8080/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
+Access the management api using the client [mgt_api_client](http://0.0.0.0:8081/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8081/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
 
 ```
 make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
@@ -124,10 +124,8 @@ rather than `legacy-token-key`.
 ### Configure Client
 
 For backend applications which uses **Client Credentials flow** you create a **Client** with:
-- **Access Type** : `public`
-- **Authentication flow** : `Standard Flow`
-- With **Service Accounts Enabled** on. If it is not enabled you do not have the tab `Credentials`
-- In tab `Credentials` you have the client id secret
+- **Client authentication** : `on`
+- **Authentication flow** : `Service accounts roles`
 
 
 ### Configure Client scopes
@@ -160,6 +158,6 @@ echo "127.0.0.1 keycloak" > /etc/hosts
 1. modify the [rabbitmq.config](../conf/keycloak/rabbitmq.config) configuration to appropriately point to `keycloak` host
 ```shell
 ...
-{oauth_provider_url, "http://keycloak:8080/realms/test"}
+{oauth_provider_url, "http://keycloak:8081/realms/test"}
 ...
 ```
