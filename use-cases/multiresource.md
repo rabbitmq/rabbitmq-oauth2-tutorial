@@ -141,9 +141,8 @@ The setup:
 
 	![Select Oauth2 resource](../assets/select-oauth2-resource.png)
 
-3. RabbitMQ takes the user to authenticate with Keycloak and get a token to access the RabbitMQ resource called `rabbit_prod`
-4. Login as `prod_user`:`prod_user`
-5. Keycloak prompts you to authorize various scopes for `prod_user`
-6. You should now get redirected to the Management UI as `prod_user` user
+3. Login as `prod_user`:`prod_user`
+4. Keycloak prompts you to authorize various scopes for `prod_user`
+5. You should now get redirected to the Management UI as `prod_user` user
 
 Now, logout and repeat the same steps for `dev_user` user. For this user, RabbitMQ has been configured to request only `rabbitmq.tag:management` scope.
