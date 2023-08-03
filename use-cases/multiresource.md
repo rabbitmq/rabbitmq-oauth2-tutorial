@@ -34,8 +34,8 @@ Since RabbitMq 3.11 and 3.12, this restriction and you can configure the scope's
 
 ### Test applications accessing AMQP protocol with their own audience
 
-The setup:
-- There are two OAuth2 clients (`prod_producer` and `dev_producer`) declared in keycloak and configured to access their respctive audience: `rabbit_prod` and `rabbit_dev`
+The setup: (This is the [rabbitmq.conf](../conf/multi-keycloak/rabbitmq.conf) used on this setup)
+- There are two OAuth2 clients (`prod_producer` and `dev_producer`) declared in keycloak and configured to access their respective audience: `rabbit_prod` and `rabbit_dev`
 - RabbitMQ OAuth2 plugin has been configured with 2 resources: `rabbit_prod` and `rabbit_dev`
 	```
 	auth_oauth2.resource_servers.1.id = rabbit_prod
