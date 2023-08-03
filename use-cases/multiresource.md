@@ -1,4 +1,4 @@
-# Use multiple OAuth2 servers
+# Use multiple OAuth 2.0 servers and/or audiences
 
 You are going to test the following OAuth flows:
 1. Access AMQP protocol
