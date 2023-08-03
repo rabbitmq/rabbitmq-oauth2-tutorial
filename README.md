@@ -41,7 +41,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
 	- [Okta](use-cases/okta.md)
 	- [Google](use-cases/google.md) **NOT SUPPORTED**
-	- [Multiple](use-cases/multiresource.md)
+	- [Multiple OAuth 2.0 servers and/or audiences](use-cases/multiresource.md)
 - [Understand the environment](#understand-the-environment)
 	- [RabbitMQ server](#rabbitmq-server)
 	- [UAA server](#uaa-server)
