@@ -4,6 +4,9 @@ You are going to test the following OAuth flows:
 1. Access AMQP protocol
 2. Access Management UI
 
+**NOTE** : This use case deploys a RabbitMQ docker image built from a PR which still in progress.
+The docker image is **pivotalrabbitmq/rabbitmq:oauth-multi-resource-support-otp-max-bazel**
+
 ## Prerequisites to follow this guide
 
 - Docker

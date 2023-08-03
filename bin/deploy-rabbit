@@ -6,7 +6,7 @@ MODE=${MODE:-uaa}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-3.13.0-beta.3.25.g698c6d0.dirty}
+IMAGE_TAG=${IMAGE_TAG:-oauth-multi-resource-support-otp-max-bazel}
 IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 
 function generate-ca-server-client-kpi {
