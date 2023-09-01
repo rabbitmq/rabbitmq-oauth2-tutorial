@@ -57,6 +57,16 @@ Click on **Add**.
 
 > :warning: **IMPORTANT**: Immediately note the value of the secret (as you won't be able to get it later and you will need it to configure the `rabbitmq_auth_backend_oauth2` on RabbitMQ side)
 
+## Grant Microsoft Graph permissions
+
+The application needs permissions to read information from Microsoft Graph, specifically openid to sign user in, profile and user.Read to view user profile.
+
+Still in [Azure Portal](https://portal.azure.com), go back to **Azure Active Directory** home page. In the left-hand menu, click on **App Registrations** and then click on your **application name** to open your application **Overview** pane.
+
+In the left-hand menu, click on **API permissions**. Then, click on **Add a permission** to add a permission. Select **Microsoft Graph** and then **Delegated permissions** find: User.Read, profile and openid. Select all of them and click **Add permissions**
+
+![Microsoft Graph API Permissions](../assets/azure-ad-ms-graph.png)
+
 ## Create OAuth 2.0 roles for your app
 
 App roles are defined by using the [Azure portal](https://portal.azure.com) during the app registration process. When a user signs in to your application, Azure AD emits a `roles` claim for each role that the user or service principal has been granted (you will have a look at it at the end of this tutorial).
