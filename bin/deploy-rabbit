@@ -27,7 +27,7 @@ function generate-ca-server-client-kpi {
 
   CUR_DIR=$(pwd)
   cd $NAME/basic
-  make CN=$NAME
+  make CN=localhost
   #make PASSWORD=$PASSWORD
   make verify
   make info
