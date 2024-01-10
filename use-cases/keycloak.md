@@ -1,4 +1,4 @@
-# Use KeyCloak as OAuth 2.0 server
+# Use Keycloak as OAuth 2.0 server
 
 You are going to test 3 OAuth flows:
 1. Access management ui via a browser
@@ -10,13 +10,13 @@ You are going to test 3 OAuth flows:
 - Docker
 - make
 
-## Deploy Key Cloak
+## Deploy Keycloak
 
-First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+First, deploy **Keycloak**. It comes preconfigured with all the required scopes, users and clients.
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+**Keycloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8081/ and enter `admin` as username and password.
@@ -30,14 +30,28 @@ management api and `producer` to access via AMQP protocol.
 
 ## Start RabbitMQ
 
-To start RabbitMQ run the following two commands. The first one tells RabbitMQ to pick up the
-rabbit.config found under [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+First of all, you need to add the following entries to your `/etc/hosts` file
 ```
-export MODE=keycloak
-make start-rabbitmq
+127.0.0.1 keycloak
+::1 keycloak
 ```
-**Note**: [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config) is also available but just for
-reference. By default, `make start-rabbitmq` will choose the new style.
+
+Run these two commands to start RabbitMQ. RabbitMQ starts with [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf).
+With this configuration, RabbitMQ automatically discovers the `jwks_uri` from where to download the signing keys.
+IF we want to statically configure the signing keys checkout [conf/keycloak/rabbitmq.legacy.conf](../conf/keycloak/rabbitmq.legacy.conf)
+```
+MODE=keycloak make start-rabbitmq
+```
+**Note**: To start RabbitMQ with [conf/keycloak/rabbitmq.legacy.conf](../conf/keycloak/rabbitmq.legacy.conf) set the following environment variable:
+```
+MODE=keycloak CONF=rabbitmq.legacy.conf make start-rabbitmq
+```
+
+**Note**: If you want to run a different RabbitMQ Docker image you can do it like shown below. Here we use a docker image built from source using Bazel.
+```
+IMAGE="bazel/packaging/docker-image" IMAGE_TAG="rabbitmq" MODE=keycloak make start-rabbitmq
+```
+
 
 ## Access Management ui
 
@@ -62,6 +76,11 @@ First you obtain the token and pass it as a parameter to the make target `start-
 make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
 ```
 
+Run the following command to inspect the output from the `producer` application
+```
+docker logs producer -f
+```
+
 **NOTE**: Initializing an application with a token has one drawback: the application cannot use the connection beyond the lifespan of the token. See the next section where you demonstrate how to refresh the token.
 
 ## Access AMQP protocol with Pika
@@ -82,7 +101,7 @@ python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 
 ## Access Management UI
 
-Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
+Go to http://localhost:15672, click on the single button on the page which redirects to **Keycloak** to authenticate.
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
@@ -145,19 +164,4 @@ When done, connect to the keycloak container and export your configuration befor
 > The following command overrides the default configuration provided with this repository
 ```shell
 docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/ --users realm_file
-```
-
-### Possible issue on MacOS
-
-If you want to run this configuration on MacOS, you could have problem reaching keycloak pointing to 0.0.0.0:8080.
-
-1. add `keycloak` entry in your `hosts` file
-```shell
-echo "127.0.0.1 keycloak" > /etc/hosts
-```
-1. modify the [rabbitmq.config](../conf/keycloak/rabbitmq.config) configuration to appropriately point to `keycloak` host
-```shell
-...
-{oauth_provider_url, "http://keycloak:8081/realms/test"}
-...
 ```
