@@ -1,35 +1,50 @@
-# Use multiple OAuth 2.0 servers and/or audiences
+# Expose multiple OAuth 2.0 resource(s)/audience(s) with one or many oauth providers
 
 You are going to test the following OAuth flows:
 1. Access AMQP protocol
 2. Access Management UI
 
 **NOTE** : This use case deploys a RabbitMQ docker image built from a PR which is still in progress.
-The docker image is **pivotalrabbitmq/rabbitmq:oauth-multi-resource-support-otp-max-bazel**
+The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resource-otp-min-bazel**
 
 ## Prerequisites to follow this guide
 
 - Docker
+- `/etc/hosts` must have the following entries. This is necessary if we want to access the management ui via the browser
+```
+127.0.0.1 keycloak uaa keycloak1 keycloak2
+::1 keycloak uaa keycloak1 keycloak2
+```
 
 ## Motivation
 
 All the examples and use-cases demonstrated by this tutorial, except for this use case, configure a single **resource_server_id** and therefore a single **OAuth 2.0 server**.
 
-However, you could encounter scenarios where some management users and/or applications are registered in
-different OAuth2 servers or they could be registered on the same OAuth2 server however they could refer to RabbitMQ with different audience values. When this happens, you have to declare two OAuth2 resources in RabbitMQ, one for each audience.
+Each of the following sections below demonstrate how to configure RabbitMQ to handle more than one
+oauth2 resource/audience where users and clients are declared in one or many oauth providers.
 
-The following section demonstrates an scenario where users are declared in **Keycloak** however they refer to RabbitMQ with two distinct **audience**, one `rabbit_prod` and the other `rabbit_dev`.
+## Scenario 1 - Many OAuth 2.0 resources
 
-## AMQP clients and management users registered in same OAuth 2.0 server but with different audience
+In this scenarios, we have the following OAuth clients declared on a single oauth2 provider called `keycloak`:
+- `prod_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_prod`
+- `rabbit_prod_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
+- `dev_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_dev`
+- `rabbit_dev_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
 
-RabbitMQ is configured with two OAuth2 resources one called `rabbit_prod` and another `rabbit_dev`. Think that the
-production team refers to RabbitMQ with the `rabbit_prod` audience. And the development team with the `rabbit_dev` audience.
-Because both teams are registered in the same OAuth2 server you are going to configure its settings such as `jwks_url` at the
-root level so that both resources share the same configuration.
-
-In the past, RabbitMQ imposed a restriction where the scopes had to be prefixed with the name of the resource/audience. For instance, if `resource_server_id` was `rabbitmq1`, all scopes had to be prefixed with the value `rabbitmq1` e.g. `rabbitmq1.tag:administrator`.
-
-Since RabbitMq 3.11 and 3.12, this restriction and you can configure the scope's prefix independent from the resource_id/audience. This is exactly what this scenario uses which configures the scope prefix with the value `rabbitmq.` so that all scopes, regardless of the resource, have the same prefix.
+Follow these steps to deploy Keycloak and RabbitMQ:
+1. Launch Keycloak
+```
+make start-keycloak
+```
+2. Launch RabbitMQ
+```
+MODE=multi-keycloak CONF=rabbitmq.multiresource.conf make start-rabbitmq
+```
+3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
+```
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9)
+```
+4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 
 
 ### Test applications accessing AMQP protocol with their own audience
@@ -112,39 +127,3 @@ This is an access token generated for `prod_producer`. The relevant attribute is
 ```
 make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H)
 ```
-
-
-### Test Management UI accessed via two separate resources
-
-The setup:
-- There are two users declared in Keycloak: `prod_user` and `dev_user`
-- The two resources, `rabbit_prod` and `rabbit_dev`, are declared in the Rabbitmq management plugin with their own OAuth2 client (`rabbit_prod_mgt_ui` and `rabbit_dev_mgt_ui`), scopes and the label associated to each resource.
-	```
-	management.oauth_resource_servers.1.id = rabbit_prod
-	management.oauth_resource_servers.1.client_id = rabbit_prod_mgt_ui
-	management.oauth_resource_servers.1.label = RabbitMQ Production
-	management.oauth_resource_servers.1.scopes = openid profile rabbitmq.tag:administrator
-
-	management.oauth_resource_servers.2.id = rabbit_dev
-	management.oauth_resource_servers.2.client_id = rabbit_dev_mgt_ui
-	management.oauth_resource_servers.2.label = RabbitMQ Development
-	management.oauth_resource_servers.2.scopes = openid profile rabbitmq.tag:management
-	```
-- Because there is only one OAuth2 server, both resources share the same `provider_url`:
-	```
-	management.oauth_provider_url = http://0.0.0.0:8081/realms/test
-	```
-- Each OAuth2 client, `rabbit_prod_mgt_ui` and `rabbit_dev_mgt_ui`, has been declared in Keycloak so that they can only emit tokens for their respective audience, be it `rabbit_prod` and `rabbit_dev` respectively.
-
-1. Go to [Management ui](http://localhost:15672)
-2. Select `RabbitMQ Production` resource
-
-	![Select Oauth2 resource](../assets/select-oauth2-resource.png)
-
-3. Login as `prod_user`:`prod_user`
-4. Keycloak prompts you to authorize various scopes for `prod_user`
-5. You should now get redirected to the Management UI as `prod_user` user
-
-Now, logout and repeat the same steps for `dev_user` user. For this user, RabbitMQ has been configured to request only `rabbitmq.tag:management` scope.
-
-**Note**: If on step 3, you login as `dev_user`, RabbitMQ will not authorize the user because RabbitMQ has been configured to request the scope `rabbitmq.tag:administrator` for `RabbitMQ Production` however the `dev_user` does not have that scope, but `rabbitmq.tag:management`. Therefore, the user gets a token which has none of the scopes RabbitMQ supports.

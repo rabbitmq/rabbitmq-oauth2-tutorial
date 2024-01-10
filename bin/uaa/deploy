@@ -17,7 +17,8 @@ docker run \
     --name uaa --net rabbitmq_net \
 		--publish 8080:8080 \
 		--publish 8443:8443 \
-		--mount "type=bind,source=${ROOT}/conf/${UAA_MODE},target=/uaa" \
-		--env UAA_CONFIG_PATH="/uaa" \
+		--mount "type=bind,source=${ROOT}/conf/${UAA_MODE},target=/config" \
+		--env UAA_CONFIG_PATH="/config" \
 		--env JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
+		--env SPRING_CONFIG_LOCATION="file:/config/application.yml" \
     "${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
