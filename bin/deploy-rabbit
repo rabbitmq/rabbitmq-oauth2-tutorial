@@ -6,8 +6,8 @@ MODE=${MODE:-uaa}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-oauth-multi-resource-support-otp-max-bazel}
-IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-rabbitmq}
+IMAGE=${IMAGE:-bazel/packaging/docker-image}
 
 function generate-ca-server-client-kpi {
   NAME=$1

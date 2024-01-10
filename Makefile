@@ -21,6 +21,9 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
+start-multi-keycloak: ## Start two keycloak instances
+	@./bin/multi-keycloak/deploy
+
 build-azure: ##  Generate SSL files for Azure AD
 	@./bin/azure/deploy
 
@@ -29,6 +32,12 @@ stop-uaa: ## Stop uaa
 
 stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
+
+stop-multi-keycloak: ## Stop two keycloaks
+	@docker kill keycloak1
+	@docker rm keycloak1
+	@docker kill keycloak2 
+	@docker rm keycloak2
 
 start-oauth2-proxy: ## Start oauth2-proxy
 	@bin/oauth2-proxy/deploy
