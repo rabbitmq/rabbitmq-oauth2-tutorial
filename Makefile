@@ -34,10 +34,10 @@ stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
 
 stop-multi-keycloak: ## Stop two keycloaks
-	@docker kill prod_keycloak
-	@docker rm prod_keycloak
-	@docker kill dev_keycloak
-	@docker rm dev_keycloak
+	@docker kill prodkeycloak
+	@docker rm prodkeycloak
+	@docker kill devkeycloak
+	@docker rm devkeycloak
 
 start-oauth2-proxy: ## Start oauth2-proxy
 	@bin/oauth2-proxy/deploy
