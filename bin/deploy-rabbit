@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -x
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
@@ -50,9 +52,11 @@ function deploy {
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
   fi
 
-  KEYCLOAK_CA_CERT_FILE=$SCRIPT/../conf/keycloak/certs/ca_certificate.pem
-  if [ -f "$KEYCLOAK_CA_CERT_FILE" ]; then
-      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${KEYCLOAK_CA_CERT_FILE}:/etc/rabbitmq/keycloak-cacert.pem"
+  if [[ "${MODE}" == "keycloak" ||  "${MODE}" == "multi-keycloak" ]]; then
+    KEYCLOAK_CA_CERT_FILE=$SCRIPT/../conf/${MODE}/certs/ca_certificate.pem
+    if [ -f "$KEYCLOAK_CA_CERT_FILE" ]; then
+        EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${KEYCLOAK_CA_CERT_FILE}:/etc/rabbitmq/keycloak-cacert.pem"
+    fi
   fi
 
   USED_CONFIG=""
