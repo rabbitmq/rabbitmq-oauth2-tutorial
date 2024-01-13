@@ -95,11 +95,11 @@ MODE=multi-keycloak make start-rabbitmq
 ```
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9)
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/multi-keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9 prod)
 ```
 4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H)
+make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/multi-keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H dev)
 ```
 5. Stop both producers
 ```
