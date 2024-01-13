@@ -12,8 +12,8 @@ The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resour
 - Docker
 - `/etc/hosts` must have the following entries. This is necessary if we want to access the management ui via the browser
 ```
-127.0.0.1 keycloak uaa keycloak1 keycloak2
-::1 keycloak uaa keycloak1 keycloak2
+127.0.0.1 keycloak uaa dev_keycloak prod_keycloak
+::1 keycloak uaa dev_keycloak prod_keycloak
 ```
 
 ## Motivation
@@ -23,19 +23,22 @@ All the examples and use-cases demonstrated by this tutorial, except for this us
 Each of the following sections below demonstrate how to configure RabbitMQ to handle more than one
 oauth2 resource/audience where users and clients are declared in one or many oauth providers.
 
-## Scenario 1 - Many OAuth 2.0 resources
+## Scenario 1 - Many OAuth 2.0 resources vs one single OAuth provider
 
-In this scenarios, we have the following OAuth clients declared on a single oauth2 provider called `keycloak`:
+In this scenario, we have the following OAuth clients declared on a single oauth2 provider called `keycloak`:
 - `prod_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_prod`
 - `rabbit_prod_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
 - `dev_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_dev`
 - `rabbit_dev_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
+- `rabbit_dev_mgt_api` this is an OAuth client with only access to `rabbit_dev` resource with the scopes to access only the management rest api with the `management` user-tag.
 
 Follow these steps to deploy Keycloak and RabbitMQ:
 1. Launch Keycloak
 ```
 make start-keycloak
 ```
+It is recommended to follow the logs until keycloak is fully initialized: `docker logs keycloak -f`
+
 2. Launch RabbitMQ
 ```
 MODE=keycloak CONF=rabbitmq.multiresource.conf make start-rabbitmq
@@ -66,4 +69,59 @@ make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_cli
 You should see in the standard output the following:
 ```
 {"error":"not_authorized","reason":"Not_Authorized"}
+```
+8. Shutdown RabbitMq and Keycloak
+```
+make stop-keycloak
+make stop-rabbitmq
+```
+
+
+## Scenario 2 - Many OAuth 2.0 resources vs many OAuth providers
+
+In this scenarios, we have two OAuth resources declared in RabbitMQ, `rabbit_prod` and `rabbit_dev`. However, alike in scenario 1, users and clients are declared in two separate OAuth providers. A dedicated **keycloak** provider for each resource.
+
+Follow these steps to deploy two Keycloaks and RabbitMQ:
+1. Launch 2 Keycloaks
+```
+make start-multi-keycloak
+```
+Run `docker ps | grep keycloak` to see the two instances.
+It is recommended to follow the logs until both instances are fully initialized: `docker logs keycloak1 -f`
+
+2. Launch RabbitMQ
+```
+MODE=multi-keycloak make start-rabbitmq
+```
+3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
+```
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9)
+```
+4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
+```
+make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H)
+```
+5. Stop both producers
+```
+make stop-perftest-producer PRODUCER=dev_producer
+make stop-perftest-producer PRODUCER=prod_producer
+```
+6. Verify `rabbit_dev_mgt_api` can access Management API because its token grants access to `rabbit_dev`
+```
+make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=jQa69T6KibxqrBokNTdFMroj3BN6H7dq
+```
+You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
+
+7. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
+```
+make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
+```
+You should see in the standard output the following:
+```
+{"error":"not_authorized","reason":"Not_Authorized"}
+```
+8. Shutdown RabbitMq and the two Keycloaks
+```
+make stop-multi-keycloak
+make stop-rabbitmq
 ```

@@ -1,6 +1,6 @@
 {
-  "id" : "test",
-  "realm" : "test",
+  "id" : "dev",
+  "realm" : "dev",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -49,14 +49,14 @@
       "name" : "rabbitmq.tag:management",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "c28bf7ca-9fb7-485c-a68b-d5fb4bd844fb",
       "name" : "rabbitmq.tag:administrator",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "d2b776e4-8c4d-4168-9d52-76aaa115ee70",
@@ -64,7 +64,7 @@
       "description" : "${role_uma_authorization}",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "6faef857-1c9b-4474-ba01-ad1946d243d6",
@@ -72,21 +72,21 @@
       "description" : "",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "0a838a26-4908-4750-a1d0-7cc322c698ae",
       "name" : "producer",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "dd893988-6661-4849-a0f1-1cd1a63b51a5",
       "name" : "rabbitmq.read:*/*",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "6feb7afe-2fa8-4569-8fb8-e50c2a4302d2",
@@ -94,7 +94,7 @@
       "description" : "${role_offline-access}",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "af1bc955-6d4d-42e9-b0d4-343e7eb075d0",
@@ -102,14 +102,14 @@
       "description" : "",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "77e9131f-1eb3-45a3-9f3b-f74991a99def",
       "name" : "rabbitmq.configure:*/*",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "97bb2b6b-33ff-404e-b754-351604d9f34c",
@@ -117,7 +117,7 @@
       "description" : "",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "b84ae322-7112-41d1-8a3f-0009447ded47",
@@ -131,21 +131,21 @@
         }
       },
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "5516969b-be85-490c-9715-9c1186075d60",
       "name" : "rabbitmq-management",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     }, {
       "id" : "216cfa85-9b8a-4fc0-bee1-814e2978d82b",
       "name" : "rabbitmq.write:*/*",
       "composite" : false,
       "clientRole" : false,
-      "containerId" : "test",
+      "containerId" : "dev",
       "attributes" : { }
     } ],
     "client" : {
@@ -449,7 +449,7 @@
     "description" : "${role_default-roles}",
     "composite" : true,
     "clientRole" : false,
-    "containerId" : "test"
+    "containerId" : "dev"
   },
   "requiredCredentials" : [ "password" ],
   "otpPolicyType" : "totp",
