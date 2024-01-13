@@ -120,6 +120,11 @@ You should see in the standard output the following:
 ```
 {"error":"not_authorized","reason":"Not_Authorized"}
 ```
+8. Verify the Management UI handles multiple resources.
+	- Open http://localhost:15672 in the browser
+	- Choose `rabbit_dev` resource
+	- You should be redirected to `devkeycloak` to authenticate as `rabbit_dev_mgt_ui`
+	
 8. Shutdown RabbitMq and the two Keycloaks
 ```
 make stop-multi-keycloak
