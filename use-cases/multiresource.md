@@ -12,8 +12,8 @@ The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resour
 - Docker
 - `/etc/hosts` must have the following entries. This is necessary if we want to access the management ui via the browser
 ```
-127.0.0.1 keycloak uaa dev_keycloak prod_keycloak
-::1 keycloak uaa dev_keycloak prod_keycloak
+127.0.0.1 keycloak uaa devkeycloak prodkeycloak
+::1 keycloak uaa devkeycloak prodkeycloak
 ```
 
 ## Motivation
