@@ -112,6 +112,9 @@ curl-uaa: ## Run curl with a JWT token. Syntax: make curl-uaa url=http://localho
 curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
 	@./bin/keycloak/curl $(url) $(client_id) $(secret)
 
+curl-multi-keycloak: ## Run curl with a JWT token. Syntax: make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor keycloak=dev
+	@./bin/multi-keycloak/curl $(url) $(client_id) $(secret) $(keycloak)
+
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)
 
