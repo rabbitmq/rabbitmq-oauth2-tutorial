@@ -2,31 +2,28 @@
 
 You are going to test the following OAuth flows:
 1. Access AMQP protocol
-2. Access Management UI
+2. Access Management UI and rest API
 
 **NOTE** : This use case deploys a RabbitMQ docker image built from a PR which is still in progress.
-The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resource-otp-min-bazel**
+The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resource-otp-max-bazel**
 
 ## Prerequisites to follow this guide
 
 - Docker
 - `/etc/hosts` must have the following entries. This is necessary if we want to access the management ui via the browser
 ```
-127.0.0.1 keycloak uaa devkeycloak prodkeycloak
-::1 keycloak uaa devkeycloak prodkeycloak
+127.0.0.1 localhost keycloak devkeycloak prodkeycloak
+::1 localhost keycloak devkeycloak prodkeycloak
 ```
 
 ## Motivation
 
 All the examples and use-cases demonstrated by this tutorial, except for this use case, configure a single **resource_server_id** and therefore a single **OAuth 2.0 server**.
 
-Each of the following sections below demonstrate how to configure RabbitMQ to handle more than one
-OAuth 2.0 resource/audience where users and clients are declared in one or many OAuth providers.
-
-In particular, the following three scenarios demonstrate how to configure two resources, called `rabbit_prod` and `rabbit_dev`:
-- Scenario 1 - Two resources are managed by the same **keycloak** realm and server. In other words, one single OAuth 2.0 provider where both resources and users and clients are registered under the same realm
-- Scenario 2 - Each resource is managed on a dedicated realm (`rabbit_prod` resource -> `prod` realm, `rabbit_dev` resource -> `dev` realm) but under the same provider physical server, `keycloak`.
-- Scenario 3 - Each resource is managed on a dedicated OAuth server (`rabbit_dev` -> `devkeycloak:8442`, `rabbit_dev` -> `prodkeycloak:8443`).
+The following three scenarios demonstrate how to configure two resources, called `rabbit_prod` and `rabbit_dev`:
+- **Scenario 1** - Two resources are managed by the same **keycloak** realm and server. In other words, one single OAuth 2.0 provider where both resources and users and clients are registered under the same realm
+- **Scenario 2** - Each resource is managed on a dedicated realm (`rabbit_prod` resource -> `prod` realm, `rabbit_dev` resource -> `dev` realm) but under the same provider physical server, `keycloak`.
+- **Scenario 3** - Each resource is managed on a dedicated OAuth server (`rabbit_dev` -> `devkeycloak:8442`, `rabbit_dev` -> `prodkeycloak:8443`).
 
 ## Scenario 1 - Two OAuth 2.0 resources under same OAuth provider
 
