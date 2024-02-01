@@ -21,18 +21,20 @@ The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resour
 All the examples and use-cases demonstrated by this tutorial, except for this use case, configure a single **resource_server_id** and therefore a single **OAuth 2.0 server**.
 
 The following three scenarios demonstrate how to configure two resources, called `rabbit_prod` and `rabbit_dev`:
-- **Scenario 1** - Two resources are managed by the same **keycloak** realm and server. In other words, one single OAuth 2.0 provider where both resources and users and clients are registered under the same realm
-- **Scenario 2** - Each resource is managed on a dedicated realm (`rabbit_prod` resource -> `prod` realm, `rabbit_dev` resource -> `dev` realm) but under the same provider physical server, `keycloak`.
-- **Scenario 3** - Each resource is managed on a dedicated OAuth server (`rabbit_dev` -> `devkeycloak:8442`, `rabbit_dev` -> `prodkeycloak:8443`).
+- **Scenario 1** - Both resources are managed by the same **keycloak** realm and server. In other words, all users and clients are registered on the same OAuth 2.0 provider and realm within the provider
+- **Scenario 2** - Each resource is managed on a dedicated realm (i.e. `rabbit_prod` resource -> `prod` realm, `rabbit_dev` resource -> `dev` realm) but under the same physical server, `keycloak`.
+- **Scenario 3** - Each resource is managed on a dedicated OAuth server (i.e. `rabbit_dev` -> `devkeycloak:8442`, `rabbit_dev` -> `prodkeycloak:8443`).
 
-## Scenario 1 - Two OAuth 2.0 resources under same OAuth provider
+## Scenario 1 - Two OAuth 2.0 resources under same OAuth provider and realm
 
-In this scenario, we have the following OAuth clients declared on a single OAuth 2.0 provider called `keycloak`:
-- `prod_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_prod` (password: `PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9`)
-- `rabbit_prod_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_prod`
-- `dev_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_dev` (password: `z1PNm47wfWyulTnAaDOf1AggTy3MxX2H`)
-- `rabbit_dev_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
-- `rabbit_dev_mgt_api` this is an OAuth client with only access to `rabbit_dev` resource with the scopes to access only the management rest api with the `management` user-tag.
+In this scenario, we have the following OAuth clients declared on a single OAuth 2.0 provider called `keycloak` and realm `test`:
+- Users and client with granted access to `rabbit_dev` resource:
+	- `dev_producer` this is an OAuth client_id used by a producer application (password: `z1PNm47wfWyulTnAaDOf1AggTy3MxX2H`).
+	- `rabbit_dev_admin` this is a management user which access RabbitMQ management ui.
+	- `rabbit_dev_mgt_api` this is an OAuth client which accesses the management rest api with the `management` user-tag.
+- Users and client with granted access to `rabbit_prod` resource:
+	- `prod_producer` this is an OAuth client_id used by a producer application (password: `PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9`)
+	- `rabbit_prod_admin` this is a management user
 
 Follow these steps to deploy Keycloak and RabbitMQ:
 1. Launch Keycloak
