@@ -37,20 +37,6 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
-    "id" : "ef5bbbed-c3c8-4396-bc1b-768f04de1b29",
-    "createdTimestamp" : 1706792938445,
-    "username" : "service-account-prod_producer",
-    "enabled" : true,
-    "totp" : false,
-    "emailVerified" : false,
-    "serviceAccountClientId" : "prod_producer",
-    "credentials" : [ ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-dev" ],
-    "notBefore" : 0,
-    "groups" : [ ]
-  }, {
     "id" : "02d5915f-b45f-4c61-a575-dc7f159ecaf4",
     "createdTimestamp" : 1706793139624,
     "username" : "service-account-rabbit_dev_mgt_api",
