@@ -63,7 +63,7 @@ appropriate scopes to access the management ui.
 Access the management api using the client [mgt_api_client](http://0.0.0.0:8081/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8081/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
 
 ```
-make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
+make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa realm=test
 ```
 
 ## Access AMQP protocol with PerfTest
@@ -72,7 +72,7 @@ To test OAuth2 authentication with AMQP protocol you are going to use RabbitMQ P
 First you obtain the token and pass it as a parameter to the make target `start-perftest-producer-with-token`.
 
 ```
-make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
+make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn test)
 ```
 
 Run the following command to inspect the output from the `producer` application

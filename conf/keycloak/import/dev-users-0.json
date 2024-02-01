@@ -1,0 +1,68 @@
+{
+  "realm" : "dev",
+  "users" : [ {
+    "id" : "a309b6fd-e3a2-478a-866e-d2f6848d0801",
+    "createdTimestamp" : 1706792571813,
+    "username" : "rabbit_dev_admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "",
+    "lastName" : "",
+    "credentials" : [ {
+      "id" : "65c2a172-8ffe-435f-9530-268abf696e11",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1706792581306,
+      "secretData" : "{\"value\":\"l037MMnti3Jy6c6/k2bvQkNKzzjammMdFzY/FRHazPtqpXv/InbHur29XVpA0Hyx5KOqYSJhu3158IqGRqymbg==\",\"salt\":\"PFURZwAzVAnpNrZrAGfm4w==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-dev" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "276dfd2c-ce80-4d73-a13c-fa42eb2ac431",
+    "createdTimestamp" : 1706790755122,
+    "username" : "service-account-dev_producer",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "dev_producer",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-dev" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "ef5bbbed-c3c8-4396-bc1b-768f04de1b29",
+    "createdTimestamp" : 1706792938445,
+    "username" : "service-account-prod_producer",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "prod_producer",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-dev" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "02d5915f-b45f-4c61-a575-dc7f159ecaf4",
+    "createdTimestamp" : 1706793139624,
+    "username" : "service-account-rabbit_dev_mgt_api",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "rabbit_dev_mgt_api",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-dev" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

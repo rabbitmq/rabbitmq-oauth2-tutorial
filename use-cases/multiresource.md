@@ -50,11 +50,11 @@ MODE=multi-keycloak OAUTH_PROVIDER=keycloak CONF=rabbitmq.scenario1.conf make st
 
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9)
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9 prod)
 ```
 4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H)
+make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H dev)
 ```
 5. Stop both producers
 ```
@@ -63,7 +63,7 @@ make stop-perftest-producer PRODUCER=prod_producer
 ```
 6. Verify `rabbit_dev_mgt_api` can access Management API because its token grants access to `rabbit_dev`
 ```
-make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=qcqIbJEDpwHTzimOrcD0FzJBj9C1pJsK
+make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=qcqIbJEDpwHTzimOrcD0FzJBj9C1pJsK realm=dev
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
@@ -78,7 +78,7 @@ You should see in the standard output the json blob corresponding to the endpoin
 
 8. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
 ```
-make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
+make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa realm=test
 ```
 You should see in the standard output the following:
 ```
@@ -118,11 +118,11 @@ MODE=multi-keycloak OAUTH_PROVIDER=keycloak CONF=rabbitmq.scenario2.conf make st
 ```
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/multi-keycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9 prod)
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/keycloak/token prod_producer sIqZ5flmSz3r6uKXMSz8CWGeScdTpqq0 prod)
 ```
 4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/multi-keycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H dev)
+make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/keycloak/token dev_producer SBuw1L5a7Y2aQfWfbsgXlEKGTNaEHxO8 dev)
 ```
 5. Stop both producers
 ```
@@ -131,13 +131,13 @@ make stop-perftest-producer PRODUCER=prod_producer
 ```
 6. Verify `rabbit_dev_mgt_api` can access Management API because its token grants access to `rabbit_dev`
 ```
-make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=p7v6DksWkcb6TUYK6payswovC0LqhU6A keycloak=dev
+make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=La1Mvj7Qvt8iAqHisZyAguEE8rUpg014 realm=dev
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
 8. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
 ```
-make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa keycloak=dev
+make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=La1Mvj7Qvt8iAqHisZyAguEE8rUpg014 realm=test
 ```
 You should see in the standard output the following:
 ```
@@ -155,8 +155,7 @@ You should see in the standard output the following:
 
 10. Shutdown RabbitMq and the two Keycloaks
 ```
-make stop-dev-keycloak
-make stop-prod-keycloak
+make stop-keycloak
 make stop-rabbitmq
 ```
 
