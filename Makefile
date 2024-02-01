@@ -113,8 +113,8 @@ curl-uaa: ## Run curl with a JWT token. Syntax: make curl-uaa url=http://localho
 	@uaac token client get $(client_id) -s $(secret)
 	@./bin/uaa/curl_url $(client_id) $(url)
 
-curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
-	@./bin/keycloak/curl $(url) $(client_id) $(secret)
+curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor realm=test
+	@./bin/keycloak/curl $(url) $(client_id) $(secret) ${realm}
 
 curl-dev-keycloak: ## Run curl with a JWT token. Syntax: make curl-dev-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
 	@./bin/devkeycloak/curl $(url) $(client_id) $(secret)
