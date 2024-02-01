@@ -67,7 +67,16 @@ make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
-7. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
+7. Verify Management UI access using `rabbit_dev_admin` user (password: `rabbit_dev_admin`)
+
+	- Go to http://localhost:15672
+	- Click on "Click here to login"
+	- Authenticate with Keycloak using `rabbit_dev_admin` / `rabbit_dev_admin`
+	- Verify that user is redirected by to Management UI
+	- Click on Logout
+	- Repeat with user `rabbit_prod_admin` / `rabbit_prod_admin`
+
+8. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
 ```
 make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
 ```
@@ -75,7 +84,7 @@ You should see in the standard output the following:
 ```
 {"error":"not_authorized","reason":"Not_Authorized"}
 ```
-8. Shutdown RabbitMq and Keycloak
+9. Shutdown RabbitMq and Keycloak
 ```
 make stop-keycloak
 make stop-rabbitmq
@@ -86,12 +95,12 @@ make stop-rabbitmq
 
 In this scenario, we are still using the same single OAuth 2.0 provider called `keycloak`, but with the following setup:
 - Under Realm `dev`:
-	- `dev_producer` with the audience `rabbit_dev` (password: `z1PNm47wfWyulTnAaDOf1AggTy3MxX2H`)
-	- `rabbit_dev_admin`
+	- `dev_producer` with the audience `rabbit_dev` (password: `SBuw1L5a7Y2aQfWfbsgXlEKGTNaEHxO8`)
+	- `rabbit_dev_admin` (password: `rabbit_dev_admin`)
 	- `rabbit_dev_mgt_api`
 - Under Realm `prod`:
 	- `prod_producer` with the audience `rabbit_prod` (password: `PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9`)
-	- `rabbit_prod_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_prod`
+	- `rabbit_prod_admin` (password: `rabbit_prod_admin`)
 
 In this scenarios, we have two OAuth resources declared in RabbitMQ, `rabbit_prod` and `rabbit_dev`. However, alike in scenario 1, users and clients are declared in two separate OAuth providers. A dedicated **keycloak** provider for each resource.
 
@@ -126,7 +135,7 @@ make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=rabbi
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
-7. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
+8. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
 ```
 make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa keycloak=dev
 ```
@@ -134,12 +143,17 @@ You should see in the standard output the following:
 ```
 {"error":"not_authorized","reason":"Not_Authorized"}
 ```
-8. Verify the Management UI handles multiple resources.
-	- Open http://localhost:15672 in the browser
-	- Choose `rabbit_dev` resource
-	- You should be redirected to `devkeycloak` to authenticate as `dev_user`/`dev_user`
 
-8. Shutdown RabbitMq and the two Keycloaks
+9. Verify Management UI access:
+
+	- Go to http://localhost:15672
+	- Click on "Click here to login"
+	- Authenticate with Keycloak using `rabbit_dev_admin` / `rabbit_dev_admin`
+	- Verify that user is redirected by to Management UI
+	- Click on Logout
+	- Repeat with user `rabbit_prod_admin` / `rabbit_prod_admin`
+
+10. Shutdown RabbitMq and the two Keycloaks
 ```
 make stop-dev-keycloak
 make stop-prod-keycloak
