@@ -21,9 +21,9 @@ The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resour
 All the examples and use-cases demonstrated by this tutorial, except for this use case, configure a single **resource_server_id** and therefore a single **OAuth 2.0 server**.
 
 The following three scenarios demonstrate how to configure two resources, called `rabbit_prod` and `rabbit_dev`:
-- **Scenario 1** - Both resources are managed by the same **keycloak** realm and server. In other words, all users and clients are registered on the same OAuth 2.0 provider and realm within the provider
+- **Scenario 1** - Both resources are managed by the same **keycloak** realm and server. In other words, all users and clients are registered on the same OAuth 2.0 provider and realm
 - **Scenario 2** - Each resource is managed on a dedicated realm (i.e. `rabbit_prod` resource -> `prod` realm, `rabbit_dev` resource -> `dev` realm) but under the same physical server, `keycloak`.
-- **Scenario 3** - Each resource is managed on a dedicated OAuth server (i.e. `rabbit_dev` -> `devkeycloak:8442`, `rabbit_dev` -> `prodkeycloak:8443`).
+- **Scenario 3** - Each resource is managed on a dedicated OAuth server and realm (i.e. `rabbit_dev` -> `https://keycloak:8443/realms/dev`, `rabbit_dev` -> `https://keycloak:8442/realms/prod`).
 
 ## Scenario 1 - Two OAuth 2.0 resources under same OAuth provider and realm
 
