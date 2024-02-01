@@ -63,7 +63,7 @@ make stop-perftest-producer PRODUCER=prod_producer
 ```
 6. Verify `rabbit_dev_mgt_api` can access Management API because its token grants access to `rabbit_dev`
 ```
-make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=jQa69T6KibxqrBokNTdFMroj3BN6H7dq
+make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_mgt_api secret=qcqIbJEDpwHTzimOrcD0FzJBj9C1pJsK
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
