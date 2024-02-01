@@ -32,8 +32,8 @@ management api and `producer` to access via AMQP protocol.
 
 First of all, you need to add the following entries to your `/etc/hosts` file
 ```
-127.0.0.1 keycloak
-::1 keycloak
+127.0.0.1 localhost keycloak
+::1 localhost keycloak
 ```
 
 Run these two commands to start RabbitMQ. RabbitMQ starts with [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf).
