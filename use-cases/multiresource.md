@@ -45,7 +45,7 @@ It is recommended to follow the logs until keycloak is fully initialized: `docke
 
 2. Launch RabbitMQ
 ```
-MODE=keycloak CONF=rabbitmq.scenario1.conf make start-rabbitmq
+MODE=multi-keycloak OAUTH_PROVIDER=keycloak CONF=rabbitmq.scenario1.conf make start-rabbitmq
 ```
 
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
@@ -95,18 +95,17 @@ In this scenario, we are still using the same single OAuth 2.0 provider called `
 
 In this scenarios, we have two OAuth resources declared in RabbitMQ, `rabbit_prod` and `rabbit_dev`. However, alike in scenario 1, users and clients are declared in two separate OAuth providers. A dedicated **keycloak** provider for each resource.
 
-Follow these steps to deploy two Keycloaks and RabbitMQ:
-1. Launch 2 Keycloaks
+Follow these steps to deploy Keycloak and RabbitMQ:
+1. Launch Keycloak
 ```
-make start-dev-keycloak
-make start-prod-keycloak
+make start-keycloak
 ```
 Run `docker ps | grep keycloak` to see the two instances.
 It is recommended to follow the logs until both instances are fully initialized: `docker logs keycloak1 -f`
 
 2. Launch RabbitMQ
 ```
-MODE=multi-keycloak make start-rabbitmq
+MODE=multi-keycloak OAUTH_PROVIDER=keycloak CONF=rabbitmq.scenario2.conf make start-rabbitmq
 ```
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
