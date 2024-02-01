@@ -26,6 +26,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 	- [AMQP 1.0 protocol](#amqp-10-protocol)
 - [Messaging on Topic Exchanges](#messaging-on-topic-exchanges)
 - Use advanced OAuth 2.0 configuration
+	- [Multiple Resource Server(s)](#multiple-resource-servers)
 	- [Use custom scope field](#use-custom-scope-field)
 	- [Use multiple asymmetrical signing keys](#use-multiple-asymmetrical-signing-keys)
 	- [Use custom scopes](#use-custom-scopes)
@@ -402,6 +403,35 @@ OAuth 2.0 authorisation backend supports variable expansion when checking permis
 ## Use advanced OAuth 2.0 configuration
 
 In this section, you are going to explore various OAuth 2.0 configurations you can enable in RabbitMQ.
+
+### <a id="multiple-resource-servers" class="anchor" href="#multiple-resource-servers">Multiple Resource Server(s)</a>
+
+Typically, all users that access a RabbitMQ cluster are registered within the same Identity Provider. And likewise, all tokens targeting the same RabbitMQ cluster also carry the same *audience*. In other words, all users reference a RabbitMQ cluster with the same name, a.k.a. *audience* using OAuth 2.0 terminology.
+
+However, there are some use-cases where RabbitMQ is either accessed by users registered in different Identity Providers or tokens issued for the same RabbitMQ installation use different *Audience*(s). For these use-cases, RabbitMQ OAuth 2.0 plugin and the Management plugin can be configured with multiple OAuth 2.0 resources.
+
+Below is the OAuth 2.0 plugin configuration for two resources with the ids, `rabbit_prod` and `rabbit_dev`. Both resources (a.k.a. *audience*) are managed by the same Identity Provider whose JWKS (Signing Key server) is `http//some_idp_url/keyset`.
+
+<pre class="lang-ini">
+auth_oauth2.jwks_url = http//some_idp_url/keyset
+auth_oauth2.scope_prefix = rabbitmq.
+
+auth_oauth2.resource_servers.1.id = rabbit_prod
+auth_oauth2.resource_servers.2.id = rabbit_dev
+auth_oauth2.resource_servers.2.scope_prefix = dev-rabbitmq.
+</pre>
+
+Not all `auth_oauth2` settings are supported to configure individual resource servers. These are the supported
+attributes:
+- `id` - This is the actual resource identifier carried in the `audience` field of a token. If omitted, the value is the index, e.g. given `auth_oauth2.resource_servers.prod.scope_prefix` setting, the `id` would be `prod`.
+- `scope_prefix`
+- `additional_scopes_key`
+- `resource_server_type`
+- `oauth_provider_id` - This is the identifier of the OAuth provider, configured in RabbitMQ, which provides all the settings to contact the Authorization server in order to discover all its endpoints, such as the `jwks_uri` to download the signing keys to validate the token. If this setting is omitted, RabbitMQ looks up the default Authorization Provider's id in the setting `auth_oauth2.default_oauth_provider`. And if it is also omitted, RabbitMQ uses `auth_oauth2.issuer` or `auth_oauth2.jwks_url` to download the signings keys to validate the token.
+
+The list of supported resources by a RabbitMQ cluster is the combination of `auth_oauth2.resource_servers` and `auth_oauth2.resource_server_id`.
+
+**NOTE**: There is an [example](./oauth2-examples-multiresource.html) that demonstrate multiple OAuth 2 resources.
 
 ### Use custom scope field  
 

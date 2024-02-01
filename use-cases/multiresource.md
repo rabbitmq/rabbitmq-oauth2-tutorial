@@ -21,14 +21,14 @@ The docker image is **pivotalrabbitmq/rabbitmq:create-oauth2-client-multi-resour
 All the examples and use-cases demonstrated by this tutorial, except for this use case, configure a single **resource_server_id** and therefore a single **OAuth 2.0 server**.
 
 Each of the following sections below demonstrate how to configure RabbitMQ to handle more than one
-oauth2 resource/audience where users and clients are declared in one or many oauth providers.
+OAuth 2.0 resource/audience where users and clients are declared in one or many OAuth providers.
 
 ## Scenario 1 - Many OAuth 2.0 resources vs one single OAuth provider
 
-In this scenario, we have the following OAuth clients declared on a single oauth2 provider called `keycloak`:
-- `prod_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_prod`
+In this scenario, we have the following OAuth clients declared on a single OAuth 2.0 provider called `keycloak`:
+- `prod_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_prod` (password: `PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9`)
 - `rabbit_prod_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
-- `dev_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_dev`
+- `dev_producer` this is an OAuth client_id used by a producer application which accesses RabbitMQ with the audience `rabbit_dev` (password: `z1PNm47wfWyulTnAaDOf1AggTy3MxX2H`)
 - `rabbit_dev_admin` this is a management user which access RabbitMQ via the resource/audience `rabbit_dev`
 - `rabbit_dev_mgt_api` this is an OAuth client with only access to `rabbit_dev` resource with the scopes to access only the management rest api with the `management` user-tag.
 
@@ -84,7 +84,8 @@ In this scenarios, we have two OAuth resources declared in RabbitMQ, `rabbit_pro
 Follow these steps to deploy two Keycloaks and RabbitMQ:
 1. Launch 2 Keycloaks
 ```
-make start-multi-keycloak
+make start-dev-keycloak
+make start-prod-keycloak
 ```
 Run `docker ps | grep keycloak` to see the two instances.
 It is recommended to follow the logs until both instances are fully initialized: `docker logs keycloak1 -f`
@@ -123,10 +124,11 @@ You should see in the standard output the following:
 8. Verify the Management UI handles multiple resources.
 	- Open http://localhost:15672 in the browser
 	- Choose `rabbit_dev` resource
-	- You should be redirected to `devkeycloak` to authenticate as `rabbit_dev_mgt_ui`
-	
+	- You should be redirected to `devkeycloak` to authenticate as `dev_user`/`dev_user`
+
 8. Shutdown RabbitMq and the two Keycloaks
 ```
-make stop-multi-keycloak
+make stop-dev-keycloak
+make stop-prod-keycloak
 make stop-rabbitmq
 ```

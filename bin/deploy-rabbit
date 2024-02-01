@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+#set -x
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -8,8 +8,10 @@ MODE=${MODE:-uaa}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-rabbitmq}
-IMAGE=${IMAGE:-bazel/packaging/docker-image}
+#IMAGE_TAG=${IMAGE_TAG:-rabbitmq}
+#IMAGE=${IMAGE:-bazel/packaging/docker-image}
+IMAGE_TAG=${IMAGE_TAG:-create-oauth2-client-multi-resource-otp-max-bazel}
+IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 
 function generate-ca-server-client-kpi {
   NAME=$1
@@ -52,11 +54,10 @@ function deploy {
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
   fi
 
-  if [[ "${MODE}" == "keycloak" ||  "${MODE}" == "multi-keycloak" ]]; then
-    KEYCLOAK_CA_CERT_FILE=$SCRIPT/../conf/${MODE}/certs/ca_certificate.pem
-    if [ -f "$KEYCLOAK_CA_CERT_FILE" ]; then
-        EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${KEYCLOAK_CA_CERT_FILE}:/etc/rabbitmq/keycloak-cacert.pem"
-    fi
+  OAUTH_SERVER_CACERTFILE=$SCRIPT/../conf/${MODE}/certs/ca_certificate.pem
+  if [ -f "$OAUTH_SERVER_CACERTFILE" ]; then
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${OAUTH_SERVER_CACERTFILE}:/etc/rabbitmq/${MODE}-ca_certificate.pem"
+      echo "${MODE} ca_certificate.pem mounted as /etc/rabbitmq/${MODE}-ca_certificate.pem"
   fi
 
   USED_CONFIG=""
