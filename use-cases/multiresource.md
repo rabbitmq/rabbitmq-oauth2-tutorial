@@ -67,14 +67,15 @@ make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_dev_
 ```
 You should see in the standard output the json blob corresponding to the endpoint `/overview` in RabbitMQ's management api.
 
-7. Verify Management UI access using `rabbit_dev_admin` user (password: `rabbit_dev_admin`)
+7. Verify Management UI access
 
 	- Go to http://localhost:15672
+	- Select *RabbitMQ Development* OAuth 2.0 resource
 	- Click on "Click here to login"
 	- Authenticate with Keycloak using `rabbit_dev_admin` / `rabbit_dev_admin`
 	- Verify that user is redirected by to Management UI
 	- Click on Logout
-	- Repeat with user `rabbit_prod_admin` / `rabbit_prod_admin`
+	- Repeat with *RabbitMQ Production* and user `rabbit_prod_admin` / `rabbit_prod_admin`
 
 8. Verify `mgt_api_client` cannot access Management API because its token does not grant access to `rabbit_dev` or `rabbit_prod`
 ```
@@ -144,14 +145,15 @@ You should see in the standard output the following:
 {"error":"not_authorized","reason":"Not_Authorized"}
 ```
 
-9. Verify Management UI access:
+9. Verify Management UI access
 
 	- Go to http://localhost:15672
+	- Select *RabbitMQ Development* OAuth 2.0 resource
 	- Click on "Click here to login"
 	- Authenticate with Keycloak using `rabbit_dev_admin` / `rabbit_dev_admin`
 	- Verify that user is redirected by to Management UI
 	- Click on Logout
-	- Repeat with user `rabbit_prod_admin` / `rabbit_prod_admin`
+	- Repeat with *RabbitMQ Production* and user `rabbit_prod_admin` / `rabbit_prod_admin`
 
 10. Shutdown RabbitMq and the two Keycloaks
 ```
