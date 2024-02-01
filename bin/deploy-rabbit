@@ -5,6 +5,7 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
+OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
@@ -54,10 +55,10 @@ function deploy {
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
   fi
 
-  OAUTH_SERVER_CACERTFILE=$SCRIPT/../conf/${MODE}/certs/ca_certificate.pem
+  OAUTH_SERVER_CACERTFILE=$SCRIPT/../conf/${OAUTH_PROVIDER}/certs/ca_certificate.pem
   if [ -f "$OAUTH_SERVER_CACERTFILE" ]; then
-      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${OAUTH_SERVER_CACERTFILE}:/etc/rabbitmq/${MODE}-ca_certificate.pem"
-      echo "${MODE} ca_certificate.pem mounted as /etc/rabbitmq/${MODE}-ca_certificate.pem"
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${OAUTH_SERVER_CACERTFILE}:/etc/rabbitmq/${OAUTH_PROVIDER}-ca_certificate.pem"
+      echo "MODE:${MODE} OAUTH_PROVIDER:${OAUTH_PROVIDER} ca_certificate.pem mounted as /etc/rabbitmq/${OAUTH_PROVIDER}-ca_certificate.pem"
   fi
 
   USED_CONFIG=""
