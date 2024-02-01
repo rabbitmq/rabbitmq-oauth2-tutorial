@@ -52,7 +52,6 @@ MODE=keycloak CONF=rabbitmq.legacy.conf make start-rabbitmq
 IMAGE="bazel/packaging/docker-image" IMAGE_TAG="rabbitmq" MODE=keycloak make start-rabbitmq
 ```
 
-
 ## Access Management ui
 
 Go to http://localhost:15672/#/, click on `Click here to log in` button, and enter the credentials
@@ -83,6 +82,11 @@ docker logs producer -f
 
 **NOTE**: Initializing an application with a token has one drawback: the application cannot use the connection beyond the lifespan of the token. See the next section where you demonstrate how to refresh the token.
 
+Run the following command to stop the producer:
+```
+make stop-perftest-producer
+```
+
 ## Access AMQP protocol with Pika
 
 This section is about testing OAuth 2.0 authentication with AMQP protocol and with Pika library. And more specifically, you
@@ -98,11 +102,6 @@ pip install requests
 python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 ```
 > Ensure you install pika 1.3
-
-## Access Management UI
-
-Go to http://localhost:15672, click on the single button on the page which redirects to **Keycloak** to authenticate.
-Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
 # Access Stream protocol with .Net Stream Client
@@ -121,8 +120,15 @@ dotnet run
 
 ## Stop keycloak
 
-`make stop-keycloak`
+```
+make stop-keycloak
+```
 
+## Stop RabbitMQ
+
+```
+make stop-rabbitmq
+```
 
 ## Notes about setting up KeyCloak
 
@@ -163,5 +169,5 @@ For testing purposes, once you modified keycloak configuration, you would want t
 When done, connect to the keycloak container and export your configuration before removing the container
 > The following command overrides the default configuration provided with this repository
 ```shell
-docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/ --users realm_file
+docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/
 ```

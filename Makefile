@@ -21,8 +21,10 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
-start-multi-keycloak: ## Start two keycloak instances
-	@./bin/multi-keycloak/deploy
+start-dev-keycloak: ## Start dev keycloak instance
+	@./bin/devkeycloak/deploy
+start-prod-keycloak: ## Start prod keycloak instance
+	@./bin/prodkeycloak/deploy
 
 build-azure: ##  Generate SSL files for Azure AD
 	@./bin/azure/deploy
@@ -33,11 +35,13 @@ stop-uaa: ## Stop uaa
 stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
 
-stop-multi-keycloak: ## Stop two keycloaks
-	@docker kill prodkeycloak
-	@docker rm prodkeycloak
+stop-dev-keycloak: ## Stop dev keycloak
 	@docker kill devkeycloak
 	@docker rm devkeycloak
+
+stop-prod-keycloak: ## Stop dev keycloak
+	@docker kill prodkeycloak
+	@docker rm prodkeycloak
 
 start-oauth2-proxy: ## Start oauth2-proxy
 	@bin/oauth2-proxy/deploy
@@ -112,8 +116,11 @@ curl-uaa: ## Run curl with a JWT token. Syntax: make curl-uaa url=http://localho
 curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
 	@./bin/keycloak/curl $(url) $(client_id) $(secret)
 
-curl-multi-keycloak: ## Run curl with a JWT token. Syntax: make curl-multi-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor keycloak=dev
-	@./bin/multi-keycloak/curl $(url) $(client_id) $(secret) $(keycloak)
+curl-dev-keycloak: ## Run curl with a JWT token. Syntax: make curl-dev-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@./bin/devkeycloak/curl $(url) $(client_id) $(secret)
+
+curl-prod-keycloak: ## Run curl with a JWT token. Syntax: make curl-prod-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@./bin/prodkeycloak/curl $(url) $(client_id) $(secret)
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)
