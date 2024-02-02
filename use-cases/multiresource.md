@@ -22,6 +22,7 @@ All the examples and use-cases demonstrated by this tutorial, except for this us
 
 The following three scenarios demonstrate how to configure two resources, called `rabbit_prod` and `rabbit_dev`:
 - **Scenario 1** - Both resources are managed by the same **keycloak** realm and server. In other words, all users and clients are registered on the same OAuth 2.0 provider and realm
+- **Scenario 1 with sligthly simpler configuration** - The scenario is exactly the same as in scenario 1 except with simpler configuration which makes some assumptions
 - **Scenario 2** - Each resource is managed on a dedicated realm (i.e. `rabbit_prod` resource -> `https://keycloak:8443/realms/prod` realm, `rabbit_dev` resource -> `https://keycloak:8443/realms/dev`) but under the same physical server, `keycloak`.
 - **Scenario 3** - Each resource is managed on a dedicated OAuth server and realm (i.e. `rabbit_dev` -> `https://devkeycloak:8443/realms/dev`, `rabbit_dev` -> `https://prodkeycloak:8442/realms/prod`).
 
@@ -93,19 +94,19 @@ make stop-rabbitmq
 
 ## Scenario 1 - Same setup but with simpler configuration
 
-The configuration used in previous section is the recommended configuration. It is more comprehensive to set all things about the OAuth provider into its own section. First, you declare the OAuth provider's issuer url. If the TLS certificate has been signed by a root ca authority, most likely you don't need to need to set the `cacertfile`.
+The [configuration](conf/multi-keycloak/rabbitmq.scenario1.conf) used in previous section is the recommended configuration. It is more comprehensive to set all things about the OAuth provider into its own section as shown below although it certainly looks more verbose. First, you declare the OAuth provider's issuer url. If the TLS certificate has been signed by a root ca authority, most likely you don't need to need to set the `cacertfile`. However, here it is used a self-signed certificate hence it is needed.
 ```
 auth_oauth2.oauth_providers.keycloak.issuer = https://keycloak:8443/realms/test
 auth_oauth2.oauth_providers.keycloak.https.cacertfile = /etc/rabbitmq/keycloak-ca_certificate.pem
 auth_oauth2.oauth_providers.keycloak.https.verify = verify_peer
 auth_oauth2.oauth_providers.keycloak.https.hostname_verification = wildcard
 ```
-And finally, you configure the previous provider as the default OAuth Provider:
+And finally, you configure the provider as the default OAuth Provider. **If you miss this setting, OAuth 2.0 functionality is disabled**:
 ```
 auth_oauth2.default_oauth_provider = keycloak
 ```
 
-However, if you prefer to use the configuration used until RabbitMQ 3.12.x, here is the equivalent and used on this section.
+However, if you prefer to use the [configuration](conf/multi-keycloak/rabbitmq.scenario1.basic.conf) used until RabbitMQ 3.12.x, here is the equivalent and used on this section.
 ```
 # OAuth provider settings for all resources
 auth_oauth2.issuer = https://keycloak:8443/realms/test
@@ -115,7 +116,7 @@ auth_oauth2.https.hostname_verification = wildcard
 ```
 
 The other simplification introduced on this section is relative to the resource's label and the resource's scope.
-In the previous section's configuration, each resource had its own label (or display text) used in the combo-box. Furthermore, each resource configured the scopes RabbitMQ should claim from the OAuth Provider on behalf of the user. Here is the configuration used in the previous section:
+Here is the configuration used in the previous section where each resource configured its label and scopes:
 ```
 ## Management ui settings for each declared resource server
 management.oauth_resource_servers.1.id = rabbit_prod
@@ -130,7 +131,7 @@ management.oauth_resource_servers.2.oauth_scopes = openid profile rabbitmq.tag:m
 ```
 
 Whereas in this section's configuration, there is no label hence the label is the resource's id. This is perfectly valid. However, if the resource's id is not very user-friendly, it is preferable to set a label.
-Also, in this section's configuration, both resources claim the same scopes therefore the scopes are set up at the root level.
+Also, in this section's configuration, both resources claim the same scopes therefore the scopes are set up at the root level. 
 ```
 management.oauth_scopes = openid profile rabbitmq.tag:administrator rabbitmq.tag:management
 
