@@ -1,1 +1,1 @@
-[rabbitmq_management,rabbitmq_auth_backend_oauth2,rabbitmq_amqp1_0,rabbitmq_web_mqtt].
+[rabbitmq_stream_management,rabbitmq_auth_backend_oauth2,rabbitmq_amqp1_0,rabbitmq_web_mqtt].
