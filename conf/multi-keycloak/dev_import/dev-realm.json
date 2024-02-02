@@ -457,7 +457,7 @@
   "otpPolicyLookAheadWindow" : 1,
   "otpPolicyPeriod" : 30,
   "otpPolicyCodeReusable" : false,
-  "otpSupportedApplications" : [ "totpAppFreeOTPName", "totpAppGoogleName" ],
+  "otpSupportedApplications" : [ "totpAppGoogleName", "totpAppFreeOTPName" ],
   "webAuthnPolicyRpEntityName" : "keycloak",
   "webAuthnPolicySignatureAlgorithms" : [ "ES256" ],
   "webAuthnPolicyRpId" : "",
@@ -479,6 +479,28 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister" : false,
   "webAuthnPolicyPasswordlessAcceptableAaguids" : [ ],
   "users" : [ {
+    "id" : "5212cf6f-0231-41a2-9472-c14146142aa4",
+    "createdTimestamp" : 1706863101656,
+    "username" : "rabbit_dev_admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "",
+    "lastName" : "",
+    "credentials" : [ {
+      "id" : "e6304620-47a0-4560-8070-47ce5b699cf4",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1706863112578,
+      "secretData" : "{\"value\":\"67nQrUkpn6rD0jXz/HGksdVS9WU4kYJq4leC+3aLvZtDTaoj+8ArcCh98i49J/qMxblwJ7giYr5YUYbCAhV6yw==\",\"salt\":\"ViNe7bGI6WRZ70or3Eo63g==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "rabbitmq.tag:management", "default-roles-test" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "a18a10cc-fefe-49a6-b844-09c28dde9a64",
     "createdTimestamp" : 1706858739584,
     "username" : "service-account-dev_producer",
@@ -531,7 +553,7 @@
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-test" ],
+    "realmRoles" : [ "rabbitmq.tag:management", "default-roles-test" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
