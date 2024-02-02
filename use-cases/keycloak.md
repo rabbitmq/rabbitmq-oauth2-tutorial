@@ -104,6 +104,7 @@ python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 > Ensure you install pika 1.3
 
 
+<<<<<<< HEAD
 # Access Stream protocol with .Net Stream Client
 
 This section is about testing OAuth 2.0 authentication with Stream protocol and with [.Net Stream Client](https://github.com/rabbitmq/rabbitmq-stream-dotnet-client) library. And more specifically, you
@@ -118,6 +119,8 @@ dotnet run
 ```
 
 
+=======
+>>>>>>> Restore keycloak.md
 ## Stop keycloak
 
 ```
@@ -169,5 +172,9 @@ For testing purposes, once you modified keycloak configuration, you would want t
 When done, connect to the keycloak container and export your configuration before removing the container
 > The following command overrides the default configuration provided with this repository
 ```shell
+<<<<<<< HEAD
 docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/
+=======
+docker exec -it keycloak /opt/keycloak/bin/kc.sh export --users realm_file --realm test --dir /opt/keycloak/data/import/
+>>>>>>> Restore keycloak.md
 ```
