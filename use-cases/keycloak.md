@@ -86,6 +86,20 @@ Go to http://localhost:15672, click on the single button on the page which redir
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
+# Access Stream protocol with .Net Stream Client
+
+This section is about testing OAuth 2.0 authentication with Stream protocol and with [.Net Stream Client](https://github.com/rabbitmq/rabbitmq-stream-dotnet-client) library. And more specifically, you
+are demonstrating how to refresh a token on a live stream connections.
+
+You can see the Python sample application [here](../stream_dot_net/Keycloak/).
+
+To run this sample:
+
+```
+dotnet run
+```
+
+
 ## Stop keycloak
 
 `make stop-keycloak`
