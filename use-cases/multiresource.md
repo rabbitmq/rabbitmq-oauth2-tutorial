@@ -224,7 +224,7 @@ make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/prodk
 ```
 4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/devkeycloak/token dev_producer SBuw1L5a7Y2aQfWfbsgXlEKGTNaEHxO8)
+make start-perftest-producer-with-token PRODUCER=dev_producer TOKEN=$(bin/devkeycloak/token dev_producer z1PNm47wfWyulTnAaDOf1AggTy3MxX2H)
 ```
 5. Stop both producers
 ```
