@@ -220,7 +220,7 @@ MODE=multi-keycloak CONF=rabbitmq.scenario3.conf make start-rabbitmq
 ```
 3. Launch AMQP producer registered in Keycloak with the **client_id** `prod_producer` and with the permission to access `rabbit_prod` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
-make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/prodkeycloak/token prod_producer sIqZ5flmSz3r6uKXMSz8CWGeScdTpqq0)
+make start-perftest-producer-with-token PRODUCER=prod_producer TOKEN=$(bin/prodkeycloak/token prod_producer PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9)
 ```
 4. Launch AMQP producer registered in Keycloak with the **client_id** `dev_producer` and with the permission to access `rabbit_dev` resource and with the scopes `rabbitmq.read:*/* rabbitmq.write:*/* rabbitmq.configure:*/*`:
 ```
