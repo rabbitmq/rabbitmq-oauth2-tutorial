@@ -94,7 +94,7 @@ make stop-rabbitmq
 
 ## Scenario 1 - Same setup but with simpler configuration
 
-The [configuration](conf/multi-keycloak/rabbitmq.scenario1.conf) used in previous section is the recommended configuration. It is more comprehensive to set all things about the OAuth provider into its own section as shown below although it certainly looks more verbose. First, you declare the OAuth provider's issuer url. If the TLS certificate has been signed by a root ca authority, most likely you don't need to need to set the `cacertfile`. However, here it is used a self-signed certificate hence it is needed.
+The [configuration](../conf/multi-keycloak/rabbitmq.scenario1.conf) used in previous section is the recommended configuration. It is more comprehensive to set all things about the OAuth provider into its own section as shown below although it certainly looks more verbose. First, you declare the OAuth provider's issuer url. If the TLS certificate has been signed by a root ca authority, most likely you don't need to need to set the `cacertfile`. However, here it is used a self-signed certificate hence it is needed.
 ```
 auth_oauth2.oauth_providers.keycloak.issuer = https://keycloak:8443/realms/test
 auth_oauth2.oauth_providers.keycloak.https.cacertfile = /etc/rabbitmq/keycloak-ca_certificate.pem
@@ -106,7 +106,7 @@ And finally, you configure the provider as the default OAuth Provider. **If you 
 auth_oauth2.default_oauth_provider = keycloak
 ```
 
-However, if you prefer to use the [configuration](conf/multi-keycloak/rabbitmq.scenario1.basic.conf) used until RabbitMQ 3.12.x, here is the equivalent and used on this section.
+However, if you prefer to use the [configuration](../conf/multi-keycloak/rabbitmq.scenario1.basic.conf) used until RabbitMQ 3.12.x, here is the equivalent and used on this section.
 ```
 # OAuth provider settings for all resources
 auth_oauth2.issuer = https://keycloak:8443/realms/test
@@ -131,7 +131,7 @@ management.oauth_resource_servers.2.oauth_scopes = openid profile rabbitmq.tag:m
 ```
 
 Whereas in this section's configuration, there is no label hence the label is the resource's id. This is perfectly valid. However, if the resource's id is not very user-friendly, it is preferable to set a label.
-Also, in this section's configuration, both resources claim the same scopes therefore the scopes are set up at the root level. 
+Also, in this section's configuration, both resources claim the same scopes therefore the scopes are set up at the root level.
 ```
 management.oauth_scopes = openid profile rabbitmq.tag:administrator rabbitmq.tag:management
 
@@ -164,7 +164,7 @@ This scenario is still using the same single OAuth 2.0 provider called `keycloak
 	- `rabbit_prod_admin` (password: `rabbit_prod_admin`)
 
 Alike in the previous scenario, we configure RabbitMQ with two OAuth 2.0 providers when there is really one.
-However, this provider is multitenant and each tenant acts like a separate OAuth provider with its own issuer URL. Check out the section `oauth_providers` in [RabbitMQ Configuration](conf/multi-keycloak/rabbitmq.scenario2.conf) used by this scenario. For convenience here is the relevant part:
+However, this provider is multitenant and each tenant acts like a separate OAuth provider with its own issuer URL. Check out the section `oauth_providers` in [RabbitMQ Configuration](../conf/multi-keycloak/rabbitmq.scenario2.conf) used by this scenario. For convenience here is the relevant part:
 ```
 ...
 ## Oauth providers
@@ -248,7 +248,7 @@ This scenario uses two separate OAuth 2.0 provider called `devkeycloak` and `pro
 	- `prod_producer` with the audience `rabbit_prod` (password: `PdLHb1w8RH1oD5bpppgy8OF9G6QeRpL9`)
 	- `rabbit_prod_admin` (password: `rabbit_prod_admin`)
 
-Check out the section `oauth_providers` in [RabbitMQ Configuration](conf/multi-keycloak/rabbitmq.scenario3.conf) used by this scenario. Like in the scenario 2, there are two OAuth providers however this time the URL refers to two different hostnames. For convenience here is the relevant part:
+Check out the section `oauth_providers` in [RabbitMQ Configuration](../conf/multi-keycloak/rabbitmq.scenario3.conf) used by this scenario. Like in the scenario 2, there are two OAuth providers however this time the URL refers to two different hostnames. For convenience here is the relevant part:
 ```
 ...
 
