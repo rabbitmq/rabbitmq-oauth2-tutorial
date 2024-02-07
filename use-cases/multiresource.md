@@ -44,7 +44,7 @@ make start-keycloak
 ```
 It is recommended to follow the logs until keycloak is fully initialized: `docker logs keycloak -f`
 
-2. Launch RabbitMQ
+2. Launch RabbitMQ with [rabbitmq.scenario1.conf](../conf/multi-keycloak/rabbitmq.scenario1.conf)
 ```
 MODE=multi-keycloak OAUTH_PROVIDER=keycloak CONF=rabbitmq.scenario1.conf make start-rabbitmq
 ```
