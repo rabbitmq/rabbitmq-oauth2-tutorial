@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+#set -x
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 MODE=${MODE:-uaa}
+OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-3.13}
+IMAGE_TAG=${IMAGE_TAG:-3.13.1}
 IMAGE=${IMAGE:-rabbitmq}
 
 function generate-ca-server-client-kpi {
@@ -21,22 +24,24 @@ function generate-ca-server-client-kpi {
     git clone https://github.com/michaelklishin/tls-gen $SCRIPT/tls-gen
   fi
 
-  echo "Generating CA and Server PKI under $NAMER ..."
+  echo "Generating CA and Server PKI under $NAME ..."
   mkdir -p $NAME
   cp -r $SCRIPT/tls-gen/* $NAME
 
   CUR_DIR=$(pwd)
   cd $NAME/basic
   make CN=localhost
-  make PASSWORD=$PASSWORD
+  #make PASSWORD=$PASSWORD
   make verify
   make info
   cd $CUR_DIR
 }
 
 function deploy {
+  if [ "${GENERATE_SSL_CERTS:-false}" == "true" ]; then
+      generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
+  fi
   if [ "${MODE}" == "azure" ]; then
-#    generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
     EXTRA_PORTS="-p 15671:15671"
     EXTRA_MOUNTS="-v $SCRIPT/../conf/${MODE}/certs/basic/testca/cacert.pem:/etc/rabbitmq/rabbitmq-ca.crt \
                   -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/key.pem:/etc/rabbitmq/rabbitmq.key \
@@ -46,6 +51,12 @@ function deploy {
   SIGNING_KEY_FILE=$SCRIPT/../conf/${MODE}/signing-key/signing-key.pem
   if [ -f "$SIGNING_KEY_FILE" ]; then
       EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
+  fi
+
+  OAUTH_SERVER_CACERTFILE=$SCRIPT/../conf/${OAUTH_PROVIDER}/certs/ca_certificate.pem
+  if [ -f "$OAUTH_SERVER_CACERTFILE" ]; then
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${OAUTH_SERVER_CACERTFILE}:/etc/rabbitmq/${OAUTH_PROVIDER}-ca_certificate.pem"
+      echo "MODE:${MODE} OAUTH_PROVIDER:${OAUTH_PROVIDER} ca_certificate.pem mounted as /etc/rabbitmq/${OAUTH_PROVIDER}-ca_certificate.pem"
   fi
 
   USED_CONFIG=""

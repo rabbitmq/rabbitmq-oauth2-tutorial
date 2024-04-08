@@ -1,4 +1,4 @@
-# Use KeyCloak as OAuth 2.0 server
+# Use Keycloak as OAuth 2.0 server
 
 You are going to test 3 OAuth flows:
 1. Access management ui via a browser
@@ -10,34 +10,47 @@ You are going to test 3 OAuth flows:
 - Docker
 - make
 
-## Deploy Key Cloak
+## Deploy Keycloak
 
-First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+First, deploy **Keycloak**. It comes preconfigured with all the required scopes, users and clients.
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+**Keycloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
-To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
+To access KeyCloak management interface go to http://0.0.0.0:8081/ and enter `admin` as username and password.
 
 There is a dedicated **KeyCloak realm** called `Test` configured as follows:
-- You configured an [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
-- And a [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
+- You configured an [rsa](http://0.0.0.0:8081/admin/master/console/#/realms/test/keys) signing key
+- And a [rsa provider](http://0.0.0.0:8081/admin/master/console/#/realms/test/keys/providers)
 - And three clients: `rabbitmq-client-code` for the rabbitmq managament ui, `mgt_api_client` to access via the
 management api and `producer` to access via AMQP protocol.
 
 
 ## Start RabbitMQ
 
-To start RabbitMQ run the following two commands. The first one tells RabbitMQ to pick up the
-rabbit.config found under [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+First of all, you need to add the following entries to your `/etc/hosts` file
 ```
-export MODE=keycloak
-make start-rabbitmq
+127.0.0.1 localhost keycloak
+::1 localhost keycloak
 ```
-**Note**: [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config) is also available but just for
-reference. By default, `make start-rabbitmq` will choose the new style. 
+
+Run these two commands to start RabbitMQ. RabbitMQ starts with [conf/keycloak/rabbitmq.conf](../conf/keycloak/rabbitmq.conf).
+With this configuration, RabbitMQ automatically discovers the `jwks_uri` from where to download the signing keys.
+IF we want to statically configure the signing keys checkout [conf/keycloak/rabbitmq.legacy.conf](../conf/keycloak/rabbitmq.legacy.conf)
+```
+MODE=keycloak make start-rabbitmq
+```
+**Note**: To start RabbitMQ with [conf/keycloak/rabbitmq.legacy.conf](../conf/keycloak/rabbitmq.legacy.conf) set the following environment variable:
+```
+MODE=keycloak CONF=rabbitmq.legacy.conf make start-rabbitmq
+```
+
+**Note**: If you want to run a different RabbitMQ Docker image you can do it like shown below. Here we use a docker image built from source using Bazel.
+```
+IMAGE="bazel/packaging/docker-image" IMAGE_TAG="rabbitmq" MODE=keycloak make start-rabbitmq
+```
 
 ## Access Management ui
 
@@ -47,10 +60,10 @@ appropriate scopes to access the management ui.
 
 ## Access Management api
 
-Access the management api using the client [mgt_api_client](http://0.0.0.0:8080/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8080/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
+Access the management api using the client [mgt_api_client](http://0.0.0.0:8081/admin/master/console/#/realms/test/clients/c5be3c24-0c88-4672-a77a-79002fcc9a9d) which has the scope [rabbitmq.tag:administrator](http://0.0.0.0:8081/admin/master/console/#/realms/test/client-scopes/f6e6dd62-22bf-4421-910e-e6070908764c)
 
 ```
-make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa
+make curl-keycloak url=http://localhost:15672/api/overview client_id=mgt_api_client secret=LWOuYqJ8gjKg3D2U8CJZDuID3KiRZVDa realm=test
 ```
 
 ## Access AMQP protocol with PerfTest
@@ -59,10 +72,20 @@ To test OAuth2 authentication with AMQP protocol you are going to use RabbitMQ P
 First you obtain the token and pass it as a parameter to the make target `start-perftest-producer-with-token`.
 
 ```
-make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn)
+make start-perftest-producer-with-token PRODUCER=producer TOKEN=$(bin/keycloak/token producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn test)
+```
+
+Run the following command to inspect the output from the `producer` application
+```
+docker logs producer -f
 ```
 
 **NOTE**: Initializing an application with a token has one drawback: the application cannot use the connection beyond the lifespan of the token. See the next section where you demonstrate how to refresh the token.
+
+Run the following command to stop the producer:
+```
+make stop-perftest-producer
+```
 
 ## Access AMQP protocol with Pika
 
@@ -80,12 +103,8 @@ python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 ```
 > Ensure you install pika 1.3
 
-## Access Management UI
 
-Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
-Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
-
-
+<<<<<<< HEAD
 # Access Stream protocol with .Net Stream Client
 
 This section is about testing OAuth 2.0 authentication with Stream protocol and with [.Net Stream Client](https://github.com/rabbitmq/rabbitmq-stream-dotnet-client) library. And more specifically, you
@@ -100,10 +119,19 @@ dotnet run
 ```
 
 
+=======
+>>>>>>> Restore keycloak.md
 ## Stop keycloak
 
-`make stop-keycloak`
+```
+make stop-keycloak
+```
 
+## Stop RabbitMQ
+
+```
+make stop-rabbitmq
+```
 
 ## Notes about setting up KeyCloak
 
@@ -124,10 +152,8 @@ rather than `legacy-token-key`.
 ### Configure Client
 
 For backend applications which uses **Client Credentials flow** you create a **Client** with:
-- **Access Type** : `public`
-- **Authentication flow** : `Standard Flow`
-- With **Service Accounts Enabled** on. If it is not enabled you do not have the tab `Credentials`
-- In tab `Credentials` you have the client id secret
+- **Client authentication** : `on`
+- **Authentication flow** : `Service accounts roles`
 
 
 ### Configure Client scopes
@@ -146,20 +172,9 @@ For testing purposes, once you modified keycloak configuration, you would want t
 When done, connect to the keycloak container and export your configuration before removing the container
 > The following command overrides the default configuration provided with this repository
 ```shell
-docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/ --users realm_file
-```
-
-### Possible issue on MacOS
-
-If you want to run this configuration on MacOS, you could have problem reaching keycloak pointing to 0.0.0.0:8080.
-
-1. add `keycloak` entry in your `hosts` file
-```shell
-echo "127.0.0.1 keycloak" > /etc/hosts
-```
-1. modify the [rabbitmq.config](../conf/keycloak/rabbitmq.config) configuration to appropriately point to `keycloak` host
-```shell
-...
-{oauth_provider_url, "http://keycloak:8080/realms/test"}
-...
+<<<<<<< HEAD
+docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/
+=======
+docker exec -it keycloak /opt/keycloak/bin/kc.sh export --users realm_file --realm test --dir /opt/keycloak/data/import/
+>>>>>>> Restore keycloak.md
 ```
