@@ -410,10 +410,10 @@ Typically, all users that access a RabbitMQ cluster are registered within the sa
 
 However, there are some use-cases where RabbitMQ is either accessed by users registered in different Identity Providers or tokens issued for the same RabbitMQ installation use different *Audience*(s). For these use-cases, RabbitMQ OAuth 2.0 plugin and the Management plugin can be configured with multiple OAuth 2.0 resources.
 
-Below is the OAuth 2.0 plugin configuration for two resources with the ids, `rabbit_prod` and `rabbit_dev`. Both resources (a.k.a. *audience*) are managed by the same Identity Provider whose JWKS (Signing Key server) is `http//some_idp_url/keyset`.
+Below is the OAuth 2.0 plugin configuration for two resources with the ids, `rabbit_prod` and `rabbit_dev`. Both resources (a.k.a. *audience*) are managed by the same Identity Provider whose JWKS (Signing Key server) is `https://some_idp_url/keyset`.
 
 <pre class="lang-ini">
-auth_oauth2.jwks_url = http//some_idp_url/keyset
+auth_oauth2.jwks_url = https://some_idp_url/keyset
 auth_oauth2.scope_prefix = rabbitmq.
 
 auth_oauth2.resource_servers.1.id = rabbit_prod
