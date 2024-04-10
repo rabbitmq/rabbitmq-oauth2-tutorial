@@ -18,8 +18,13 @@ docker run \
 		--detach \
 		--name keycloak --net rabbitmq_net \
 		--publish 8080:8080 \
+        --publish 8443:8443 \
 		--env KEYCLOAK_ADMIN=admin \
 		--env KEYCLOAK_ADMIN_PASSWORD=admin \
 		--mount type=bind,source=${ROOT}/conf/keycloak/import/,target=/opt/keycloak/data/import/ \
+        --mount type=bind,source=${ROOT}/conf/keycloak/certs/,target=/opt/keycloak/certs/ \
 		${EXTRA_MOUNTS} \
-		quay.io/keycloak/keycloak:20.0 start-dev --import-realm
+		quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
+        --https-certificate-file=/opt/keycloak/certs/server_keycloak_certificate.pem \
+        --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem \
+        --hostname=keycloak --hostname-admin=localhost

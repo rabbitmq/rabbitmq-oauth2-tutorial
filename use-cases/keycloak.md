@@ -37,7 +37,7 @@ export MODE=keycloak
 make start-rabbitmq
 ```
 **Note**: [conf/keycloak/rabbitmq.config](../conf/keycloak/rabbitmq.config) is also available but just for
-reference. By default, `make start-rabbitmq` will choose the new style. 
+reference. By default, `make start-rabbitmq` will choose the new style.
 
 ## Access Management ui
 
@@ -105,7 +105,10 @@ dotnet run
 `make stop-keycloak`
 
 
-## Notes about setting up KeyCloak
+## Notes about setting up KeyCloak from scratch
+
+The following sections explain the steps carried out to configure the Keycloak
+server used by this use case and whose configuration is stored under `conf/keycloak/import/test-realm.json`.
 
 ### Configure JWT signing Keys
 
