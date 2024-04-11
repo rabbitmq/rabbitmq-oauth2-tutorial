@@ -139,6 +139,13 @@ UAA has been configured with these 2 users:
  - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
  - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
 
+To configure the management ui with OAuth 2.0 you need the following configuration entries:
+```ini
+management.oauth_enabled = true
+management.oauth_client_id = rabbit_client_code
+management.oauth_provider_url = http://localhost:8080
+```
+
 #### Testing OAuth 2.0 in the management ui
 
 First of all, deploy RabbitMQ by running the following command. This uses the RabbitMQ configuration file [conf/uaa/rabbitmq.conf](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial/blob/main/conf/uaa/rabbitmq.conf)
@@ -153,12 +160,6 @@ It was signed with the symmetric key.
 
 ![JWT token](assets/admin-token-signed-sym-key.png)
 
-To configure the management ui with OAuth 2.0 you need the following configuration entries:
-```ini
-management.oauth_enabled = true
-management.oauth_client_id = rabbit_client_code
-management.oauth_provider_url = http://localhost:8080
-```
 
 ### Identity-Provider initiated logon
 
