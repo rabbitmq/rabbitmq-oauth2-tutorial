@@ -2,7 +2,7 @@
 
 These are the two goals of this guide:
 1. Explore how applications and end users can authenticate with RabbitMQ server using OAuth 2.0 protocol rather than the traditional username/password, or others.
-2. Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. Additionally you explore how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 Authorization Server and all the operations to create OAuth clients, users and obtain their tokens.
+2. Explore what it takes to set up RabbitMQ Server with OAuth 2.0 authentication mechanism. Additionally you explore how to stand up ([UAA](https://github.com/cloudfoundry/uaa)) as an OAuth 2.0 authorization server and all the operations to create OAuth clients, users and obtain their tokens.
 
 If you want to quickly test how it works go straight to [OAuth2 plugin in action](#oauth2-plugin-in-action) section.
 
@@ -65,20 +65,20 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 ## OAuth2 plugin in action
 
 In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_auth_backend_oauth2) plugin in action you need the following:
-- an OAuth 2.0 **Authorization server** running and
-- RabbitMQ server configured to use the above OAuth 2.0.
+- an OAuth 2.0 **authorization server** running and
+- RabbitMQ server configured to use the above authorization server.
 
 The following sections walks you through the following actions:
-- Deploy an Authorization Server called UAA
-- Deploy RabbitMQ with various configurations using UAA as the Authorization Server
+- Deploy an authorization server called UAA
+- Deploy RabbitMQ with various configurations using UAA as the authorization server
 - Test various ways to access RabbitMQ and authenticating with OAuth 2.0
 
-In addition to the Authorization Server called UAA, RabbitMQ can be used with other Authorization Servers. The section [Use different OAuth 2.0 servers](#use-different-oauth2-servers) has one sub-section for each one of the Authorization Servers RabbitMQ has been tested against.
+In addition to the authorization server called UAA, RabbitMQ can be used with other authorization servers. The section [Use different OAuth 2.0 servers](#use-different-oauth2-servers) has one sub-section for each one of the authorization servers RabbitMQ has been tested against.
 
 ### Set up UAA and RabbitMQ
 
 RabbitMQ support two types of two signing keys used to digitally sign the JWT tokens.
-The two types are **symmetrical** and **asymmetrical** signing keys. The Authorization server is who digitally signs the JWT tokens and RabbitMQ has to be configured to validate any of the two types of digital signatures.
+The two types are **symmetrical** and **asymmetrical** signing keys. The authorization server is who digitally signs the JWT tokens and RabbitMQ has to be configured to validate any of the two types of digital signatures.
 
 Given that asymmetrical keys are the most widely used option, you are going to focus on how to
 configure RabbitMQ with them.
@@ -116,11 +116,11 @@ The Management UI can be configured with one of these two login modes:
 
 Since RabbitMQ 3.10 the Management UI uses *Authorization Code flow with PKCE**. Because RabbitMQ is a single-page
 web application, it cannot safely store credentials such as the `client_id` and `client_secret` required by
-RabbitMQ to authenticate with the Authorization Server in order to get a token for the end-user. Therefore, you
-should configure the RabbitMQ OAuth client in the Authorization Server so that it does not require `client_secret`.
+RabbitMQ to authenticate with the authorization server in order to get a token for the end-user. Therefore, you
+should configure the RabbitMQ OAuth client in the authorization server so that it does not require `client_secret`.
 This type of OAuth clients/applications are known as **public** or **non-confidential**. In UAA they are configured as `allowpublic: true`.
 
-Nevertheless, should your Authorization Server require a `client_secret` , you can configure it via `management.oauth_client_secret`.
+Nevertheless, should your authorization server require a `client_secret` , you can configure it via `management.oauth_client_secret`.
 
 ### Service-Provider initiated logon
 
@@ -361,7 +361,7 @@ basic AMQP 1.0 application by invoking this command:
 make build-amqp1_0-client
 ```
 
-Launch RabbitMQ with the following command. It will start RabbitMQ configured with UAA as its Authorization Server.
+Launch RabbitMQ with the following command. It will start RabbitMQ configured with UAA as its authorization server.
 ```
 make start-rabbitmq
 ```
@@ -380,7 +380,7 @@ make start-amqp1_0-publisher
 
 This section has been dedicated exclusively to explain what scopes you need in order to operate on **Topic Exchanges**.
 
-**NOTE**: None of the users and/or clients declared in any of Authorization servers provided by this tutorial have the
+**NOTE**: None of the users and/or clients declared in any of authorization servers provided by this tutorial have the
 appropriate scopes to operate on **Topic Exchanges**. In the [MQTT Protocol](#mqtt-protocol) section, the application used a hand-crafted token with the scopes to operate on **Topic Exchanges**.
 
 To bind and/or unbind a queue to/from a **Topic Exchange**, you need to have the following scopes:
@@ -412,7 +412,7 @@ In this section, you are going to explore various OAuth 2.0 configurations you c
 
 ### Use custom scope field  
 
-There are some Authorization servers which cannot include RabbitMQ scopes into the standard
+There are some authorization servers which cannot include RabbitMQ scopes into the standard
 JWT `scope` field. Instead, they can include RabbitMQ scopes in a custom JWT scope of their choice.
 
 Since RabbitMQ 3.9, it is possible to configure RabbitMQ with a different field to look for scopes as shown below:
@@ -821,7 +821,7 @@ make curl-with-token URL=http://localhost:15672/api/overview \
 
 ## <a id="use-different-oauth2-server" class="anchor" href="#use-different-oauth2-server">Use different OAuth 2.0 servers</a>
 
-Below there is a list of all the Authorization Servers RabbitMQ has been tested against. For each Authorization Server, there is a dedicated README file that explains how to configure RabbitMQ for that Authorization Server, tests various flows and deploy the Authorization Server when applicable. Some Authorization Servers are hosted in the cloud like Auth0, Okta and Azure and others are deployed locally like KeyCloak or OAuth2 Proxy. 
+Below there is a list of all the authorization servers RabbitMQ has been tested against. For each authorization server, there is a dedicated README file that explains how to configure RabbitMQ for that authorization server, tests various flows and deploy the authorization server when applicable. Some authorization servers are hosted in the cloud like Auth0, Okta and Azure and others are deployed locally like KeyCloak or OAuth2 Proxy.
 
 - [KeyCloak](use-cases/keycloak.md)
 - [Auth0](use-cases/auth0.md)
