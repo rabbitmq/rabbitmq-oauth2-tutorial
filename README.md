@@ -6,9 +6,7 @@ These are the two goals of this guide:
 
 **NOTE**: This guide has been verified against RabbitMQ 3.13.1. This version is hard-coded in the script [bin/deploy-rabbit](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial/blob/main/bin/deploy-rabbit#L9).
 
-If you want to quickly test how it works go straight to [OAuth2 plugin in action](#oauth2-plugin-in-action) section.
-
-If you want to understand the details of how to configure RabbitMQ with Oauth2 go straight to [Understand the environment](#understand-the-environment) section.
+If you want to quickly test how it works go straight to [OAuth2 plugin in action](#oauth2-plugin-in-action) section. However, if you want to understand the details of how to configure RabbitMQ with OAuth 2.0, the section [Understand the environment](#understand-the-environment) explains everything about it.
 
 **Table of Content**
 
