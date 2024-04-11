@@ -67,7 +67,7 @@ In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabb
 - an OAuth 2.0 **authorization server** running and
 - RabbitMQ server configured to use the above authorization server.
 
-This guide uses UAA as the authorization server to demonstrate the majority of the uses cases and/or configurations. However, there is a section called [Use different OAuth 2.0 servers](#use-different-oauth2-servers) which does a basic demonstration of connecting RabbitMQ against other authorization servers.
+This guide uses UAA as the authorization server to demonstrate the majority of the uses cases and/or configurations. However, there is a section called [Use different OAuth 2.0 servers](#use-different-oauth2-servers) which shows how to configure RabbitMQ with other authorization servers.
 
 ### Use Symmetrical digital signing keys
 
