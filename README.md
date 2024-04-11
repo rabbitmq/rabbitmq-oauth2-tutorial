@@ -107,14 +107,14 @@ The file (conf/uaa/signing-key/signing-key.pem)[conf/uaa/signing-key/signing-key
 The management ui supports two types of login when it comes to OAuth 2.0 authentication. They are:
 
 * [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the management ui, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting the user to the configured **authorization server**.
-* [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This mode is opposite to the previous mode. The user must first send its access token to the management's `/login` endpoint. If the token is valid, the user is allowed to access the management ui. This mode is very useful for web sites which allow users to access the management ui with a single click. When the user clicks, the web site produces a token and redirects the to the RabbitMQ management's `/login` endpoint with the token.
+* [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This mode is opposite to the previous mode. The user must first send its access token to the management's `/login` endpoint. If the token is valid, the user is allowed to access the management ui. This mode is very useful for web sites which allow users to access the management ui with a single click. When the user clicks, the web site produces a token and redirects the user to the RabbitMQ management's `/login` endpoint with the token.
 
 ### Service-Provider initiated logon
 
 #### OAuth 2.0 authentication flow used by RabbitMQ
 
-The management ui uses *Authorization Code flow with PKCE** to implement this login type. RabbitMQ is a single-page web application and therefore it cannot safely store credentials such as the `client_id` and `client_secret` required to authenticate with the authorization server. For this reason, you
-should configure the RabbitMQ OAuth client in the authorization server so that it does not require `client_secret`.
+The management ui uses **Authorization Code flow with PKCE** to implement this login type. RabbitMQ is a single-page web application and therefore it cannot safely store credentials such as `client_secret` required in other OAuth 2.0 Flows. For this reason, you
+should configure the authorization server so that it does not require `client_secret`.
 This type of OAuth clients/applications are known as **public** or **non-confidential**. In UAA they are configured as `allowpublic: true`.
 
 Nevertheless, should your authorization server require a `client_secret` , you can configure it via `management.oauth_client_secret`.
