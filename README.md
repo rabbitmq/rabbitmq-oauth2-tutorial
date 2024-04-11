@@ -135,9 +135,6 @@ The first time an end user arrives to the management ui, and click on the button
 authorize RabbitMQ application as shown on the screenshot below.
 > ![authorize application](assets/authorize-app.png)
 
-UAA has been configured with these 2 users:
- - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
- - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
 
 To configure the management ui with OAuth 2.0 you need the following configuration entries:
 ```ini
@@ -153,7 +150,11 @@ First of all, deploy RabbitMQ by running the following command. This uses the Ra
 make start-rabbitmq
 ```
 
-Go to http://localhost:15672 and login using any of those two users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
+UAA has been configured with these 2 users:
+ - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
+ - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
+
+Go to http://localhost:15672 and login using any of aforementioned users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
 
 This is a token issued by UAA for the `rabbit_admin` user through the redirect flow you just saw above.
 It was signed with the symmetric key.
