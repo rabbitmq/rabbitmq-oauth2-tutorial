@@ -121,7 +121,7 @@ Nevertheless, should your authorization server require a `client_secret` , you c
 
 #### OAuth 2.0 authentication step by step
 
-The first time an end user arrives to the management ui, and click on the button `Click here to login`, they redirected to the OAuth 2.0 provider to authenticate. Once they successfully authenticate, the user is redirected back to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
+The first time an end user arrives to the management ui, and click on the button `Click here to login`, it is redirected to the OAuth 2.0 provider to authenticate. Once it successfully authenticates, the user is redirected back to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
 
 ```
     [ UAA ] <----2. auth----    [ RabbitMQ ]
@@ -135,7 +135,7 @@ The first time an end user arrives to the management ui, and click on the button
 authorize RabbitMQ application as shown on the screenshot below.
 > ![authorize application](assets/authorize-app.png)
 
-UAA has been configured with 2 users:
+UAA has been configured with these 2 users:
  - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
  - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
 
