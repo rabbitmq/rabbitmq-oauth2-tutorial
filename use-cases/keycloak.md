@@ -86,7 +86,7 @@ Go to http://localhost:15672, click on the single button on the page which redir
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
-# Access Stream protocol with .Net Stream Client
+## Access Stream protocol with .Net Stream Client
 
 This section is about testing OAuth 2.0 authentication with Stream protocol and with [.Net Stream Client](https://github.com/rabbitmq/rabbitmq-stream-dotnet-client) library. And more specifically, you
 are demonstrating how to refresh a token on a live stream connections.
@@ -105,12 +105,12 @@ dotnet run
 `make stop-keycloak`
 
 
-## Notes about setting up KeyCloak from scratch
+# Notes about setting up KeyCloak from scratch
 
 The following sections explain the steps carried out to configure the Keycloak
 server used by this use case and whose configuration is stored under `conf/keycloak/import/test-realm.json`.
 
-### Configure JWT signing Keys
+## Configure JWT signing Keys
 
 At the realm level, you go to `Keys > Providers` tab and create one of type `rsa` and you enter the
 private key and certificate of the public key. In this repository you do not have yet the certificate
@@ -124,7 +124,7 @@ docker exec -it rabbitmq rabbitmqctl add_uaa_key Gnl2ZlbRh3rAr6Wymc988_5cY7T5Gue
 or you have to modify the RabbitMQ configuration so that it says `Gnl2ZlbRh3rAr6Wymc988_5cY7T5GuePd5dpJlXDJUk`
 rather than `legacy-token-key`.
 
-### Configure Client
+## Configure Client
 
 For backend applications which uses **Client Credentials flow** you create a **Client** with:
 - **Access Type** : `public`
@@ -133,18 +133,18 @@ For backend applications which uses **Client Credentials flow** you create a **C
 - In tab `Credentials` you have the client id secret
 
 
-### Configure Client scopes
+## Configure Client scopes
 
 > *Default Client Scope* are scopes automatically granted to every token. Whereas *Optional Client Scope* are
 scopes which are only granted if they are explicitly requested during the authorization/token request flow.
 
 
-### Include appropriate aud claim
+## Include appropriate aud claim
 
 You must configure a **Token Mapper** of type **Hardcoded claim** with the value of rabbitmq's *resource_server_id**.
 You can configure **Token Mapper** either to a **Client scope** or to a **Client**.
 
-### Export Keycloak configuration
+## Export Keycloak configuration
 For testing purposes, once you modified keycloak configuration, you would want to export keycloak configuration.
 When done, connect to the keycloak container and export your configuration before removing the container
 > The following command overrides the default configuration provided with this repository
@@ -152,7 +152,7 @@ When done, connect to the keycloak container and export your configuration befor
 docker exec -it keycloak /opt/keycloak/bin/kc.sh export --realm test --dir /opt/keycloak/data/import/ --users realm_file
 ```
 
-### Possible issue on MacOS
+## Possible issue on MacOS
 
 If you want to run this configuration on MacOS, you could have problem reaching keycloak pointing to 0.0.0.0:8080.
 

@@ -26,5 +26,4 @@ docker run \
 		${EXTRA_MOUNTS} \
 		quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
         --https-certificate-file=/opt/keycloak/certs/server_keycloak_certificate.pem \
-        --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem \
-        --hostname=keycloak --hostname-admin=localhost
+        --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem 
