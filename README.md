@@ -201,7 +201,7 @@ It is only when the user clicks **Click here to login** , the user is redirected
 
 ## Access other protocols using OAuth 2.0 tokens
 
-The following subsections demonstrate how to use access tokens with any messaging protocol and also to access the management rest api.
+The following subsections show how to use OAuth 2.0 authentication with any messaging protocol and the management rest api too.
 
 
 ### Monitoring agent accessing management REST api
