@@ -106,8 +106,8 @@ The file (conf/uaa/signing-key/signing-key.pem)[conf/uaa/signing-key/signing-key
 
 The management ui supports two types of login when it comes to OAuth 2.0 authentication. They are:
 
-* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the management ui, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting to the configured **authorization server**.
-* [Identity-Provider initiated logon](#identity-provider-initiated-logon) -this mode is opposite to the previous mode. The user must first access the management's `/login` endpoint. If the token is valid, the user is allowed to access the management UI. This mode is very useful for Web sites which allow users to access the management UI with a single click. The original Web site get a token on user's behalf and redirects the user to the management's `/login` endpoint.
+* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the management ui, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting the user to the configured **authorization server**.
+* [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This mode is opposite to the previous mode. The user must first send its access token to the management's `/login` endpoint. If the token is valid, the user is allowed to access the management ui. This mode is very useful for web sites which allow users to access the management ui with a single click. When the user clicks, the web site produces a token and redirects the to the RabbitMQ management's `/login` endpoint with the token.
 
 ### Service-Provider initiated logon
 
