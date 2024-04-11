@@ -74,19 +74,17 @@ This guide uses UAA as the authorization server to demonstrate the majority of t
 RabbitMQ supports two types of two signing keys used to digitally sign the JWT tokens.
 The two types are **symmetrical** and **asymmetrical** signing keys. The authorization server is who digitally signs the JWT tokens and RabbitMQ has to be configured to validate any of the two types of digital signatures.
 
-The following two commands deploy UAA and RabbitMQ configured with symmetrical digital keys:
+The following two commands deploy UAA and RabbitMQ configured with symmetrical digital signing keys:
 
   1. `UAA_MODE="uaa-symmetrical" make start-uaa` to get UAA server running
   2. `MODE="uaa-symmetrical" make start-rabbitmq` to start RabbitMQ server
 
-To validate this configuration very quickly, run the following command which accesses the Management Rest endpoint
- `/api/overview` with a token obtained from UAA using `mgt_api_client` OAuth2 client:
+To validate this configuration, run the following command which accesses the management rest endpoint
+ `/api/overview` with a token obtained from UAA using `mgt_api_client` client:
 
 ```
 make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
-
-It prints out the JSON payload corresponding to the REST endpoint `/api/overview`.
 
 ### Use Asymmetrical digital signing keys
 
