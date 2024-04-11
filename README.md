@@ -204,12 +204,11 @@ It is only when the user clicks **Click here to login** , the user is redirected
 The following subsections show how to use OAuth 2.0 authentication with any messaging protocol and the management rest api too.
 
 
-### Monitoring agent accessing management REST api
+### Monitoring agent accessing management rest api
 
-You may have a monitoring agent such as Prometheus accessing RabbitMQ management REST api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, you refer to it as a *service account*. This *service account* could be our `mgt_api_client` client you created in UAA with the `monitoring` *user tag*.
+You may have a monitoring agent such as Prometheus accessing the management rest api; or other type of agent checking the health of RabbitMQ. Because it is not an end user, or human, you refer to it as a *service account*. This *service account* could be our `mgt_api_client` client already configured in UAA with the `monitoring` *user tag*.
 
-This *monitoring agent* would use the *client credentials* or *password* grant flow to authenticate (`1`) with
-UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a HTTP request to the RabbitMQ management endpoint passing the JWT token.
+This *monitoring agent* would use the *client credentials* or *password* grant flow to authenticate with UAA and get back a JWT token. Once it gets the token, it sends a HTTP request, carrying the token, to the management endpoint of interest.
 
 ```
     [ UAA ]                  [ RabbitMQ ]
@@ -219,6 +218,11 @@ UAA and get back a JWT token (`2.`). Once it gets the token, it sends (`3.`) a H
        |                           |
        +-----1.auth---------  monitoring agent
        --------2.JWT-------->
+```
+
+First of all, deploy RabbitMQ by running the following command:
+```
+make start-rabbitmq
 ```
 
 The following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
