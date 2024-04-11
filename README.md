@@ -86,11 +86,14 @@ To validate this configuration, run the following command which accesses the man
 make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
 
+
 ### Use Asymmetrical digital signing keys
 
 To deploy UAA with asymmetrical signing keys you need to run the following command:
-
-  1. `make start-uaa`
+```
+make start-uaa
+```
+> It does not matter if UAA is already running using symmetrical keys. You do not need to stop it first. This script stops it if it is running and deploy its again. 
 
 The rest of the sections in this guide will configure RabbitMQ with asymmetrical signing keys. Each section will provide the exact command to deploy RabbitMQ which will vary depending on the use case. However, below you can find the key configuration to enable OAuth 2.0 and asymmetrical signing keys:
 ```ini
@@ -225,7 +228,7 @@ First of all, deploy RabbitMQ by running the following command:
 make start-rabbitmq
 ```
 
-The following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
+Once RabbitMQ is running, run the following command launches the browser with `mgt_api_client` client with a JWT token previously obtained from UAA:
 ```
 make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
