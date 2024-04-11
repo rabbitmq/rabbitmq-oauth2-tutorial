@@ -34,7 +34,7 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 - [Combine OAuth 2.0 authentication with other mechanism](#oauth2-and-other-mechanism)
 	- [Basic Authentication](#basic-authentication)
 	- [Authn with OAuth 2 and Authz with internal](#authn-with-oauth-authz-with-internal)
-- Use different OAuth 2.0 servers
+- [Use different OAuth 2.0 servers](#use-different-oauth2-servers)
 	- [KeyCloak](use-cases/keycloak.md)
 	- [Auth0](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
@@ -64,8 +64,16 @@ If you want to understand the details of how to configure RabbitMQ with Oauth2 g
 
 ## OAuth2 plugin in action
 
-In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_auth_backend_oauth2) plugin in action you need an OAuth 2.0 **Authorization server** running and RabbitMQ server configured accordingly. To get up and running quickly, you are going to use UAA as Authorization Server. In the next section, you will see how to set up UAA and RabbitMQ. If you are new to OAuth 2.0, it is a good starting point. If you already know OAuth 2.0 and you want to learn how to configure RabbitMQ to talk to one of OAuth 2.0 server tested on this tutorial, you can jump straight to them. They are [KeyCloak](use-cases/keycloak.md), [https://auth0.com/](use-cases/auth0.md) and [Azure Active Directory](use-cases/azure.md) in addition to UAA which you will use it in the next sections.
+In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_auth_backend_oauth2) plugin in action you need the following:
+- an OAuth 2.0 **Authorization server** running and
+- RabbitMQ server configured to use the above OAuth 2.0.
 
+The following sections walks you through the following actions:
+- Deploy an Authorization Server called UAA
+- Deploy RabbitMQ with various configurations using UAA as the Authorization Server
+- Test various ways to access RabbitMQ and authenticating with OAuth 2.0
+
+In addition to the Authorization Server called UAA, RabbitMQ can be used with other Authorization Servers. The section [Use different OAuth 2.0 servers](#use-different-oauth2-servers) has one sub-section for each one of the Authorization Servers RabbitMQ has been tested against.
 
 ### Set up UAA and RabbitMQ
 
@@ -810,6 +818,17 @@ make curl-with-token URL=http://localhost:15672/api/overview \
 ```
 
 > Check out the token [here](jwts/producer-without-scopes.json)
+
+## <a id="use-different-oauth2-server" class="anchor" href="#use-different-oauth2-server">Use different OAuth 2.0 servers</a>
+
+Below there is a list of all the Authorization Servers RabbitMQ has been tested against. For each Authorization Server, there is a dedicated README file that explains how to configure RabbitMQ for that Authorization Server, tests various flows and deploy the Authorization Server when applicable. Some Authorization Servers are hosted in the cloud like Auth0, Okta and Azure and others are deployed locally like KeyCloak or OAuth2 Proxy. 
+
+- [KeyCloak](use-cases/keycloak.md)
+- [Auth0](use-cases/auth0.md)
+- [Azure Active Directory](use-cases/azure.md)
+- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
+- [Okta](use-cases/okta.md)
+- [Google](use-cases/google.md) **NOT SUPPORTED**
 
 ## Understand the environment
 
