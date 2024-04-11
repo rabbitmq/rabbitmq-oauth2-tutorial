@@ -13,9 +13,8 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 <!-- TOC depthFrom:2 depthTo:3 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
-- [OAuth2 plugin in action](#oauth2-plugin-in-action)
-	- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
--	[Access Management UI using OAuth 2.0 tokens](#access-management-ui-using-oauth-20-tokens)
+- [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
+- [Access Management UI using OAuth 2.0 tokens](#access-management-ui-using-oauth-20-tokens)
 	- [Service-Provider initiated logon](#service-provider-initiated-logon)
  	- [Identity-Provider initiated logon](#identity-provider-initiated-logon)
 - [Access other protocols using OAuth 2.0 tokens](#access-other-protocols)
@@ -62,30 +61,20 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 - make
 
 
-## OAuth2 plugin in action
+## Set up UAA and RabbitMQ
 
 In order see the [rabbitmq-auth-backend-oauth2](https://github.com/rabbitmq/rabbitmq-server/tree/main/deps/rabbitmq_auth_backend_oauth2) plugin in action you need the following:
 - an OAuth 2.0 **authorization server** running and
 - RabbitMQ server configured to use the above authorization server.
 
-The following sections walks you through the following actions:
-- Deploy an authorization server called UAA
-- Deploy RabbitMQ with various configurations using UAA as the authorization server
-- Test various ways to access RabbitMQ and authenticating with OAuth 2.0
+This guide uses UAA as the authorization server to demonstrate the majority of the uses cases and/or configurations. However, there is a section called [Use different OAuth 2.0 servers](#use-different-oauth2-servers) which does a basic demonstration of connecting RabbitMQ against other authorization servers.
 
-In addition to the authorization server called UAA, RabbitMQ can be used with other authorization servers. The section [Use different OAuth 2.0 servers](#use-different-oauth2-servers) has one sub-section for each one of the authorization servers RabbitMQ has been tested against.
-
-### Set up UAA and RabbitMQ
+### Use Symmetrical digital signing keys
 
 RabbitMQ supports two types of two signing keys used to digitally sign the JWT tokens.
 The two types are **symmetrical** and **asymmetrical** signing keys. The authorization server is who digitally signs the JWT tokens and RabbitMQ has to be configured to validate any of the two types of digital signatures.
 
-Given that asymmetrical keys are the most widely used option, you are going to focus on how to
-configure RabbitMQ with them.
-
-#### Use Symmetrical digital signing keys
-
-Run the following 2 commands to get the environment ready to see OAuth 2.0 plugin in action:
+The following two commands deploy UAA and RabbitMQ configured with symmetrical digital keys:
 
   1. `UAA_MODE="uaa-symmetrical" make start-uaa` to get UAA server running
   2. `MODE="uaa-symmetrical" make start-rabbitmq` to start RabbitMQ server
@@ -97,37 +86,44 @@ To validate this configuration very quickly, run the following command which acc
 make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client secret=mgt_api_client
 ```
 
-It should print out the JSON payload corresponding to the REST endpoint `/api/overview`.
+It prints out the JSON payload corresponding to the REST endpoint `/api/overview`.
 
+### Use Asymmetrical digital signing keys
 
-#### Use Asymmetrical digital signing keys
+To deploy UAA with asymmetrical signing keys you need to run the following command:
 
-Run the following 2 commands to get the environment ready to see Oauth2 plugin in action:
+  1. `make start-uaa`
 
-  1. `make start-uaa` to get UAA server running
-  2. `make start-rabbitmq` to start RabbitMQ server
+The rest of the sections in this guide will configure RabbitMQ with asymmetrical signing keys. Each section will provide the exact command to deploy RabbitMQ which will vary depending on the use case. However, below you can find the key configuration to enable OAuth 2.0 and asymmetrical signing keys:
+```ini
+auth_backends.1 = rabbit_auth_backend_oauth2
+auth_oauth2.resource_server_id = rabbitmq
+auth_oauth2.default_key = legacy-token-key
+auth_oauth2.signing_keys.legacy-token-key = /etc/rabbitmq/signing-key.pem
+```
 
+The file (conf/uaa/signing-key/signing-key.pem)[conf/uaa/signing-key/signing-key.pem] is mounted on the RabbitMQ docker container under the path /etc/rabbitmq/signing-key.pem.
 
 ## Access Management UI using OAuth 2.0 tokens
 
-The Management UI can be configured with one of these two login modes:
+The Management UI supports two types of login when it comes to OAuth 2.0 authentication. They are:
 
-* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. The user comes to the Management UI and clicks on the button "Click here to logon" which initiates the logon. The logon process starts in RabbitMQ, the Service Provider.
-* [Identity-Provider initiated logon](#identity-provider-initiated-logon) - This is a logon mode meant for web portals. Users navigate to RabbitMQ with a token already obtained by the web portal on behalf of the user.
+* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the RabbitMQ Management UI, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting to the configured **authorization server**.
+* [Identity-Provider initiated logon](#identity-provider-initiated-logon) -this mode is opposite to the previous mode. The user must first access the RabbitMQ Management's `/login` endpoint. If the token is valid, the user is allowed to access the RabbitMQ Management UI. This mode is very useful for Web sites which allow users to access the RabbitMQ Management UI with a single click. The original Web site get a token on user's behalf and redirects the user to the RabbitMQ Management's `/login` endpoint.
 
-### Supported OAuth 2.0 flow
+### Service-Provider initiated logon
 
-Since RabbitMQ 3.10 the Management UI uses *Authorization Code flow with PKCE**. Because RabbitMQ is a single-page
-web application, it cannot safely store credentials such as the `client_id` and `client_secret` required by
-RabbitMQ to authenticate with the authorization server in order to get a token for the end-user. Therefore, you
+#### OAuth 2.0 authentication flow used by RabbitMQ
+
+The management UI uses *Authorization Code flow with PKCE** to implement this login type. RabbitMQ is a single-page web application and therefore it cannot safely store credentials such as the `client_id` and `client_secret` required to authenticate with the authorization server. For this reason, you
 should configure the RabbitMQ OAuth client in the authorization server so that it does not require `client_secret`.
 This type of OAuth clients/applications are known as **public** or **non-confidential**. In UAA they are configured as `allowpublic: true`.
 
 Nevertheless, should your authorization server require a `client_secret` , you can configure it via `management.oauth_client_secret`.
 
-### Service-Provider initiated logon
+#### OAuth 2.0 authentication step by step
 
-The first time an end user arrives to the management ui (`1`), The user clicks on the button `Click here to login` and it is redirected (`2`) to UAA to authenticate. Once they successfully authenticate with UAA, the user is redirected back (`3.`) to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
+The first time an end user arrives to the management ui, and click on the button `Click here to login`, they redirected to the OAuth 2.0 provider to authenticate. Once they successfully authenticate, the user is redirected back to RabbitMQ with a valid JWT token. RabbitMQ validates it and identifies the user and extracts its permissions from the JWT token.
 
 ```
     [ UAA ] <----2. auth----    [ RabbitMQ ]
@@ -141,39 +137,42 @@ The first time an end user arrives to the management ui (`1`), The user clicks o
 authorize RabbitMQ application as shown on the screenshot below.
 > ![authorize application](assets/authorize-app.png)
 
-You have previously configured UAA with 2 users:
+UAA has been configured with 2 users:
  - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
  - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
 
+#### Testing OAuth 2.0 in the management ui
+
+First of all, deploy RabbitMQ by running the following command. This is uses the RabbitMQ configuration file
+```
+make start-rabbitmq
+```
+> It is equivalent to run also: MODE=uaa make start-rabbitmq
+
 Go to http://localhost:15672 and login using any of those two users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
 
-This is a token issued by UAA for the `rabbit_admin` user thru the redirect flow you just saw above.
+This is a token issued by UAA for the `rabbit_admin` user through the redirect flow you just saw above.
 It was signed with the symmetric key.
 
 ![JWT token](assets/admin-token-signed-sym-key.png)
 
 To configure RabbitMQ Management UI with OAuth 2.0 you need the following configuration entries:
-```
- ...
- {rabbitmq_management, [
-    {oauth_enabled, true},
-    {oauth_client_id, "rabbit_client_code"},
-    {oauth_provider_url, "http://localhost:8080"},      
-    ...
-  ]},
+```ini
+management.oauth_enabled = true
+management.oauth_client_id = rabbit_client_code
+management.oauth_provider_url = http://localhost:8080
 ```
 
 ### Identity-Provider initiated logon
 
-Alike Service-Provider initiated logon, with Idp-initiated logon users land to RabbitMQ management ui with a valid token.
-These two scenarios below are examples of Idp-initiated logon:
+Alike the service-provider initiated logon, with Idp-initiated logon users land to RabbitMQ management ui with a valid token. These two scenarios below are examples of Idp-initiated logon:
 
 * RabbitMQ is behind a web portal which conveniently allow users to navigate directly to RabbitMQ management ui already authenticated
 * There is an OAuth2 proxy in between users and RabbitMQ which intercepts their requests and forwards them to RabbitMQ injecting the token into the HTTP `Authorization` header  
 
 The latter scenario is demonstrated [here](oauth2-examples-proxy.html). The former scenario is covered in the following section.
 
-#### Idp-initiated logon via the login endpoint
+#### OAuth 2.0 authentication step by step
 
 A web portal offers their authenticated users, the option to navigate to RabbitMQ by submitting a form with their OAuth  token in `access_token` form field as it is illustrated below:
 
@@ -186,23 +185,20 @@ A web portal offers their authenticated users, the option to navigate to RabbitM
 
 If the access token is valid, RabbitMQ redirects the user to the overview page.
 
-By default, the RabbitMQ Management UI is configured with **service-provider initiated logon**, to configure **Identity-Provider initiated logon**,
-add one entry to `advanced.config`. For example:
+#### Testing OAuth 2.0 in the management ui
 
-```
- ...
- {rabbitmq_management, [
-    {oauth_enabled, true},
-    {oauth_provider_url, "http://localhost:8080"},      
-    {oauth_initiated_logon_type, idp_initiated},
-    ...
-  ]},
+By default, the management ui is configured with **service-provider initiated logon**. To configure **Identity-Provider initiated logon**, add one entry to `rabbitmq.conf`. For example:
+
+```ini
+management.oauth_enabled = true
+management.oauth_initiated_logon_type = idp_initiated
+management.oauth_provider_url = http://localhost:8080
 ```
 
-**Important**: when the user logs out, or its RabbitMQ session expired, or the token expired, the user is directed to the
-RabbitMQ Management landing page which has a **Click here to login** button.
+**Important**: when the user logs out, or its management ui's session expired, or the token expired, the user is redirected to the landing page in the management ui which has the **Click here to login** button.
 The user is never automatically redirected back to the url configured in the `oauth_provider_url`.
 It is only when the user clicks **Click here to login** , the user is redirected to the configured url in `oauth_provider_url`.
+
 
 ## Access other protocols using OAuth 2.0 tokens
 
