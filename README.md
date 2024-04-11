@@ -141,11 +141,10 @@ UAA has been configured with these 2 users:
 
 #### Testing OAuth 2.0 in the management ui
 
-First of all, deploy RabbitMQ by running the following command. This is uses the RabbitMQ configuration file
+First of all, deploy RabbitMQ by running the following command. This uses the RabbitMQ configuration file [conf/uaa/rabbitmq.conf](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial/blob/main/conf/uaa/rabbitmq.conf)
 ```
 make start-rabbitmq
 ```
-> It is equivalent to run also: MODE=uaa make start-rabbitmq
 
 Go to http://localhost:15672 and login using any of those two users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
 
@@ -172,7 +171,7 @@ The latter scenario is demonstrated [here](oauth2-examples-proxy.html). The form
 
 #### OAuth 2.0 authentication step by step
 
-A web portal offers their authenticated users, the option to navigate to RabbitMQ by submitting a form with their OAuth  token in `access_token` form field as it is illustrated below:
+A web portal offers their authenticated users, the option to navigate to RabbitMQ by submitting a form with their OAuth token in `access_token` form field as it is illustrated below:
 
 ```
     [ Idp | WebPortal ] ----&gt; 2. /login [access_token: TOKEN]----   [ RabbitMQ Cluster ]            
