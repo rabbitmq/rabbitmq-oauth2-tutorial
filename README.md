@@ -14,7 +14,7 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 
 - [Prerequisites to follow this guide](#prerequisites-to-follow-this-guide)
 - [Set up UAA and RabbitMQ](#set-up-uaa-and-rabbitmq)
-- [Access Management UI using OAuth 2.0 tokens](#access-management-ui-using-oauth-20-tokens)
+- [Access management ui using OAuth 2.0 tokens](#access-management-ui-using-oauth-20-tokens)
 	- [Service-Provider initiated logon](#service-provider-initiated-logon)
  	- [Identity-Provider initiated logon](#identity-provider-initiated-logon)
 - [Access other protocols using OAuth 2.0 tokens](#access-other-protocols)
@@ -31,7 +31,7 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 	- [Preferred username claims](#preferred-username-claims)
 	- [Use Rich Authorization Request Tokens](#use-rich-authorization-request-tokens)
 - [Combine OAuth 2.0 authentication with other mechanism](#oauth2-and-other-mechanism)
-	- [Basic Authentication](#basic-authentication)
+	- [Basic authentication](#basic-authentication)
 	- [Authn with OAuth 2 and Authz with internal](#authn-with-oauth-authz-with-internal)
 - [Use different OAuth 2.0 servers](#use-different-oauth2-servers)
 	- [KeyCloak](use-cases/keycloak.md)
@@ -102,18 +102,18 @@ auth_oauth2.signing_keys.legacy-token-key = /etc/rabbitmq/signing-key.pem
 
 The file (conf/uaa/signing-key/signing-key.pem)[conf/uaa/signing-key/signing-key.pem] is mounted on the RabbitMQ docker container under the path /etc/rabbitmq/signing-key.pem.
 
-## Access Management UI using OAuth 2.0 tokens
+## Access management ui using OAuth 2.0 tokens
 
-The Management UI supports two types of login when it comes to OAuth 2.0 authentication. They are:
+The management ui supports two types of login when it comes to OAuth 2.0 authentication. They are:
 
-* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the RabbitMQ Management UI, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting to the configured **authorization server**.
-* [Identity-Provider initiated logon](#identity-provider-initiated-logon) -this mode is opposite to the previous mode. The user must first access the RabbitMQ Management's `/login` endpoint. If the token is valid, the user is allowed to access the RabbitMQ Management UI. This mode is very useful for Web sites which allow users to access the RabbitMQ Management UI with a single click. The original Web site get a token on user's behalf and redirects the user to the RabbitMQ Management's `/login` endpoint.
+* [Service-Provider initiated logon](#service-provider-initiated-logon) - This is the default and traditional OAuth 2.0 logon mode. When the user visits the management ui, it shows a button with the label "Click here to logon". When the user clicks it, the logon process starts by redirecting to the configured **authorization server**.
+* [Identity-Provider initiated logon](#identity-provider-initiated-logon) -this mode is opposite to the previous mode. The user must first access the management's `/login` endpoint. If the token is valid, the user is allowed to access the management UI. This mode is very useful for Web sites which allow users to access the management UI with a single click. The original Web site get a token on user's behalf and redirects the user to the management's `/login` endpoint.
 
 ### Service-Provider initiated logon
 
 #### OAuth 2.0 authentication flow used by RabbitMQ
 
-The management UI uses *Authorization Code flow with PKCE** to implement this login type. RabbitMQ is a single-page web application and therefore it cannot safely store credentials such as the `client_id` and `client_secret` required to authenticate with the authorization server. For this reason, you
+The management ui uses *Authorization Code flow with PKCE** to implement this login type. RabbitMQ is a single-page web application and therefore it cannot safely store credentials such as the `client_id` and `client_secret` required to authenticate with the authorization server. For this reason, you
 should configure the RabbitMQ OAuth client in the authorization server so that it does not require `client_secret`.
 This type of OAuth clients/applications are known as **public** or **non-confidential**. In UAA they are configured as `allowpublic: true`.
 
@@ -154,7 +154,7 @@ It was signed with the symmetric key.
 
 ![JWT token](assets/admin-token-signed-sym-key.png)
 
-To configure RabbitMQ Management UI with OAuth 2.0 you need the following configuration entries:
+To configure the management ui with OAuth 2.0 you need the following configuration entries:
 ```ini
 management.oauth_enabled = true
 management.oauth_client_id = rabbit_client_code
@@ -768,14 +768,14 @@ If you try to access the rest api again, you will get
 {"error":"not_authorised","reason":"HTTP access denied: basic auth disabled"}
 ```
 
-3. Test OAuth2 authentication:
+3. Test the management rest api with OAuth 2.0
 ```
 make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token mgt-api-client.json legacy-token-key private.pem public.pem)
 ```
 
-4. Test Management UI
+4. Test the management ui with OAuth 2.0
 
-The Management UI though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment.
+The managenet ui though only accepts OAuth 2 authentication if you have OAuth 2 enabled (i.e, `management.oauth_enabled = true`), at least, for the moment.
 
 
 ## <a id="authn-with-oauth-authz-with-internal" class="anchor" href="#authn-with-oauth-authz-with-internal">Authn with OAuth 2 and Authz with internal</a>
@@ -882,7 +882,7 @@ To check that UAA is running fine:
 curl -k  -H 'Accept: application/json' http://localhost:8080/uaa/info | jq .
 ```
 
-Currently RabbitMQ Management plugin does not support latest version of UAA. That is
+Currently RabbitMQ management plugin does not support latest version of UAA. That is
 why in order to run the use cases you use the image built from the folder `uaa-4.24`. This has to do
 with the javascript library that comes with the management plugin.
 
@@ -912,7 +912,7 @@ and permissions required by this tutorial. For instance:
 ### About Users and Clients
 
 First of all, you need to clarify the distinction between *users* and *clients*.
-- A *user* is often represented as a live person. This is typically the user who wants to access the RabbitMQ Management UI/API.  
+- A *user* is often represented as a live person. This is typically the user who wants to access the  management ui/api.  
 - A *client* (a.k.a. *service account*) is an application that acts on behalf of a user or act on its own. This is typically an AMQP application.
 
 ### About Permissions
