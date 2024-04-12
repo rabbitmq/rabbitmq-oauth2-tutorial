@@ -517,14 +517,15 @@ make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_tok
 
 ### Use custom scopes
 
-In this use case you are going to demonstrate how to configure RabbitMQ to handle
+This section shows how to configure RabbitMQ to handle
 *custom scopes*. But what are *custom scopes*? They are any
 scope whose format is not compliant with RabbitMQ format. For instance, `api://rabbitmq:Read.All`
 is one of the custom scopes you will use in this use case.
 
 #### How to configure RabbitMQ with custom scope mapping
 
-Since RabbitMQ `3.10.0-rc.6`, you are able to map a custom scope to one or many RabbitMQ scopes.
+Custom scopes must be configured in the `advanced.config` configuration file.
+
 See below a sample RabbitMQ configuration where you map `api://rabbitmq:Read.All`
 custom scope to `rabbitmq.read:*/*` RabbitMQ scope.
 ```
@@ -538,7 +539,7 @@ custom scope to `rabbitmq.read:*/*` RabbitMQ scope.
 ]}
 ```
 
-Additionally, you can map a custom scope to many RabbitMQ scopes. For instance below you
+You can map a custom scope to one or many RabbitMQ scopes. For instance below you
 are mapping the role `api://rabbitmq:producer` to 3 RabbitMQ scopes which grants
 `read`, `write` and `configure` access on any resource and on any vhost:
 ```
@@ -558,7 +559,7 @@ are mapping the role `api://rabbitmq:producer` to 3 RabbitMQ scopes which grants
 
 #### How custom scopes are carried in JWT tokens
 
-If you do not configure RabbitMQ OAuth2 plugin with `extra_scopes_source`, RabbitMQ
+If you do not configure RabbitMQ OAuth2 plugin with `additional_scopes_key`, RabbitMQ
 expects the `scope` token's field to carry *custom scopes*. For instance, below you have a sample JWT
 token where the custom scopes are in the `scope` field :
 ```
@@ -574,12 +575,10 @@ token where the custom scopes are in the `scope` field :
 }
 ```
 
-Now, let's say you do configure RabbitMQ OAuth2 plugin with `extra_scopes_source` as shown below:
-```
-  {rabbitmq_auth_backend_oauth2, [
-    {resource_server_id, <<"rabbitmq">>},
-    {extra_scopes_source, <<"roles">>},
-    ...
+Now, let's say you do configure RabbitMQ OAuth2 plugin with `additional_scopes_key` as shown below:
+```ini
+auth_oauth2.resource_server_id = rabbitmq
+auth_oauth2.additional_scopes_key = roles
 ```
 
 With this configuration, RabbitMQ expects *custom scopes* in the field `roles` and
