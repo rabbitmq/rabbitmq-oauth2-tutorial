@@ -93,7 +93,7 @@ To deploy UAA with asymmetrical signing keys you need to run the following comma
 ```
 make start-uaa
 ```
-> It does not matter if UAA is already running using symmetrical keys. You do not need to stop it first. This script stops it if it is running and deploy its again. 
+> It does not matter if UAA is already running using symmetrical keys. You do not need to stop it first. This script stops it if it is running and deploy its again.
 
 The rest of the sections in this guide will configure RabbitMQ with asymmetrical signing keys. Each section will provide the exact command to deploy RabbitMQ which will vary depending on the use case. However, below you can find the key configuration to enable OAuth 2.0 and asymmetrical signing keys:
 ```ini
@@ -154,8 +154,8 @@ make start-rabbitmq
 ```
 
 UAA has been configured with these 2 users:
- - `rabbit_admin:rabbit_admin` with full administrator access, i.e. `administrator` user-tag
- - and `rabbitmq_management:rabbitmq_management` with just `management` user-tag
+ - `rabbit_admin`:`rabbit_admin` with full administrator access, i.e. `administrator` user-tag
+ - and `rabbitmq_management`:`rabbitmq_management` with just `management` user-tag
 
 Go to http://localhost:15672 and login using any of aforementioned users. To try with a different user, just click on "logout" button and click again on `Click here to log in` and login with the other user.
 
