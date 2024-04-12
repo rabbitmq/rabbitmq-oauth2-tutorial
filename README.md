@@ -144,7 +144,10 @@ To configure the management ui with OAuth 2.0 you need the following configurati
 management.oauth_enabled = true
 management.oauth_client_id = rabbit_client_code
 management.oauth_provider_url = http://localhost:8080
+management.oauth_scopes = openid profile rabbitmq.*
 ```
+
+UAA supports regular expressions in scopes like seen above in the `management.oauth_scopes` variable. However, this is not the case for other Authorization Servers.
 
 #### Testing OAuth 2.0 in the management ui
 
@@ -236,13 +239,13 @@ make curl-uaa url=http://localhost:15672/api/overview client_id=mgt_api_client s
 
 ### AMQP Protocol
 
-In this section, you are demonstrating how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application you are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test) which is not an OAuth 2.0 aware application -see [next use case](#) for an OAuth 2.0 aware application.
+This section shows how an application can connect to RabbitMQ presenting a JWT Token as a credential. The application you are going to use is [PerfTest](https://github.com/rabbitmq/rabbitmq-perf-test).
 
-You are launching PerfTest with a token that you have previously obtained from UAA. This is just to probe AMQP access with a JWT Token. Needless to say that the application should instead obtain the JWT Token prior to connecting to RabbitMQ and it should also be able to refresh it before reconnecting. RabbitMQ validates the token before accepting it. If the token has expired, RabbitMQ will reject the connection.
+#### The OAUth 2.0 Authentication flow
 
-First of all, an application which wants to connect to RabbitMQ using OAuth2 must present a
-valid JWT token. To obtain the token, the application must first authenticate (`1.`) with UAA. In case of a successful
-authentication, it gets back a JWT token (`2.`) which uses it to connect (`3.`) to RabbitMQ.  
+This is the flow depicted in the diagram below:
+- Request an access token
+- Connect to RabbitMQ via AMQP using the access token as password
 
 
 ```
@@ -255,7 +258,7 @@ authentication, it gets back a JWT token (`2.`) which uses it to connect (`3.`) 
        --------2.JWT-------->
 ```
 
-You have previously configured UAA with these 2 OAuth clients:
+UAA has been configured UAA with these 2 OAuth clients:
  - `consumer`
  - and `producer`
 > An application requires an oauth client in order to get an JWT token. Applications use the `Oauth client grant flow` to obtain a JWT token
@@ -263,6 +266,20 @@ You have previously configured UAA with these 2 OAuth clients:
 This the token issued by UAA for the `consumer` OAuth client.
 
 ![JWT token](assets/consumer-token-signed-with-sym-key.png)
+
+#### Start RabbitMQ
+
+If you are following this guide chronologically, RabbitMQ is already running with the appropriate configuration for this use case. However, in any case, this is the command to start RabbitMQ:
+```
+make start-rabbbitmq
+```
+
+And likewise, UAA must be also running. However, this is the command to start UAA for this use case:
+```
+make start-uaa
+```
+
+#### Testing the flow
 
 To launch the consumer application invoke the following command:
 ```
@@ -281,7 +298,6 @@ To stop all the applications call the following command:
 ```
 make stop-all-apps
 ```
-
 
 ### JMS protocol
 
