@@ -348,7 +348,7 @@ make start-jms-subscriber
 
 > Note: RabbitMQ is already configured with `rabbitmq_mqtt` plugin.
 
-Similar to AMQP or JMS API, with MQTT we send the access token in the password field.
+Similar to AMQP or JMS API, with MQTT you send the access token in the password field.
 
 MQTT heavily rely on RabbitMQ's Topics and therefore on topic permissions. For instance, `rabbitmq.write:*/*/*` means allow write operation on a any vhost, on any exchange and any topic. In fact,
 it is any "routing-key" because that is translated to a topic/queue.
@@ -392,7 +392,7 @@ in UAA does not have the required permissions. In our handcrafted token, you hav
 
 ### AMQP 1.0 protocol
 
-Similar to AMQP 0.9.1, with AMQP 1.0 we also send the access token in the password field. This guide provides a sample Java AMQP 1.0 application which reads the access from an environment variable called `PASSWORD`.
+Similar to AMQP 0.9.1, with AMQP 1.0 you also send the access token in the password field. This guide provides a sample Java AMQP 1.0 application which reads the access from an environment variable called `PASSWORD`.
 
 #### Building AMQP 1.0 application image
 
@@ -444,12 +444,12 @@ To publish to a **Topic Exchange**, you need to have the following scope:
 
 OAuth 2.0 authorisation backend supports variable expansion when checking permission on topics. It supports any JWT claim whose value is a plain string and the `vhost` variable. For example, if a user has connected with the token below against the vhost `prod` should have write permission to send to any exchanged starting with `x-prod-` and any routing key starting with `u-bob-`:
 
-<pre class="json">
+```json
 {
   "sub" : "bob",
   "scope" : [ "rabbitmq.write:*/q-{vhost}-*/u-{sub}-*" ]
 }
-</pre>
+```
 
 ## Use advanced OAuth 2.0 configuration
 
@@ -462,24 +462,16 @@ JWT `scope` field. Instead, they can include RabbitMQ scopes in a custom JWT sco
 
 Since RabbitMQ 3.9, it is possible to configure RabbitMQ with a different field to look for scopes as shown below:
 
-```
-[
-  {rabbitmq_auth_backend_oauth2, [
-    ...
-    {extra_scopes_source, <<"extra_scope">>},
-    ...
-    ]}
-  ]},
-].
+```ini
+auth_oauth2.additional_scopes_key = extra_scope
 ```
 
 To test this feature you are going to build a token, sign it and use it to hit one of the RabbitMQ management endpoints.
-The command below allows us to hit any management endpoint, in this case it is the `overview`, with a token.
+The command below allows you to hit any management endpoint, in this case it is the `overview`, with a token.
 
 ```
 make curl-with-token URL=http://localhost:15672/api/overview TOKEN=$(bin/jwt_token scope-and-extra-scope.json legacy-token-key private.pem public.pem)
 ```
-
 
 You use the python script `bin/jwt_token.py` to build the minimal JWT token possible that RabbitMQ is able to
 validate which is:
@@ -506,6 +498,7 @@ There are 2 ways to configure RabbitMQ with multiple signing keys:
 - Or you can do it **dynamically**, i.e, add signing keys while RabbitMQ is running and without having to
 restart it. This alternative is explained in more detail in the section [About rotating JWT signing key](#about-rotating-jwt-signing-key).
 However, you are going to demonstrate it here as well.
+- Or you can configure `auth_oauth2.issuer` with the URL of your OpenId compliant Authorization Server and RabbitMQ discovers the JWKS endpoint. When RabbitMQ receives a token with a signing key id for which it does not have its signing key, RabbitMQ gets the latest signing keys from the JWKS endpoint. Or you can instead configure `auth_oauth2.jwks_url` and RabbitMQ will use that URL as the JKWS endpoint.
 
 First you add a second signing key called `legacy-token-2-key` whose public key is `conf/public-2.pem`:
 ```
