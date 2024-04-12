@@ -301,8 +301,7 @@ make stop-all-apps
 
 ### JMS protocol
 
-In this use case you are demonstrating a basic JMS application which reads, via an environment variable (`TOKEN`),
-the JWT token that will use as password when authenticating with RabbitMQ.
+To authenticate with an access token over the JMS API, you have to pass an access token as a password, very similar to how it was done with AMQP in the previous section. To show this use case, this guide has a sample Java application which reads the access token from environment variable called `TOKEN`. And there are two make commands which starts with `make start-jms-` which requests a token to UAA and runs the Java application with the token in the env variable.
 
 It is **VERY IMPORTANT** to grant the required permission to the *exchange* `jms.durable.queues`.
 
@@ -312,8 +311,19 @@ Applications which send JMS messages require of these permissions:
 - `rabbitmq.read:*/jms.durable.queues`
 > Those permissions grant access on any vhost.
 
+#### Start RabbitMQ and UAA
+
+If you have followed this guide chronologically, you should have RabbitMQ and UAA running.
+However, in any case, this is how to run them:
+```
+make start-uaa
+make start-rabbitmq
+```
+
+#### Testing OAuth 2.0 with JMS protocol
+
 Before testing a publisher and a subscriber application you need to build a local image for the
-basic jms application by invoking this command:
+sample JMS application by invoking this command:
 ```
 make build-jms-client
 ```
@@ -336,13 +346,26 @@ make start-jms-subscriber
 
 ### MQTT protocol
 
-This scenario explores the use case where you authenticate with a JWT token to RabbitMQ MQTT port.
-
 > Note: RabbitMQ is already configured with `rabbitmq_mqtt` plugin.
 
-This is no different than using AMQP or JMS protocols, all that matters is to pass an empty username and a JWT token as password.
-However, **what it is really different** is how you encode the permissions. In this use case you are going to proceed as you did it in the previous use case where you handcrafted the JWT token rather than requesting it to UAA. Here is the the scopes required to publish
-a message to a mqtt topic ([scopes-for-mqtt.json](jwts/scopes-for-mqtt.json))
+Similar to AMQP or JMS API, with MQTT we send the access token in the password field.
+
+MQTT heavily rely on RabbitMQ's Topics and therefore on topic permissions. For instance, `rabbitmq.write:*/*/*` means allow write operation on a any vhost, on any exchange and any topic. In fact,
+it is any "routing-key" because that is translated to a topic/queue.
+
+#### Start RabbitMQ if not running
+
+If RabbitMQ is not running yet, start it by running the following command:
+```
+make start-rabbitmq
+```
+It uses the rabbitmq.conf file found under conf/uaa folder. However, you do not need to run UAA because this time the scripts are capable of producing a digitally signed token given its payload.
+
+#### Testing MQTT with an access token
+
+This time, the scripts prepared to test this protocol, MQTT, do not request an access token to UAA. Instead, the script reads a token's payload from a file and signs it to produce a digitally signed token. The scripts use the same signing key RabbitMQ is configured with.
+
+Here is a sample token's payload. You can find it in the file [jwts/scopes-for-mqtt.json](jwts/scopes-for-mqtt.json))
 ```
 {
   "scope": [
@@ -358,11 +381,7 @@ a message to a mqtt topic ([scopes-for-mqtt.json](jwts/scopes-for-mqtt.json))
 }
 ```
 
-`rabbitmq.write:*/*/*` means allow write operation on a any vhost, on any exchange and any topic. In fact,
-it is any "routing-key" because that is translated to a topic/queue.
-
-You are going to publish a mqtt message by running the following command. If you have not run any of the
-previous use cases, you need to launch rabbitmq first like this `make start-rabbitmq`.
+The command below publishes a mqtt message and sends the access token whose payload is found in the file jwts/`scopes-for-mqtt.json`.
 ```
 make start-mqtt-publish TOKEN=$(bin/jwt_token scopes-for-mqtt.json legacy-token-key private.pem public.pem)
 ```
