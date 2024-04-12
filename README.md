@@ -392,14 +392,17 @@ in UAA does not have the required permissions. In our handcrafted token, you hav
 
 ### AMQP 1.0 protocol
 
-In this use case you are demonstrating a basic AMQP 1.0 application which reads, via an environment variable (`PASSWORD`),
-the JWT token that will use as password when authenticating with RabbitMQ.
+Similar to AMQP 0.9.1, with AMQP 1.0 we also send the access token in the password field. This guide provides a sample Java AMQP 1.0 application which reads the access from an environment variable called `PASSWORD`.
+
+#### Building AMQP 1.0 application image
 
 Before testing a publisher and a subscriber application you need to build a local image for the
 basic AMQP 1.0 application by invoking this command:
 ```
 make build-amqp1_0-client
 ```
+
+#### Start RabbitMQ and UAA
 
 Launch RabbitMQ with the following command. It will start RabbitMQ configured with UAA as its authorization server.
 ```
@@ -411,7 +414,9 @@ Launch UAA.
 make start-uaa
 ```
 
-And send a message. It uses the *client_id*  `jms_producer`, declared in UAA, to obtain a token:
+#### Testing AMQP 1.0 with an access token
+
+And send a message. It uses the *client_id* `jms_producer` to obtain a token from UAA:
 ```
 make start-amqp1_0-publisher
 ```
