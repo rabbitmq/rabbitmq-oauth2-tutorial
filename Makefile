@@ -21,6 +21,9 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
+start-pingfederate: ## Start PingFederate
+	@-./bin/pingfederate/deploy 
+
 build-azure: ##  Generate SSL files for Azure AD
 	@./bin/azure/deploy
 
@@ -42,6 +45,9 @@ start-rabbitmq:  ## Run RabbitMQ Server
 stop-rabbitmq:
 	@docker stop rabbitmq
 
+stop-pingfederate: ## Stop PingFederate
+	@docker kill pingfederate
+	
 start-perftest-producer: ## Start PerfTest producer application
 	@uaac token client get $(PRODUCER) -s $(PRODUCER)_secret
 	@./bin/run-perftest $(PRODUCER) \

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+LICENSE_KEY_FILE=${LICENSE_KEY_FILE:?"Set absolute path to license key file in env var LICENSE_KEY_FILE"}
+ROOT=$SCRIPT/../..
+
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f pingfederate 2>/dev/null || echo "pingfederate was not running"
+
+echo "Running pingfederate docker image ..."
+
+docker run \
+		--detach \
+		--name pingfederate \
+		-v ${LICENSE_KEY_FILE}:/opt/out/instance/server/default/conf/pingfederate.lic \
+		-p 9031:9031 \
+		-p 9999:9999 \
+		pingidentity/pingfederate
+
+#		-v ${ROOT}/conf/pingfederate/data.zip:/opt/out/instance/server/default/data/drop-in-deployer/data.zip \

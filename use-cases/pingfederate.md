@@ -1,7 +1,22 @@
+# Use PingFederate as OAuth 2.0 server
 
+You are going to test one OAuth flow:
+1. Access management ui via a browser
 
-Configure CORS 
+## Prerequisites to follow this guide
 
-To deploy PingFederate 
+- Docker
+- make
+- A license key downloaded from [PingFederate](https://docs.pingidentity.com/r/en-us/pingfederate-103/imb1564002973616)
 
-docker run --name ping  -v  ~/Documents/PingFederate-12.0.1-Development.lic:/opt/out/instance/server/default/conf/pingfederate.lic -p 9031:9031 -p 9999:9999 pingidentity/pingfederate
+## Deploy PingFederate
+
+First, deploy **PingFederate** by running the following command. However, you must modify the location of the license key file in the environment variable `LICENSE_KEY_FILE`. 
+```
+export LICENSE_KEY_FILE="/Users/mrosales/Documents/pingfedeerate/PingFederate-12.0.1-Development.lic" 
+make start-pingfederate
+```
+
+To access PingFederate management interface go to https://0.0.0.0:9999/. 
+
+**IN PROGESS**
