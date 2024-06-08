@@ -1,4 +1,4 @@
-# Use KeyCloak as OAuth 2.0 server
+# Use Keycloak as OAuth 2.0 server
 
 You are going to test 3 OAuth flows:
 1. Access management ui via a browser
@@ -10,18 +10,18 @@ You are going to test 3 OAuth flows:
 - Docker
 - make
 
-## Deploy Key Cloak
+## Deploy Keycloak
 
-First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+First, deploy **Keycloak**. It comes preconfigured with all the required scopes, users and clients.
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+**Keycloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
-To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
+To access Keycloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
 
-There is a dedicated **KeyCloak realm** called `Test` configured as follows:
+There is a dedicated **Keycloak realm** called `Test` configured as follows:
 - You configured an [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
 - And a [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
 - And three clients: `rabbitmq-client-code` for the rabbitmq managament ui, `mgt_api_client` to access via the
@@ -82,7 +82,7 @@ python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 
 ## Access Management UI
 
-Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
+Go to http://localhost:15672, click on the single button on the page which redirects to **Keycloak** to authenticate.
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
@@ -105,7 +105,7 @@ dotnet run
 `make stop-keycloak`
 
 
-# Notes about setting up KeyCloak from scratch
+# Notes about setting up Keycloak from scratch
 
 The following sections explain the steps carried out to configure the Keycloak
 server used by this use case and whose configuration is stored under `conf/keycloak/import/test-realm.json`.

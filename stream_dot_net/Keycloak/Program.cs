@@ -60,9 +60,9 @@ var producer = await Producer.Create(new ProducerConfig(system, stream));
 // and the producer continuing to send messages
 for (var i = 0; i < 10 * 5; i++)
 {
-    await producer.Send(new Message(Encoding.UTF8.GetBytes($"Hello KeyCloak! {i}")));
+    await producer.Send(new Message(Encoding.UTF8.GetBytes($"Hello Keycloak! {i}")));
     await Task.Delay(TimeSpan.FromSeconds(1));
-    Console.WriteLine($"{DateTime.Now} - Sent: Hello KeyCloak! {i}");
+    Console.WriteLine($"{DateTime.Now} - Sent: Hello Keycloak! {i}");
 }
 
 completed.SetResult(true);
