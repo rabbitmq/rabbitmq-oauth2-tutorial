@@ -28,9 +28,9 @@ make start-keycloak
 **Keycloak** comes configured with its own signing key. And [rabbitmq.conf](../conf/oauth2-proxy/rabbitmq.conf)
 is also configured with the same signing key.
 
-To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
+To access Keycloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
 
-There is a dedicated **KeyCloak realm** called `Test` configured as follows:
+There is a dedicated **Keycloak realm** called `Test` configured as follows:
 - [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
 - [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
 - `rabbitmq-proxy-client` client

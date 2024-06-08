@@ -34,7 +34,7 @@ If you want to quickly test how it works go straight to [OAuth2 plugin in action
 	- [Basic authentication](#basic-authentication)
 	- [Authn with OAuth 2 and Authz with internal](#authn-with-oauth-authz-with-internal)
 - [Use different OAuth 2.0 servers](#use-different-oauth2-servers)
-	- [KeyCloak](use-cases/keycloak.md)
+	- [Keycloak](use-cases/keycloak.md)
 	- [Auth0](use-cases/auth0.md)
 	- [Azure Active Directory](use-cases/azure.md)
 	- [OAuth2 Proxy](use-cases/oauth2-proxy.md)
@@ -858,9 +858,9 @@ make curl-with-token URL=http://localhost:15672/api/overview \
 
 ## <a id="use-different-oauth2-server" class="anchor" href="#use-different-oauth2-server">Use different OAuth 2.0 servers</a>
 
-Below there is a list of all the authorization servers RabbitMQ has been tested against. For each authorization server, there is a dedicated README file that explains how to configure RabbitMQ for that authorization server, tests various flows and deploy the authorization server when applicable. Some authorization servers are hosted in the cloud like Auth0, Okta and Azure and others are deployed locally like KeyCloak or OAuth2 Proxy.
+Below there is a list of all the authorization servers RabbitMQ has been tested against. For each authorization server, there is a dedicated README file that explains how to configure RabbitMQ for that authorization server, tests various flows and deploy the authorization server when applicable. Some authorization servers are hosted in the cloud like Auth0, Okta and Azure and others are deployed locally like Keycloak or OAuth2 Proxy.
 
-- [KeyCloak](use-cases/keycloak.md)
+- [Keycloak](use-cases/keycloak.md)
 - [Auth0](use-cases/auth0.md)
 - [Azure Active Directory](use-cases/azure.md)
 - [OAuth2 Proxy](use-cases/oauth2-proxy.md)

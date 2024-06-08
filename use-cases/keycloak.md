@@ -1,4 +1,4 @@
-# Use KeyCloak as OAuth 2.0 server
+# Use Keycloak as OAuth 2.0 server
 
 You are going to test 3 OAuth flows:
 1. Access management ui via a browser
@@ -19,9 +19,9 @@ make start-keycloak
 **Keycloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
-To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
+To access Keycloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
 
-There is a dedicated **KeyCloak realm** called `Test` configured as follows:
+There is a dedicated **Keycloak realm** called `Test` configured as follows:
 - You configured an [rsa](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys) signing key
 - And a [rsa provider](http://0.0.0.0:8080/admin/master/console/#/realms/test/keys/providers)
 - And three clients: `rabbitmq-client-code` for the rabbitmq managament ui, `mgt_api_client` to access via the
@@ -105,7 +105,7 @@ dotnet run
 `make stop-keycloak`
 
 
-# Notes about setting up KeyCloak from scratch
+# Notes about setting up Keycloak from scratch
 
 The following sections explain the steps carried out to configure the Keycloak
 server used by this use case and whose configuration is stored under `conf/keycloak/import/test-realm.json`.
