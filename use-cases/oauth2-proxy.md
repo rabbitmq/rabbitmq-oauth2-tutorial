@@ -19,13 +19,13 @@ You are going to test the following flow: Access management ui via a browser thr
 - Docker
 - make
 
-## Deploy Key Cloak
+## Deploy Keycloak
 
-First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+First, deploy **Keycloak**. It comes preconfigured with all the required scopes, users and clients.
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And [rabbitmq.conf](../conf/oauth2-proxy/rabbitmq.conf)
+**Keycloak** comes configured with its own signing key. And [rabbitmq.conf](../conf/oauth2-proxy/rabbitmq.conf)
 is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.

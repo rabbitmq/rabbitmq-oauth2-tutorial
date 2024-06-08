@@ -10,13 +10,13 @@ You are going to test 3 OAuth flows:
 - Docker
 - make
 
-## Deploy Key Cloak
+## Deploy Keycloak
 
-First, deploy **Key Cloak**. It comes preconfigured with all the required scopes, users and clients.
+First, deploy **Keycloak**. It comes preconfigured with all the required scopes, users and clients.
 ```
 make start-keycloak
 ```
-**Key Cloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
+**Keycloak** comes configured with its own signing key. And the [rabbitmq.conf](../conf/keycloak/rabbitmq.conf)
 used by `make start-keycloak` is also configured with the same signing key.
 
 To access KeyCloak management interface go to http://0.0.0.0:8080/ and enter `admin` as username and password.
@@ -82,7 +82,7 @@ python3 pika-client/producer.py producer kbOFBXI9tANgKUq8vXHLhT6YhbivgXxn
 
 ## Access Management UI
 
-Go to http://localhost:15672, click on the single button on the page which redirects to **Key Cloak** to authenticate.
+Go to http://localhost:15672, click on the single button on the page which redirects to **Keycloak** to authenticate.
 Enter `rabbit_admin` and `rabbit_admin` and you should be redirected back to RabbitMQ Management fully logged in.
 
 
