@@ -1,5 +1,5 @@
-./uaa
-./uaa-4.24.0/
+uaa
+uaa-4.24.0/
 conf/asymmetric_key/uaa.yml
 conf/symmetric_key/uaa.yml
 conf/entra/certs
@@ -16,6 +16,6 @@ master-*.zip
 target/
 .mvn
 *.iml
-conf/*/certs
-conf/certs
-./tls-gen
+conf/keycloak/certs
+conf/certs/*
+tls-gen/*
