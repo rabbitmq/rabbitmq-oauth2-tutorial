@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+tabs 1
+declare -i PADDING_LEVEL=0
+declare -i STEP=1
+
+begin() {
+  print "\n[$STEP] $@"
+  PADDING_LEVEL=$(($PADDING_LEVEL + 1))
+  STEP=$(($STEP + 1))
+}
+end() {
+  PADDING_LEVEL=$(($PADDING_LEVEL - 1))
+  print "$@"
+}
+print() {
+  tabbing=""
+  if [[  $PADDING_LEVEL -gt 0 ]]; then
+    for i in $(seq $PADDING_LEVEL); do
+        tabbing="$tabbing\t"
+    done
+  fi
+  echo -e "$tabbing$1"
+}
+
+wait_for_message() {
+  attemps_left=10
+  while ! docker logs $1 2>&1 | grep -q "$2";
+  do
+      sleep 5
+      print "Waiting 5sec for $1 to start ($attemps_left attempts left )..."
+      ((attemps_left--))
+      if [[ "$attemps_left" -lt 1 ]]; then
+        print "Timed out waiting"
+        exit 1
+      fi
+  done
+}
+kill_container_if_exist() {
+  if docker stop $1 &> /dev/null; then
+     docker rm $1 &> /dev/null
+  fi
+}
+ensure_docker_network() {
+  NETWORK=${DOCKER_NETWORK:-rabbitmq_net}
+  begin "Ensuring $NETWORK network ..."
+  if [ ! "$(docker network ls | grep $NETWORK)" ]; then
+    print "> DOCKER_NETWORK: $NETWORK created"
+    docker network create $NETWORK
+  fi
+  end "$NETWORK network exists"
+}
+function generate-ca-server-client-kpi {
+  NAME=$1
+  FOLDER=$2
+  TLSGEN_FOLDER=$3
+
+  begin "Generate certs for $NAME"
+
+  if [ -d "$NAME" ]; then
+    end "SSL Certificates already present under $NAME. Skip SSL generation"
+    return
+  fi
+
+  if [ ! -d "$SCRIPT/tls-gen" ]; then
+    git clone https://github.com/michaelklishin/tls-gen $TLSGEN_FOLDER
+  fi
+
+  print "Generating CA and Server (localhost and $NAME) PKI under $FOLDER ..."
+  mkdir -p $FOLDER
+  cp -r $TLSGEN_FOLDER/* $FOLDER
+
+  CUR_DIR=$(pwd)
+  cd $FOLDER/basic
+  make CN=$NAME
+  #make PASSWORD=$PASSWORD
+  make verify
+  make info
+  cd $CUR_DIR
+
+  end "SSL Certificates generated for $NAME under $FOLDER"
+}

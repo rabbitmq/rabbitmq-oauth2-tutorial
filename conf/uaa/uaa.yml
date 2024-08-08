@@ -1,8 +1,8 @@
 logging:
-  config: /uaa/log4j2.properties
+  config: /config/log4j2.properties
 
 issuer:
-  uri: http://local:8080/
+  uri: https://localhost:8443/
 
 encryption:
   active_key_label: CHANGE-THIS-KEY
@@ -95,11 +95,18 @@ jwt:
             8XSfaPiTyQwWpzbFNZzzemlTsIDiF3UqwkHvWaMYPDf4Ng3cokPPxw==
             -----END RSA PRIVATE KEY-----
 
+requires_https: true
+
+
+
 scim:
   users:
     - rabbit_admin|rabbit_admin|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:administrator
     - rabbitmq_management|rabbitmq_management|scim.read,openid,rabbitmq.read:*/*,rabbitmq.write:*/*,rabbitmq.configure:*/*,rabbitmq.tag:management
     - rabbit_monitor|rabbit_monitor|scim.read,openid,rabbitmq.tag:monitoring
+    - rabbit_prod_1|rabbit_prod_1|scim.read,openid,rabbit_prod.read:*/*,rabbit_prod.write:*/*,rabbit_prod.configure:*/*,rabbit_prod.tag:administrator
+    - rabbit_dev_1|rabbit_dev_1|scim.read,openid,rabbit_dev.read:*/*,rabbit_dev.write:*/*,rabbit_dev.configure:*/*,rabbit_dev.tag:administrator
+
   groups:
     'rabbitmq.read:*/*': Read all
     'rabbitmq.write:*/*': Write all
@@ -107,6 +114,74 @@ scim:
     'rabbitmq.tag:management': Management
     'rabbitmq.tag:monitoring': Monitoring
     'rabbitmq.tag:administrator': Administrator
+    'rabbit_dev.read:*/*': Read all
+    'rabbit_dev.write:*/*': Write all
+    'rabbit_dev.configure:*/*': Configure all
+    'rabbit_dev.tag:management': Management
+    'rabbit_dev.tag:monitoring': Monitoring
+    'rabbit_dev.tag:administrator': Administrator
+    'rabbit_prod.read:*/*': Read all
+    'rabbit_prod.write:*/*': Write all
+    'rabbit_prod.configure:*/*': Configure all
+    'rabbit_prod.tag:management': Management
+    'rabbit_prod.tag:monitoring': Monitoring
+    'rabbit_prod.tag:administrator': Administrator
+
+
+sslCertificate: |
+  -----BEGIN CERTIFICATE-----
+  MIIDtDCCApygAwIBAgIBBjANBgkqhkiG9w0BAQsFADBMMTswOQYDVQQDDDJUTFNH
+  ZW5TZWxmU2lnbmVkdFJvb3RDQSAyMDIzLTExLTE2VDEyOjI0OjQ3LjI4OTA5MzEN
+  MAsGA1UEBwwEJCQkJDAeFw0yNDAxMTAxMDQyMzVaFw0zNDAxMDcxMDQyMzVaMB8x
+  DDAKBgNVBAMMA3VhYTEPMA0GA1UECgwGc2VydmVyMIIBIjANBgkqhkiG9w0BAQEF
+  AAOCAQ8AMIIBCgKCAQEA1ABlo/7GuVKaQfUoEwyLgwCI8zN1a2J+ROZT8fhKl3zn
+  c1GRe5UvcIxEviSJ/WEqGw8kGxWiyhggUKzmtCNMSrtNsLcP9kolZxlbOIm3Jhm2
+  GRPAvc33HBc2wvDKDP/4DeizgL+LONCjS+3CtI5Fc2pXBFaHOlEdDDQRDy2PXLjR
+  HqwVG3Jzmm1+s3zkLQNz3JigdkHDgcfOA8nVR9OYVkXHiDZhJgW+H91RM5booJrZ
+  lgw0SbTlqZLyoCdHo4+5IkisYoM9V55yocRikHV+5xy1zfMhfybMhkfH5cqN4BoG
+  0qzTkXkg+fzlMXv+hevbzhKWf8H2HWKMdrfq2B3I4QIDAQABo4HNMIHKMAkGA1Ud
+  EwQCMAAwCwYDVR0PBAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcD
+  AjAeBgNVHREEFzAVggN1YWGCA3VhYYIJbG9jYWxob3N0MB0GA1UdDgQWBBQKquMC
+  lB3n6jT8Ss/1SlINVU61XjAfBgNVHSMEGDAWgBS2Icxjr1ucGCIxikeSG9igJf55
+  8jAxBgNVHR8EKjAoMCagJKAihiBodHRwOi8vY3JsLXNlcnZlcjo4MDAwL2Jhc2lj
+  LmNybDANBgkqhkiG9w0BAQsFAAOCAQEAvo+DEEdomWhYyHqsTAJ66X7lpH++v5ZJ
+  79PyVwdySb3xAklHteHpGisIO7TR7yKAhsEe4hap/vV2/NvDcjADEQG+zRy8+MiV
+  ZI6kfY5PhTPLdUvdPiM/R2br6j9z9HfBwlTdSEXUJoe2LyTM9oeJXEA8VDbBxTxD
+  WvHb8H0k3QVcwYKgLOQx1Y62HkqAgcdVmji0SQSQIPPTgzLp9m4UBDE951IwxCte
+  EIJI0GdxIRpjDS/YL3x2ZbjF3zBDMEBfZ6eL2F8agN33GtZt0FkD2X09UOA4R+Pz
+  VihQt+A2mRjG2pWUUvKmbXSfpdICkdO6lpj0tZ2JrX8NyHxssXgEBw==
+  -----END CERTIFICATE-----
+
+sslPrivateKey: |
+  -----BEGIN PRIVATE KEY-----
+  MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDUAGWj/sa5UppB
+  9SgTDIuDAIjzM3VrYn5E5lPx+EqXfOdzUZF7lS9wjES+JIn9YSobDyQbFaLKGCBQ
+  rOa0I0xKu02wtw/2SiVnGVs4ibcmGbYZE8C9zfccFzbC8MoM//gN6LOAv4s40KNL
+  7cK0jkVzalcEVoc6UR0MNBEPLY9cuNEerBUbcnOabX6zfOQtA3PcmKB2QcOBx84D
+  ydVH05hWRceINmEmBb4f3VEzluigmtmWDDRJtOWpkvKgJ0ejj7kiSKxigz1XnnKh
+  xGKQdX7nHLXN8yF/JsyGR8flyo3gGgbSrNOReSD5/OUxe/6F69vOEpZ/wfYdYox2
+  t+rYHcjhAgMBAAECggEBAK16VbHIvdzQVyI59j0AOvlL6sT4CtGAm0rOH0sVnhQw
+  RUT8LkwuW8+BOI9PXwtUAxx5W1Y+ciNlcqwRkAdACyHr+zrr0cf8DHc9LIQrTQ+E
+  YppKq6GldNwrssf6OZxBqT3YeWqVUtt+/uEXAgi1kudK0UHffHCgB2EBCiSdZ366
+  z2ko6WdLAz8j55ZgQFobLnXYNUSan1tvlcM1ihhapm0bGqIOdTKAwK8J7hKb9rZN
+  /KMDrjFuRl1KfIzXwZ4iRnja90X19FLi6w6zIQRLbovlr2bzZWLOnSZ4fPUdHuiz
+  /q407RzcjDjdBS3YhURAqw5FnzISLmMLNIfIw8XNfbECgYEA+O60kKIt0xvA+fUb
+  Z+WS63k9/RdFxlo795h/OD0cm9x2eLmCBV+cZJHg6JlU9WBh2vC1/lYA9Vi5Lusr
+  wabB4WYgrPAoktJS+cOmE3n53EcbPqye1zb1i28iCPKhAEOPOda87qPLRSEmd7fn
+  lq5Je6HEgPmm4AATj2aY9iQxYlsCgYEA2gVFH9g9/TA3+MUkGks92m6qE1ZaqNyM
+  TyjOx4ShL6Z2666thrbIbNw0I+D+NzdqrwRZeFt6scOpbXDyhKRSFp4Jj4Kiy1Iu
+  tN+7IilFEZYdGTOINN3WBVuOI2X8mscqliJbayxgp4890Irozr0o+eONPd87fNFm
+  eg93LLHa7nMCgYEA9eucJmaRrsT0V/t1H6cFBeu4+ZdMLzBlnazhwcVdxfx+bbWW
+  ZYiXECOtdRxFekPFaG303VZJjBgimd9qUt1THEGwdiirbKCrqGNIZmVSGfOFTt1p
+  7mM1IJKhpQVNWN1lWVZzP65A2gJt5kegWpPDtIeTgXchDJoGuNw6sLAAuZECgYEA
+  g14DjbGdgG7KexJGs7U8mt5timNRE0h5HsWG+v92pCCYrWA+XNrMH5P7stbCNwEk
+  PjrPsk7kujIcZ75T0wq0D77AIgHkF8D4NbJNrsLRREyAUgwT+U7lw6qsFbZBI/34
+  MiiXjxdZUf1kkMDykIe4JgIvu+VDke0W41toQr0UHvMCgYAj2Lh6sgwLZ6op62Z3
+  36mxdC4MESUj8bJekta0P5TwWL4m1X7IzWpwt+0ub0nKpaszpuZpTTV35pQNDOgi
+  jsaKefE+emERWw/DyDhT+7zjhaAmN7bKBgFddZXLITYZ+Eg8WKPSfRxeUlVbxxYE
+  GJ7dUlF99MT/tdOcKerKais36w==
+  -----END PRIVATE KEY-----
+
 
 oauth:
   # Always override clients on startup
@@ -143,6 +218,32 @@ oauth:
       id: producer
       secret: producer_secret
       authorities: rabbitmq.write:*/*,rabbitmq.read:*/*,rabbitmq.configure:*/*
+      authorized-grant-types: client_credentials
+    prod_producer:
+      id: prod_producer
+      secret: prod_producer
+      authorities: rabbit_prod.write:*/*,rabbit_prod.read:*/*,rabbit_prod.configure:*/*
+      authorized-grant-types: client_credentials
+    rabbit_prod_1:
+      id: rabbit_prod_1
+      secret: rabbit_prod_1
+      scope: rabbit_prod.*,openid,profile
+      authorities: uaa.resource,rabbit_prod
+      authorized-grant-types: authorization_code
+      redirect-uri: http://localhost:15672
+      allowpublic: true
+    rabbit_dev_1:
+      id: rabbit_dev_1
+      secret: rabbit_dev_1
+      scope: rabbit_dev.*,openid,profile
+      authorities: uaa.resource,rabbit_dev
+      authorized-grant-types: authorization_code
+      redirect-uri: http://localhost:15672
+      allowpublic: true
+    uaa_producer:
+      id: uaa_producer
+      secret: uaa_producer_secret
+      authorities: rabbitmq-4-uaa.write:*/*,rabbitmq-4-uaa.read:*/*,rabbitmq-4-uaa.configure:*/*
       authorized-grant-types: client_credentials
     consumer:
       id: consumer

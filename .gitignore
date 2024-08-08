@@ -16,3 +16,6 @@ master-*.zip
 target/
 .mvn
 *.iml
+conf/*/certs
+conf/certs
+./tls-gen
