@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
+#set -x
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+source $SCRIPT/common
+
 MODE=${MODE:-uaa}
+OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 #CONF=${CONF:-rabbitmq.conf}
 #CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
@@ -23,14 +28,14 @@ function generate-ca-server-client-kpi {
     git clone https://github.com/michaelklishin/tls-gen $SCRIPT/tls-gen
   fi
 
-  echo "Generating CA and Server PKI under $NAMER ..."
+  echo "Generating CA and Server PKI under $NAME ..."
   mkdir -p $NAME
   cp -r $SCRIPT/tls-gen/* $NAME
 
   CUR_DIR=$(pwd)
   cd $NAME/basic
   make CN=localhost
-  make PASSWORD=$PASSWORD
+  #make PASSWORD=$PASSWORD
   make verify
   make info
   cd $CUR_DIR
@@ -75,3 +80,5 @@ function deploy {
 }
 
 deploy
+wait_for_message rabbitmq "Time to start RabbitMQ"
+print "RabbitMQ is running"

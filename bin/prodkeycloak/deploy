@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT=$SCRIPT/../..
+
+docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
+docker rm -f keycloak 2>/dev/null || echo "keycloak was not running"
+
+echo "Running keycloack docker image ..."
+
+docker run \
+    --detach \
+    --name prodkeycloak --net rabbitmq_net \
+    --publish 8082:8080 \
+    --publish 8442:8442 \
+    --env KEYCLOAK_ADMIN=admin \
+    --env KEYCLOAK_ADMIN_PASSWORD=admin \
+    --mount type=bind,source=${ROOT}/conf/multi-keycloak/prod_import/,target=/opt/keycloak/data/import/ \
+    --mount type=bind,source=${ROOT}/conf/multi-keycloak/certs/,target=/opt/keycloak/certs/ \
+      quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
+     --https-certificate-file=/opt/keycloak/certs/server_prodkeycloak_certificate.pem \
+     --https-certificate-key-file=/opt/keycloak/certs/server_prodkeycloak_key.pem \
+     --hostname=prodkeycloak --hostname-admin=prodkeycloak --https-port=8442

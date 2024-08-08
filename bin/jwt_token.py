@@ -12,6 +12,7 @@ key_name = sys.argv[2]
 private_key = open(sys.argv[3], "r").read()
 public_key = open(sys.argv[4], "r").read()
 client_id = sys.argv[5]
+include_kid = sys.argv[6]
 
 JWT = """{
   "scope": [
@@ -33,6 +34,8 @@ with open(jwt_file_name) as json_file:
 #decoded_jwt["cid"] = client_id
 #decoded_jwt["sub"] = client_id
 
-encoded = jwt.encode(decoded_jwt, private_key, algorithm="RS256",
-  headers={"kid": key_name})
+HEADERS={"kid": key_name}
+if include_kid == "False" : HEADERS={}
+
+encoded = jwt.encode(decoded_jwt, private_key, algorithm="RS256", headers=HEADERS)
 print(encoded)

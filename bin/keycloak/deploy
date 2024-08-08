@@ -4,10 +4,18 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
 
-docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-docker rm -f keycloak 2>/dev/null || echo "keycloak was not running"
+source $SCRIPT/../common
 
-echo "Running keycloack docker image ..."
+ensure_docker_network
+kill_container_if_exist keycloak
+
+generate-ca-server-client-kpi keycloak $ROOT/conf/keycloak/certs $ROOT/tls-gen
+find $ROOT/conf/keycloak/certs  -mindepth 1 -maxdepth 1 ! -name 'basic' -type f -exec rm -f {} +
+find $ROOT/conf/keycloak/certs -mindepth 1 -maxdepth 1 ! -name "basic" -type d -exec rm -rf {} +
+cp $ROOT/conf/keycloak/certs/basic/result/* $ROOT/conf/keycloak/certs
+rm -rf $ROOT/conf/keycloak/certs/basic
+
+begin "Running keycloack docker image ..."
 
 docker run \
 		--detach \

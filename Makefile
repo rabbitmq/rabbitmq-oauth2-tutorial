@@ -27,6 +27,14 @@ stop-uaa: ## Stop uaa
 stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
 
+stop-dev-keycloak: ## Stop dev keycloak
+	@docker kill devkeycloak
+	@docker rm devkeycloak
+
+stop-prod-keycloak: ## Stop dev keycloak
+	@docker kill prodkeycloak
+	@docker rm prodkeycloak
+
 start-oauth2-proxy: ## Start oauth2-proxy
 	@bin/oauth2-proxy/deploy
 
@@ -97,8 +105,14 @@ curl-uaa: ## Run curl with a JWT token. Syntax: make curl-uaa url=http://localho
 	@uaac token client get $(client_id) -s $(secret)
 	@./bin/uaa/curl_url $(client_id) $(url)
 
-curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
-	@./bin/keycloak/curl $(url) $(client_id) $(secret)
+curl-keycloak: ## Run curl with a JWT token. Syntax: make curl-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor realm=test
+	@./bin/keycloak/curl $(url) $(client_id) $(secret) ${realm}
+
+curl-dev-keycloak: ## Run curl with a JWT token. Syntax: make curl-dev-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@./bin/devkeycloak/curl $(url) $(client_id) $(secret)
+
+curl-prod-keycloak: ## Run curl with a JWT token. Syntax: make curl-prod-keycloak url=http://localhost:15672/api/overview client_id=rabbit_monitor secret=rabbit_monitor
+	@./bin/prodkeycloak/curl $(url) $(client_id) $(secret)
 
 open: ## Open the browser and login the user with the JWT Token. e.g: make open username=rabbit_admin password=rabbit_admin
 	@./bin/open_url $(username) $(password)
