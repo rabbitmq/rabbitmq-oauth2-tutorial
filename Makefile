@@ -21,8 +21,8 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
-build-azure: ##  Generate SSL files for Azure AD
-	@./bin/azure/deploy
+build-entra: ##  Generate SSL files for Entra ID
+	@./bin/entra/deploy
 
 stop-uaa: ## Stop uaa
 	@docker kill uaa
