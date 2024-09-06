@@ -9,11 +9,6 @@ docker rm -f keycloak 2>/dev/null || echo "keycloak was not running"
 
 echo "Running keycloack docker image ..."
 
-SIGNING_KEY_FILE=$SCRIPT/../conf/${MODE}/signing-key/signing-key.pem
-if [ -f "$SIGNING_KEY_FILE" ]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
-fi
-
 docker run \
 		--detach \
 		--name keycloak --net rabbitmq_net \
@@ -23,7 +18,6 @@ docker run \
 		--env KEYCLOAK_ADMIN_PASSWORD=admin \
 		--mount type=bind,source=${ROOT}/conf/keycloak/import/,target=/opt/keycloak/data/import/ \
         --mount type=bind,source=${ROOT}/conf/keycloak/certs/,target=/opt/keycloak/certs/ \
-		${EXTRA_MOUNTS} \
 		quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
         --https-certificate-file=/opt/keycloak/certs/server_keycloak_certificate.pem \
-        --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem 
+        --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem

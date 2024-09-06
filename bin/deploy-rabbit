@@ -9,6 +9,8 @@ ADVANCED=${ADVANCED:-advanced.config}
 IMAGE_TAG=${IMAGE_TAG:-3.13.6-management}
 IMAGE=${IMAGE:-rabbitmq}
 
+CONF_DIR=$SCRIPT/../conf/${MODE}
+
 function generate-ca-server-client-kpi {
   NAME=$1
 
@@ -35,42 +37,41 @@ function generate-ca-server-client-kpi {
 }
 
 function deploy {
-  if [ "${MODE}" == "azure" ]; then
-#    generate-ca-server-client-kpi $SCRIPT/../conf/${MODE}/certs
-    EXTRA_PORTS="-p 15671:15671"
-    EXTRA_MOUNTS="-v $SCRIPT/../conf/${MODE}/certs/basic/testca/cacert.pem:/etc/rabbitmq/rabbitmq-ca.crt \
-                  -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/key.pem:/etc/rabbitmq/rabbitmq.key \
-                  -v $SCRIPT/../conf/${MODE}/certs/basic/server_localhost/cert.pem:/etc/rabbitmq/rabbitmq.crt"
-  fi
-
-  SIGNING_KEY_FILE=$SCRIPT/../conf/${MODE}/signing-key/signing-key.pem
-  if [ -f "$SIGNING_KEY_FILE" ]; then
-      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SIGNING_KEY_FILE}:/etc/rabbitmq/signing-key.pem"
-  fi
-
   USED_CONFIG=""
-
-  if [[ -n "${CONFIG}"  &&  -f "$SCRIPT/../conf/${MODE}/${CONFIG}" ]]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
-    USED_CONFIG="${SCRIPT}/../conf/${MODE}/${CONFIG}"
-  elif [ -f "$SCRIPT/../conf/${MODE}/${CONF:-rabbitmq.conf}" ]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${CONF:-rabbitmq.conf}:/etc/rabbitmq/rabbitmq.conf:ro "
-    USED_CONFIG="${SCRIPT}/../conf/${MODE}/${CONF:-rabbitmq.conf}"
+  CERTS_DIR=${CONF_DIR}/certs
+  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
+    generate-ca-server-client-kpi $CERTS_DIR
+    cp $CERTS_DIR/basic/testca/cacert.pem $CERTS_DIR
+    cp $CERTS_DIR/basic/server_localhost/key.pem $CERTS_DIR
+    cp $CERTS_DIR/basic/server_localhost/cert.pem $CERTS_DIR
+    EXTRA_PORTS="-p 15671:15671 "
   fi
+  EXTRA_MOUNTS="-v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf "
 
-  if [[ -n "${ADVANCED}"  && -f "$SCRIPT/../conf/${MODE}/${ADVANCED}"  ]]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/${MODE}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
-    USED_CONFIG="${USED_CONFIG} ${SCRIPT}/../conf/${MODE}/${ADVANCED}"
+  if [[ -n "${CONFIG}"  &&  -f "${CONF_DIR}/${CONFIG}" ]]; then
+    USED_CONFIG="${CONF_DIR}/${CONFIG}"
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
+  elif [ -f "${CONF_DIR}/${CONF:-rabbitmq.conf}" ]; then
+    USED_CONFIG="${CONF_DIR}/${CONF:-rabbitmq.conf}"
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.conf:ro "
   fi
-
+  if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
+    USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
+  fi
 
   docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
   docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
   echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
-  docker run -d --name rabbitmq --net rabbitmq_net \
-      -p 15672:15672 -p 5672:5672 -p 5552:5552 ${EXTRA_PORTS}\
-      -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins \
-      -v ${SCRIPT}/../conf:/conf ${EXTRA_MOUNTS} ${IMAGE}:${IMAGE_TAG}
+  docker run -d --name rabbitmq \
+      --net rabbitmq_net \
+      -p 15672:15672 \
+      -p 5672:5672 \
+      -p 5552:5552 \
+      ${EXTRA_PORTS}\
+      ${EXTRA_MOUNTS} \
+      ${IMAGE}:${IMAGE_TAG}
 }
 
 deploy
