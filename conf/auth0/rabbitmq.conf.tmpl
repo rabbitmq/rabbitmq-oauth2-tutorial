@@ -1,15 +1,15 @@
 auth_backends.1 = rabbit_auth_backend_oauth2
-auth_backends.2 = rabbit_auth_backend_internal
 
 log.console.level = debug
 
 management.oauth_enabled = true
-management.oauth_client_id = {Application(client) ID}
-management.oauth_scopes = openid profile api://{Application(client) ID}/rabbitmq
+management.oauth_client_id = {Client ID}
+management.oauth_scopes = openid profile rabbitmq.tag:administrator
 
-auth_oauth2.resource_server_id = {Application(client) ID}
-auth_oauth2.additional_scopes_key = roles
-auth_oauth2.issuer = https://login.microsoftonline.com/{Directory (tenant) ID}
+auth_oauth2.resource_server_id = rabbitmq
+auth_oauth2.additional_scopes_key = permissions
+auth_oauth2.issuer = {Domain}
+auth_oauth2.https.hostname_verification = wildcard
 
 management.ssl.port = 15671
 management.ssl.cacertfile = /conf/certs/cacert.pem
