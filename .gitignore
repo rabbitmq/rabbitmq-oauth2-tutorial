@@ -9,4 +9,4 @@ conf/certs/*
 tls-gen/*
 .DS_Store
 conf/entra/rabbitmq.conf
-conf/oauth0/rabbitm.conf
+conf/auth0/rabbitmq.conf
