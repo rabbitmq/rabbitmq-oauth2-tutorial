@@ -9,8 +9,8 @@ management.oauth_scopes = openid profile api://{Application(client) ID}/rabbitmq
 auth_oauth2.resource_server_id = {Application(client) ID}
 auth_oauth2.additional_scopes_key = roles
 auth_oauth2.issuer = https://login.microsoftonline.com/{Directory (tenant) ID}
-#discovery_endpoint_params setting is only required if your app configured a custom signing key
-#auth_oauth2.discovery_endpoint_params.appid = a9b67a68-065c-4748-993c-7b1737a675fa
+#include the following line if your app has a custom signing key
+#auth_oauth2.discovery_endpoint_params.appid = {Application(client) ID}
 auth_oauth2.preferred_username_claims.1 = name
 auth_oauth2.preferred_username_claims.2 = preferred_username
 
