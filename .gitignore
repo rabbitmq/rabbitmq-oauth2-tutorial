@@ -19,3 +19,6 @@ target/
 conf/keycloak/certs
 conf/certs/*
 tls-gen/*
+.DS_Store
+conf/*/certs/
+tls-gen
