@@ -10,3 +10,4 @@ tls-gen/*
 .DS_Store
 conf/entra/rabbitmq.conf
 conf/auth0/rabbitmq.conf
+.DS_Store
