@@ -8,8 +8,6 @@ source $SCRIPT/common
 
 MODE=${MODE:-uaa}
 OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
-#CONF=${CONF:-rabbitmq.conf}
-#CONFIG=${CONFIG:-rabbitmq.config}
 ADVANCED=${ADVANCED:-advanced.config}
 IMAGE_TAG=${IMAGE_TAG:-3.13.6-management}
 IMAGE=${IMAGE:-rabbitmq}
