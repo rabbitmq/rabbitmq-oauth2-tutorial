@@ -3,16 +3,16 @@ auth_backends.1 = rabbit_auth_backend_oauth2
 management.oauth_enabled = true
 management.oauth_client_id = {okta_client_app_ID}
 management.oauth_scopes = admin monitoring
+management.oauth_metadata_url = {okta-domain-name}/oauth2/default/.well-known/oauth-authorization-server
+management.oauth_provider_url = {okta-domain-name}/oauth2/default
 
 auth_oauth2.resource_server_id = {okta_client_app_ID}
-auth_oauth2.issuer = {okta-domain-name}/oauth2/default
-#Okta supports two openid discovery endpoints. The standard and .well-known/oauth-authorization-server
-#Comment out this following line if the standard path does not work
-#auth_oauth2.discovery_endpoint_path = .well-known/oauth-authorization-server
+auth_oauth2.jwks_url = {okta-domain-name}/oauth2/default/v1/keys
 auth_oauth2.additional_scopes_key = role
 auth_oauth2.verify_aud = false
 auth_oauth2.scope_prefix = okta.
 auth_oauth2.https.hostname_verification = wildcard
+
 
 management.ssl.port = 15671
 management.ssl.cacertfile = /conf/certs/cacert.pem
