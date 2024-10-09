@@ -13,14 +13,3 @@ auth_oauth2.issuer = https://login.microsoftonline.com/{Directory (tenant) ID}/v
 #auth_oauth2.discovery_endpoint_params.appid = {Application(client) ID}
 auth_oauth2.preferred_username_claims.1 = name
 auth_oauth2.preferred_username_claims.2 = preferred_username
-
-management.ssl.port = 15671
-management.ssl.cacertfile = /conf/certs/cacert.pem
-management.ssl.certfile = /conf/certs/cert.pem
-management.ssl.keyfile = /conf/certs/key.pem
-management.ssl.verify = verify_none
-management.ssl.fail_if_no_peer_cert = false
-management.ssl.client_renegotiation = false
-management.ssl.secure_renegotiate = true
-management.ssl.honor_ecc_order = true
-management.ssl.honor_cipher_order = true

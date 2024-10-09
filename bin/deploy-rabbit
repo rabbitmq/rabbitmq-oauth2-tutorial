@@ -7,12 +7,26 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT/common
 
 MODE=${MODE:-uaa}
-OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
-ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-main}
-IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
-
+IMAGE_TAG=${IMAGE_TAG:-3.13.6-management}
+IMAGE=${IMAGE:-rabbitmq}
 CONF_DIR=$SCRIPT/../conf/${MODE}
+CERTS_DIR=${CONF_DIR}/certs
+
+function generate-final-conf-dir {
+  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+  if [[ -z "${CONF_FILES}" ]]; then
+    for i in $CONF_DIR/*.conf
+    do
+      cp $i $FINAL_CONF_DIR
+    done
+  else
+    for i in ${CONF_FILES//,/ }
+    do
+      cp $CONF_DIR/${i}.conf $FINAL_CONF_DIR
+    done
+  fi
+
+}
 
 function generate-ca-server-client-kpi {
   NAME=$1
@@ -39,36 +53,27 @@ function generate-ca-server-client-kpi {
   cd $CUR_DIR
 }
 
-function deploy {
-  USED_CONFIG=""
-  CERTS_DIR=${CONF_DIR}/certs
+function generate-tls-certs-if-required {
   if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
     generate-ca-server-client-kpi $CERTS_DIR
     cp $CERTS_DIR/basic/testca/cacert.pem $CERTS_DIR
     cp $CERTS_DIR/basic/server_localhost/key.pem $CERTS_DIR
     cp $CERTS_DIR/basic/server_localhost/cert.pem $CERTS_DIR
     EXTRA_PORTS="-p 15671:15671 "
+    EXTRA_MOUNTS="-v ${CERTS_DIR}:/certs"
   fi
-  EXTRA_MOUNTS="-v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf "
+}
 
-  if [[ -n "${CONFIG}"  &&  -f "${CONF_DIR}/${CONFIG}" ]]; then
-    USED_CONFIG="${CONF_DIR}/${CONFIG}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
-  elif [ -f "${CONF_DIR}/${CONF:-rabbitmq.conf}" ]; then
-    USED_CONFIG="${CONF_DIR}/${CONF:-rabbitmq.conf}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.conf:ro "
-  fi
-  if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
-    USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
-  fi
+function deploy {
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/conf "
 
   docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
   docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
+  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE"
   docker run -d --name rabbitmq \
       --net rabbitmq_net \
+      --env RABBITMQ_CONFIG_FILES="/conf" \
       -p 15672:15672 \
       -p 5672:5672 \
       -p 5552:5552 \
@@ -77,6 +82,8 @@ function deploy {
       ${IMAGE}:${IMAGE_TAG}
 }
 
+generate-final-conf-dir
+generate-tls-certs-if-required
 deploy
 wait_for_message rabbitmq "Time to start RabbitMQ"
 print "RabbitMQ is running"
