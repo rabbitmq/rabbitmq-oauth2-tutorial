@@ -5,6 +5,7 @@ The instructions on how to configure and test OAuth 2.0 in RabbitMQ have been mo
 **IMPORTANT**
 This branch, `next`, of this repository is meant for the RabbitMQ docs with the version `Next`. For `4.0` or earlier, check the [main](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial) branch.
 
+This branch uses the latest docker image built from https://github.com/rabbitmq/rabbitmq-server `main` branch. That is when you run `make start-rabbitmq` it is deployed the latest RabbitMQ.
 
 **Table of Contents**
 
