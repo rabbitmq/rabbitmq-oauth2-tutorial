@@ -3,8 +3,8 @@
 The instructions on how to configure and test OAuth 2.0 in RabbitMQ have been moved to [RabbitMQ documentation](https://www.rabbitmq.com/docs/next/oauth2-examples). This repository only maintains the configuration files and scripts referenced from the RabbitMQ documentation.
 
 **IMPORTANT**
-This branch `main` of this repository is meant for the RabbitMQ docs with the version `Next`.
-For RabbitMQ docs with version `4.0`, check the branch [4.0](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial/tree/4.0).
+This branch `main` of this repository is meant for the RabbitMQ docs with the version `4.0` or earlier.
+For RabbitMQ docs with version `Next`, check the branch [next](https://github.com/rabbitmq/rabbitmq-oauth2-tutorial/tree/next).
 
 
 **Table of Contents**
