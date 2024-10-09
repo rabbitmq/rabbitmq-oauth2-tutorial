@@ -9,7 +9,7 @@ source $SCRIPT/common
 MODE=${MODE:-uaa}
 OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-3.13.6-management}
+IMAGE_TAG=${IMAGE_TAG:-4.0.2-management}
 IMAGE=${IMAGE:-rabbitmq}
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
