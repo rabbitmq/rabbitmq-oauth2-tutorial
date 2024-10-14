@@ -1,10 +1,10 @@
 server:
-  BindAddress: 0.0.0.0:4180
+  BindAddress: 0.0.0.0:8442
 upstreamConfig:
   upstreams:
   - id: rabbitmq
     path: /
-    uri: http://rabbitmq:15672
+    uri: https://rabbitmq:15671
 injectRequestHeaders:
 - name: Authorization
   values:
@@ -18,7 +18,7 @@ providers:
   code_challenge_method: S256
   scope: openid profile email rabbitmq.tag:administrator
   oidcConfig:
-    issuerURL: http://keycloak:8080/realms/test
+    issuerURL: https://keycloak:8443/realms/test
     insecureSkipNonce: true
     audienceClaims:
         - aud

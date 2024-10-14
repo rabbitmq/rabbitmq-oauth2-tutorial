@@ -8,33 +8,11 @@ UAA_IMAGE_NAME=${UAA_IMAGE_NAME:-cloudfoundry/uaa}
 CONF_DIR=${ROOT}/conf/uaa
 CERTS_DIR=${CONF_DIR}/certs
 
-function generate-ca-server-client-kpi {
-  DIR=$1
-
-  if [ -d "$DIR" ]; then
-    echo "SSL Certificates for uaa already present under $DIR. Skip SSL generation"
-    return
-  fi
-
-  if [ ! -d "$ROOT/tls-gen" ]; then
-    git clone https://github.com/michaelklishin/tls-gen $ROOT/tls-gen
-  fi
-
-  echo "Generating CA and Server PKI for uaa under $DIR ..."
-  mkdir -p $DIR
-
-  CUR_DIR=$(pwd)
-  cd $ROOT/tls-gen/basic
-  make CN=uaa PASSWORD=foobar
-  #make
-  make verify
-  make info
-  cd $CUR_DIR
-}
+source $SCRIPT/../common
 
 function generate-tls-certs-if-required {
   if [[ ! -d "${CERTS_DIR}" ]]; then
-    generate-ca-server-client-kpi $CERTS_DIR
+	generate-ca-server-client-kpi uaa $CERTS_DIR
     cp $ROOT/tls-gen/basic/testca/cacert.pem $CERTS_DIR
     cp $ROOT/tls-gen/basic/server_uaa/key.pem $CERTS_DIR
     cp $ROOT/tls-gen/basic/server_uaa/cert.pem $CERTS_DIR
@@ -53,12 +31,8 @@ function generate-tls-certs-if-required {
 			-noprompt
   fi
 }
-
 function deploy {
 	echo "Running ${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG} docker image with .."
-	docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-	docker rm -f uaa 2>/dev/null || echo "uaa was not running"
-
 	docker run \
 		--detach \
     	--name uaa \
@@ -71,5 +45,8 @@ function deploy {
 		--env JAVA_OPTS="-Djava.security.policy=unlimited -Djava.security.egd=file:/dev/./urandom" \
     	"${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
 }
+
 generate-tls-certs-if-required
+ensure_docker_network
+kill_container_if_exist uaa
 deploy

@@ -3,17 +3,17 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/keycloak
+CERTS_DIR=${CONF_DIR}/certs
 
 source $SCRIPT/../common
 
 ensure_docker_network
 kill_container_if_exist keycloak
 
-generate-ca-server-client-kpi keycloak $ROOT/conf/keycloak/certs $ROOT/tls-gen
-find $ROOT/conf/keycloak/certs  -mindepth 1 -maxdepth 1 ! -name 'basic' -type f -exec rm -f {} +
-find $ROOT/conf/keycloak/certs -mindepth 1 -maxdepth 1 ! -name "basic" -type d -exec rm -rf {} +
-cp $ROOT/conf/keycloak/certs/basic/result/* $ROOT/conf/keycloak/certs
-rm -rf $ROOT/conf/keycloak/certs/basic
+if [[ ! -d "${CERTS_DIR}" ]]; then  
+	generate-ca-server-client-kpi keycloak $CERTS_DIR
+fi
 
 begin "Running keycloack docker image ..."
 
@@ -24,8 +24,8 @@ docker run \
         --publish 8443:8443 \
 		--env KEYCLOAK_ADMIN=admin \
 		--env KEYCLOAK_ADMIN_PASSWORD=admin \
-		--mount type=bind,source=${ROOT}/conf/keycloak/import/,target=/opt/keycloak/data/import/ \
-        --mount type=bind,source=${ROOT}/conf/keycloak/certs/,target=/opt/keycloak/certs/ \
+		--mount type=bind,source=${CONF_DIR}/import/,target=/opt/keycloak/data/import/ \
+        --mount type=bind,source=${CERTS_DIR}/,target=/opt/keycloak/certs/ \
 		quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
         --https-certificate-file=/opt/keycloak/certs/server_keycloak_certificate.pem \
         --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem

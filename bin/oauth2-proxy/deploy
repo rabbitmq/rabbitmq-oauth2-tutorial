@@ -3,11 +3,19 @@
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/oauth2-proxy
+CERTS_DIR=${CONF_DIR}/certs
 
-docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
+source $SCRIPT/../common
 
-echo "Running oauth2-proxy docker image ..."
+ensure_docker_network
+docker-compose -f $CONF_DIR/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
+
+if [[ ! -d "${CERTS_DIR}" ]]; then  
+    generate-ca-server-client-kpi oauth2-proxy $CERTS_DIR
+fi 
+
+begin "Running oauth2-proxy docker image ..."
 
 export OAUTH2_PROXY_COOKIE_SECRET=`python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))'`
-docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml up
+docker-compose -f $CONF_DIR/compose.yml up

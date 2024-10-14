@@ -54,7 +54,7 @@ function generate-ca-server-client-kpi {
 }
 
 function generate-tls-certs-if-required {
-  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
+  if [[ -f "${CONF_DIR}/requires-tls" && ! -d "${CERTS_DIR}" ]]; then
     generate-ca-server-client-kpi $CERTS_DIR
     cp $CERTS_DIR/basic/testca/cacert.pem $CERTS_DIR
     cp $CERTS_DIR/basic/server_localhost/key.pem $CERTS_DIR

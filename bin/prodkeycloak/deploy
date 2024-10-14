@@ -2,22 +2,31 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/multi-keycloak
+CERTS_DIR=${CONF_DIR}/certs
+NAME=prodkeycloak
 
-docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-docker rm -f keycloak 2>/dev/null || echo "keycloak was not running"
+source $SCRIPT/../common
 
-echo "Running keycloack docker image ..."
+ensure_docker_network
+kill_container_if_exist $NAME
+
+if [[ ! -d "${CERTS_DIR}" ]]; then  
+	generate-ca-server-client-kpi $NAME $CERTS_DIR
+fi
+
+echo "Running $NAME docker image ..."
 
 docker run \
     --detach \
-    --name prodkeycloak --net rabbitmq_net \
+    --name ${NAME} --net rabbitmq_net \
     --publish 8082:8080 \
     --publish 8442:8442 \
     --env KEYCLOAK_ADMIN=admin \
     --env KEYCLOAK_ADMIN_PASSWORD=admin \
-    --mount type=bind,source=${ROOT}/conf/multi-keycloak/prod_import/,target=/opt/keycloak/data/import/ \
-    --mount type=bind,source=${ROOT}/conf/multi-keycloak/certs/,target=/opt/keycloak/certs/ \
+    --mount type=bind,source=${CONF_DIR}/prod_import/,target=/opt/keycloak/data/import/ \
+    --mount type=bind,source=${CERTS_DIR}/,target=/opt/keycloak/certs/ \
       quay.io/keycloak/keycloak:20.0 start-dev --import-realm \
-     --https-certificate-file=/opt/keycloak/certs/server_prodkeycloak_certificate.pem \
-     --https-certificate-key-file=/opt/keycloak/certs/server_prodkeycloak_key.pem \
-     --hostname=prodkeycloak --hostname-admin=prodkeycloak --https-port=8442
+     --https-certificate-file=/opt/keycloak/certs/server_${NAME}_certificate.pem \
+     --https-certificate-key-file=/opt/keycloak/certs/server_${NAME}_key.pem \
+     --hostname=${NAME} --hostname-admin=${NAME} --https-port=8442
