@@ -7,8 +7,8 @@ SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT/common
 
 MODE=${MODE:-uaa}
-IMAGE_TAG=${IMAGE_TAG:-3.13.6-management}
-IMAGE=${IMAGE:-rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-main}
+IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 CONF_DIR=$SCRIPT/../conf/${MODE}
 CERTS_DIR=${CONF_DIR}/certs
 
@@ -25,51 +25,26 @@ function generate-final-conf-dir {
       cp $CONF_DIR/${i}.conf $FINAL_CONF_DIR
     done
   fi
-
-}
-
-function generate-ca-server-client-kpi {
-  NAME=$1
-
-  if [ -d "$NAME" ]; then
-    echo "SSL Certificates already present under $NAME. Skip SSL generation"
-    return
-  fi
-
-  if [ ! -d "$SCRIPT/tls-gen" ]; then
-    git clone https://github.com/michaelklishin/tls-gen $SCRIPT/tls-gen
-  fi
-
-  echo "Generating CA and Server PKI under $NAME ..."
-  mkdir -p $NAME
-  cp -r $SCRIPT/tls-gen/* $NAME
-
-  CUR_DIR=$(pwd)
-  cd $NAME/basic
-  make CN=localhost
-  #make PASSWORD=$PASSWORD
-  make verify
-  make info
-  cd $CUR_DIR
 }
 
 function generate-tls-certs-if-required {
   if [[ -f "${CONF_DIR}/requires-tls" && ! -d "${CERTS_DIR}" ]]; then
-    generate-ca-server-client-kpi $CERTS_DIR
-    cp $CERTS_DIR/basic/testca/cacert.pem $CERTS_DIR
-    cp $CERTS_DIR/basic/server_localhost/key.pem $CERTS_DIR
-    cp $CERTS_DIR/basic/server_localhost/cert.pem $CERTS_DIR
+    generate-ca-server-client-kpi rabbitmq $CERTS_DIR
+    mv $CERTS_DIR/ca_certificate.pem $CERTS_DIR/cacert
+    mv $CERTS_DIR/server_rabbitmq_certificate.pem $CERTS_DIR/cert.pem
+    mv $CERTS_DIR/server_rabbitmq_key.pem $CERTS_DIR/key.pem
     EXTRA_PORTS="-p 15671:15671 "
-    EXTRA_MOUNTS="-v ${CERTS_DIR}:/certs"
+    EXTRA_MOUNTS="-v ${CERTS_DIR}:/certs"        
   fi
 }
 
 function deploy {
   EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
   EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/conf "
+  if [[ "${MODE}" == "oauth2-proxy" ]]; then 
+      EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "    
+  fi 
 
-  docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-  docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
   echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE"
   docker run -d --name rabbitmq \
       --net rabbitmq_net \
@@ -84,6 +59,8 @@ function deploy {
 
 generate-final-conf-dir
 generate-tls-certs-if-required
+ensure_docker_network
+kill_container_if_exist rabbitmq
 deploy
 wait_for_message rabbitmq "Time to start RabbitMQ"
 print "RabbitMQ is running"
