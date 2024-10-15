@@ -1,5 +1,10 @@
 server:
-  BindAddress: 0.0.0.0:8442
+  SecureBindAddress: 0.0.0.0:8442
+  TLS: 
+    Key: 
+      FromFile: /etc/oauth2-proxy/certs/server_oauth2-proxy_key.pem
+    Cert: 
+      FromFile: /etc/oauth2-proxy/certs/server_oauth2-proxy_certificate.pem
 upstreamConfig:
   upstreams:
   - id: rabbitmq
