@@ -1639,7 +1639,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "nt6pmZMeyrgzYgkg2MLgZQZxLveRMW5M",
-    "redirectUris" : [ "http://0.0.0.0:4180/*" ],
+    "redirectUris" : [ "http://0.0.0.0:8442/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,

@@ -1,5 +1,5 @@
 server:
-  SecureBindAddress: 0.0.0.0:8442
+  SecureBindAddress: 0.0.0.0:443
   TLS: 
     Key: 
       FromFile: /etc/oauth2-proxy/certs/server_oauth2-proxy_key.pem
