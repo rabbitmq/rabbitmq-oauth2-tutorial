@@ -1,4 +1,3 @@
-version: "3.7"
 networks:
   rabbitmq_net:
     name: rabbitmq_net
@@ -6,13 +5,13 @@ networks:
 
 services:
   oauth2-proxy:
-    image: bitnami/oauth2-proxy:7.4.0
+    image: bitnami/oauth2-proxy:7.7.1
     networks:
       - rabbitmq_net
-    command: --alpha-config /etc/oauth2-proxy/oauth2-proxy.yaml --cookie-secure=false
+    command: --alpha-config /etc/oauth2-proxy/config.yaml --cookie-secure=true
     volumes:
-      - "./alpha-config.yaml:/etc/oauth2-proxy/oauth2-proxy.yaml"
-      - "./certs:/etc/oauth2-proxy/certs"
+      - "./:/etc/oauth2-proxy"
+      - "../keycloak:/etc/keycloak"
     environment:
       OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET}
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"

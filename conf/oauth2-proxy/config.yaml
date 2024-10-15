@@ -17,10 +17,12 @@ providers:
   clientID: rabbitmq-proxy-client
   code_challenge_method: S256
   scope: openid profile email rabbitmq.tag:administrator
+  caFiles:
+    - /etc/keycloak/certs/ca_certificate.pem
   oidcConfig:
     issuerURL: https://keycloak:8443/realms/test
     insecureSkipNonce: true
     audienceClaims:
-        - aud
+      - aud
     emailClaim: email
     userIDClaim: email
