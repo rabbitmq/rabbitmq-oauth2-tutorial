@@ -9,4 +9,4 @@ CLIENT_SECRET=${3:?Third parameter must be the client_secret}
 
 ACCESS_TOKEN=$($SCRIPT/token ${CLIENT_ID} ${CLIENT_SECRET})
 
-curl -u :$ACCESS_TOKEN $URL
+curl -k -u :$ACCESS_TOKEN $URL

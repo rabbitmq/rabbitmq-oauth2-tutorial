@@ -11,5 +11,5 @@ uaac token owner get test_client $USERNAME -s test_client -p $PASSWORD \
 
 echo "Opening Management UI as $USERNAME ... "
 token=$(uaac context $USERNAME | awk '/access_token/ { print $2}')
-url="http://localhost:15672/#/login?&access_token=$token"
+url="https://localhost:15671/#/login?&access_token=$token"
 open $url

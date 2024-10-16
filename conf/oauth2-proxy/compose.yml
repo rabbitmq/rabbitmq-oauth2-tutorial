@@ -1,4 +1,3 @@
-version: "3.7"
 networks:
   rabbitmq_net:
     name: rabbitmq_net
@@ -6,18 +5,23 @@ networks:
 
 services:
   oauth2-proxy:
-    image: bitnami/oauth2-proxy:7.4.0
+    image: bitnami/oauth2-proxy:7.7.1
     networks:
       - rabbitmq_net
-    command: --alpha-config /etc/oauth2-proxy/oauth2-proxy.yaml --cookie-secure=false
+    command: --alpha-config /etc/oauth2-proxy/config.yaml --cookie-secure=true --skip-auth-preflight=true
     volumes:
-      - "./alpha-config.yaml:/etc/oauth2-proxy/oauth2-proxy.yaml"
+      - "./:/etc/oauth2-proxy"
+      - "../keycloak:/etc/keycloak"
     environment:
       OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET}
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"
       OAUTH2_PROXY_WHITELIST_DOMAINS: "*"
       OAUTH2_PROXY_COOKIE_CSRF_PER_REQUEST: "true"
       OAUTH2_PROXY_COOKIE_CSRF_EXPIRE: "5m"
-      OAUTH2_PROXY_REDIRECT_URL: http://0.0.0.0:4180/oauth2/callback
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_REDIRECT_URL: https://0.0.0.0:8442/oauth2/callback
+      OAUTH2_PROXY_TLS_KEY_FILE: /etc/oauth2-proxy/certs/server_oauth2-proxy_key.pem
+      OAUTH2_PROXY_TLS_CERT_FILE: /etc/oauth2-proxy/certs/server_oauth2-proxy_certificate.pem
     ports:
-      - 4180:4180
+      - 8442:443      

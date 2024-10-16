@@ -6,4 +6,4 @@ URL=${2:?Second parameter must be the url to curl}
 token=$(uaac context $CONTEXT | awk '/access_token/ { print $2}')
 echo "token => $token"
 
-curl -u :$token $URL
+curl -k -u :$token $URL
