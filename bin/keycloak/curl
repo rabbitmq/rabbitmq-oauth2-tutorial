@@ -10,4 +10,4 @@ REALM=${4:?Forth parameter must be the realm}
 
 ACCESS_TOKEN=$($SCRIPT/token ${CLIENT_ID} ${CLIENT_SECRET} ${REALM})
 
-curl -u :$ACCESS_TOKEN $URL
+curl -k -u :$ACCESS_TOKEN $URL
