@@ -11,7 +11,7 @@ services:
       - rabbitmq_net
     command: --alpha-config /etc/oauth2-proxy/oauth2-proxy.yaml --cookie-secure=false
     volumes:
-      - "./alpha-config.yaml:/etc/oauth2-proxy/oauth2-proxy.yaml"
+      - "./alpha-config.yaml:/etc/oauth2-proxy/oauth2-proxy.yaml"      
     environment:
       OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET}
       OAUTH2_PROXY_EMAIL_DOMAINS: "*"

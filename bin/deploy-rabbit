@@ -50,7 +50,10 @@ function deploy {
     EXTRA_PORTS="-p 15671:15671 "
   fi
   EXTRA_MOUNTS="-v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf -v ${CONF_DIR}/certs:/certs "
+  if [[ "${MODE}" == "oauth2-proxy" ]]; then 
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "
+  fi 
 
   if [[ -n "${CONFIG}"  &&  -f "${CONF_DIR}/${CONFIG}" ]]; then
     USED_CONFIG="${CONF_DIR}/${CONFIG}"
