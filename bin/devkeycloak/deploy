@@ -10,10 +10,7 @@ source $SCRIPT/../common
 
 ensure_docker_network
 kill_container_if_exist $NAME
-
-if [[ ! -f "${CERTS_DIR}/server_${NAME}_key.pem" ]]; then  
-	generate-ca-server-client-kpi $NAME $CERTS_DIR
-fi
+generate-ca-server-client-kpi $NAME $CERTS_DIR
 
 echo "Running ${NAME} docker image ..."
 

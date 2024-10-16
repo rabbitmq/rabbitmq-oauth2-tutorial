@@ -11,15 +11,11 @@ CERTS_DIR=${CONF_DIR}/certs
 source $SCRIPT/../common
 
 function generate-tls-certs-if-required {
-  if [[ ! -d "${CERTS_DIR}" ]]; then
-	generate-ca-server-client-kpi uaa $CERTS_DIR
-    cp $ROOT/tls-gen/basic/testca/cacert.pem $CERTS_DIR
-    cp $ROOT/tls-gen/basic/server_uaa/key.pem $CERTS_DIR
-    cp $ROOT/tls-gen/basic/server_uaa/cert.pem $CERTS_DIR
-	cp $ROOT/tls-gen/basic/server_uaa/keycert.p12 $CERTS_DIR
+  generate-ca-server-client-kpi uaa $CERTS_DIR    
+  if [[ ! -f "${CERTS_DIR}/uaa.jks" ]]; then
 	keytool -importkeystore \
 			-destkeystore ${CERTS_DIR}/uaa.jks \
-			-srckeystore ${CERTS_DIR}/keycert.p12 \
+			-srckeystore ${CERTS_DIR}/server_uaa.p12 \
 			-deststoretype pkcs12 \
 			-srcstoretype pkcs12 \
             -alias 1 \

@@ -10,10 +10,7 @@ source $SCRIPT/../common
 
 ensure_docker_network
 kill_container_if_exist keycloak
-
-if [[ ! -f "${CERTS_DIR}/server_keycloak_key.pem" ]]; then  
-	generate-ca-server-client-kpi keycloak $CERTS_DIR
-fi
+generate-ca-server-client-kpi keycloak $CERTS_DIR
 
 begin "Running keycloack docker image ..."
 

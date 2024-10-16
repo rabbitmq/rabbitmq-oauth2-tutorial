@@ -56,7 +56,13 @@ ensure_docker_network() {
 function generate-ca-server-client-kpi {
   NAME=$1
   FOLDER=$2
-
+  if [[ ! -f "${FOLDER}/server_${NAME}_key.pem" ]]; then  
+	  do_generate-ca-server-client-kpi $1 $2
+  fi
+}
+function do_generate-ca-server-client-kpi {
+  NAME=$1
+  FOLDER=$2
   begin "Generate certs for $NAME"
 
   if [ -d "$NAME" ]; then
@@ -82,5 +88,6 @@ function generate-ca-server-client-kpi {
   cp $ROOT/tls-gen/basic/result/ca_certificate.pem $FOLDER/ca_${NAME}_certificate.pem
   cp $ROOT/tls-gen/basic/result/server_${NAME}_certificate.pem $FOLDER
   cp $ROOT/tls-gen/basic/result/server_${NAME}_key.pem $FOLDER
+  cp $ROOT/tls-gen/basic/result/server_${NAME}.p12 $FOLDER
   end "SSL Certificates generated for $NAME under $FOLDER"
 }

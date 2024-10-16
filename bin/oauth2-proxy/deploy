@@ -12,12 +12,8 @@ source $SCRIPT/../common
 ensure_docker_network
 docker-compose -f $CONF_DIR/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
 
-if [[ ! -d "${CERTS_DIR}" ]]; then  
-    generate-ca-server-client-kpi oauth2-proxy $CERTS_DIR
-fi 
-if [[ ! -d "${KEYCLOAK_CERTS_DIR}" ]]; then  
-    generate-ca-server-client-kpi keycloak $KEYCLOAK_CERTS_DIR
-fi 
+generate-ca-server-client-kpi oauth2-proxy $CERTS_DIR
+generate-ca-server-client-kpi keycloak $KEYCLOAK_CERTS_DIR
 
 begin "Running oauth2-proxy docker image with keycloak as oauth-provider ..."
 
