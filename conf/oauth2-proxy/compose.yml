@@ -8,7 +8,7 @@ services:
     image: bitnami/oauth2-proxy:7.7.1
     networks:
       - rabbitmq_net
-    command: --alpha-config /etc/oauth2-proxy/config.yaml --cookie-secure=true
+    command: --alpha-config /etc/oauth2-proxy/config.yaml --cookie-secure=true --skip-auth-preflight=true
     volumes:
       - "./:/etc/oauth2-proxy"
       - "../keycloak:/etc/keycloak"
@@ -18,6 +18,8 @@ services:
       OAUTH2_PROXY_WHITELIST_DOMAINS: "*"
       OAUTH2_PROXY_COOKIE_CSRF_PER_REQUEST: "true"
       OAUTH2_PROXY_COOKIE_CSRF_EXPIRE: "5m"
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
       OAUTH2_PROXY_REDIRECT_URL: https://0.0.0.0:8442/oauth2/callback
       OAUTH2_PROXY_TLS_KEY_FILE: /etc/oauth2-proxy/certs/server_oauth2-proxy_key.pem
       OAUTH2_PROXY_TLS_CERT_FILE: /etc/oauth2-proxy/certs/server_oauth2-proxy_certificate.pem

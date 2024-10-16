@@ -1,3 +1,4 @@
+
 server:
   SecureBindAddress: 0.0.0.0:443
   TLS: 
@@ -23,7 +24,7 @@ providers:
   code_challenge_method: S256
   scope: openid profile email rabbitmq.tag:administrator
   caFiles:
-    - /etc/keycloak/certs/ca_certificate.pem
+    - /etc/keycloak/certs/ca_keycloak_certificate.pem
   oidcConfig:
     issuerURL: https://keycloak:8443/realms/test
     insecureSkipNonce: true

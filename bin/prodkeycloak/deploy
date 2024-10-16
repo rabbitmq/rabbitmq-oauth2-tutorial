@@ -11,7 +11,7 @@ source $SCRIPT/../common
 ensure_docker_network
 kill_container_if_exist $NAME
 
-if [[ ! -d "${CERTS_DIR}" ]]; then  
+if [[ ! -f "${CERTS_DIR}/server_${NAME}_key.pem" ]]; then  
 	generate-ca-server-client-kpi $NAME $CERTS_DIR
 fi
 
