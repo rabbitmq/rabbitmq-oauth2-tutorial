@@ -9,5 +9,5 @@ docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml down 2>/dev/null || echo "
 
 echo "Running oauth2-proxy docker image ..."
 
-export OAUTH2_PROXY_COOKIE_SECRET=`python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))'`
-docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml up
+export OAUTH2_PROXY_COOKIE_SECRET=`dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo`
+docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml up -d
