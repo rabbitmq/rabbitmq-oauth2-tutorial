@@ -16,11 +16,12 @@ providers:
   clientSecret: nt6pmZMeyrgzYgkg2MLgZQZxLveRMW5M
   clientID: rabbitmq-proxy-client
   code_challenge_method: S256
-  scope: openid profile email rabbitmq.tag:administrator
+  scope: "email openid profile rabbitmq.tag:administrator"
+  skipClaimsFromProfileURL: true
   oidcConfig:
     issuerURL: http://keycloak:8080/realms/test
     insecureSkipNonce: true
     audienceClaims:
         - aud
-    emailClaim: email
-    userIDClaim: email
+    emailClaim: sub
+    userIDClaim: user_name
