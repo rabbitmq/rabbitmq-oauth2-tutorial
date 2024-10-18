@@ -13,30 +13,42 @@ IMAGE_TAG=${IMAGE_TAG:-4.0.2-management}
 IMAGE=${IMAGE:-rabbitmq}
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
+CERTS_DIR=${CONF_DIR}/certs
+
+function generate-final-conf-dir {
+  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+  if [[ -z "${CONF_FILES}" ]]; then
+    for i in $CONF_DIR/*.conf
+    do
+      cp $i $FINAL_CONF_DIR
+    done
+  else
+    for i in ${CONF_FILES//,/ }
+    do
+      cp $CONF_DIR/${i}.conf $FINAL_CONF_DIR
+    done
+  fi
+
+}
+function generate-tls-certs-if-required {
+  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
+    generate-ca-server-client-kpi rabbitmq $CERTS_DIR       
+  fi
+}
 
 function deploy {
-  USED_CONFIG=""
-  CERTS_DIR=${CONF_DIR}/certs
-  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
-    generate-ca-server-client-kpi rabbitmq $CERTS_DIR
-    mv $CERTS_DIR/ca_rabbitmq_certificate.pem $CERTS_DIR/cacert.pem
-    mv $CERTS_DIR/server_rabbitmq_certificate.pem $CERTS_DIR/cert.pem
-    mv $CERTS_DIR/server_rabbitmq_key.pem $CERTS_DIR/key.pem       
-    EXTRA_PORTS="-p 15671:15671 "
-  fi
-  EXTRA_MOUNTS="-v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf -v ${CONF_DIR}/certs:/certs "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/conf -v ${CERTS_DIR}:/certs "
+  USED_CONFIG="${FINAL_CONF_DIR}/*.conf "
+
+  if [[ -f "${CONF_DIR}/requires-tls" ]]; then 
+    EXTRA_PORTS="-p 15671:15671 "  
+  fi 
+
   if [[ "${MODE}" == "oauth2-proxy" ]]; then 
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "
   fi 
 
-  if [[ -n "${CONFIG}"  &&  -f "${CONF_DIR}/${CONFIG}" ]]; then
-    USED_CONFIG="${CONF_DIR}/${CONFIG}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
-  elif [ -f "${CONF_DIR}/${CONF:-rabbitmq.conf}" ]; then
-    USED_CONFIG="${CONF_DIR}/${CONF:-rabbitmq.conf}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.conf:ro "
-  fi
   if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
     USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
@@ -50,11 +62,16 @@ function deploy {
       -p 15672:15672 \
       -p 5672:5672 \
       -p 5552:5552 \
-      ${EXTRA_PORTS}\
+      --env RABBITMQ_CONFIG_FILES="/conf" \
+      ${EXTRA_PORTS} \
       ${EXTRA_MOUNTS} \
       ${IMAGE}:${IMAGE_TAG}
 }
 
+generate-final-conf-dir
 deploy
-wait_for_message rabbitmq "Time to start RabbitMQ"
+generate-tls-certs-if-required
+ensure_docker_network
+kill_container_if_exist rabbitmq
+wait_for_message rabbitmq "Starting broker... completed"
 print "RabbitMQ is running"

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT=$SCRIPT/..
+
 tabs 1
 declare -i PADDING_LEVEL=0
 declare -i STEP=1
