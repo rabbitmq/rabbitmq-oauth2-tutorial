@@ -11,6 +11,7 @@ OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
 IMAGE_TAG=${IMAGE_TAG:-4.0.2-management}
 IMAGE=${IMAGE:-rabbitmq}
+RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
 CERTS_DIR=${CONF_DIR}/certs
@@ -20,8 +21,13 @@ function generate-final-conf-dir {
   if [[ -z "${CONF_FILES}" ]]; then
     for i in $CONF_DIR/*.conf
     do
-      cp $i $FINAL_CONF_DIR
+      echo "Checking $i ..."
+      if [[ "$i" =~ "rabbitmq.*" ]]
+      then
+        cp $i $FINAL_CONF_DIR        
+      fi      
     done
+    cp ${CONF_DIR}/${RABBITMQ_CONF} $FINAL_CONF_DIR 
   else
     for i in ${CONF_FILES//,/ }
     do

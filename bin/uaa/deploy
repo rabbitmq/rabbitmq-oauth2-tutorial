@@ -9,6 +9,8 @@ UAA_MODE=${UAA_MODE:-"uaa"}
 CONF_DIR=${ROOT}/conf/${UAA_MODE}
 CERTS_DIR=${CONF_DIR}/certs
 
+source $SCRIPT/../common
+	
 function generate-keystore-if-required {
   if [[ ! -f "${CERTS_DIR}/uaa.jks " ]]; then    
 	keytool -importkeystore \

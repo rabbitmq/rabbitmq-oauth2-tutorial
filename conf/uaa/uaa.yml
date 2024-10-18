@@ -2,7 +2,7 @@ require_https: true
 https_port: 8443
 
 logging:
-  config: /config/log4j2.properties
+  config: /uaa/log4j2.properties
 
 issuer:
   uri: https://localhost:8443/
