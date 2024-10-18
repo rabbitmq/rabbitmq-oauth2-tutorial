@@ -4,7 +4,7 @@ set -ex
 CLIENT_ID=${1:?First parameter must be client_id}
 CLIENT_SECRET=${2:?Second parameter must be the client_secret}
 
-TOKEN=$(curl --silent --location --request POST 'http://localhost:8082/realms/prod/protocol/openid-connect/token' \
+TOKEN=$(curl -k --silent --location --request POST 'https://localhost:8442/realms/prod/protocol/openid-connect/token' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode client_id=${CLIENT_ID} \
 --data-urlencode client_secret=${CLIENT_SECRET} \
