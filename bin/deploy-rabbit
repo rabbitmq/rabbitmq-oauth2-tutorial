@@ -54,9 +54,7 @@ function deploy {
     USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
   fi
 
-  docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-  docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
+  echo "Running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
   docker run -d --name rabbitmq \
       --net rabbitmq_net \
       -p 15672:15672 \
@@ -69,9 +67,9 @@ function deploy {
 }
 
 generate-final-conf-dir
-deploy
 generate-tls-certs-if-required
 ensure_docker_network
 kill_container_if_exist rabbitmq
+deploy
 wait_for_message rabbitmq "Starting broker... completed"
 print "RabbitMQ is running"
