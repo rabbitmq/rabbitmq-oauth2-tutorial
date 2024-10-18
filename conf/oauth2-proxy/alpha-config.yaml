@@ -31,6 +31,6 @@ providers:
     issuerURL: https://keycloak:8443/realms/test
     insecureSkipNonce: true
     audienceClaims:
-        - aud
+      - aud
     emailClaim: sub
     userIDClaim: user_name
