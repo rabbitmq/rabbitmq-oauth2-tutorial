@@ -5,6 +5,8 @@ log.console.level = debug
 management.oauth_enabled = true
 management.oauth_client_id = {Client ID}
 management.oauth_scopes = openid profile rabbitmq.tag:administrator
+management.oauth_authorization_endpoint_params.audience = rabbitmq
+management.oauth_token_endpoint_params.audience = rabbitmq
 
 auth_oauth2.resource_server_id = rabbitmq
 auth_oauth2.issuer = {Domain}
