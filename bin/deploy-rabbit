@@ -9,8 +9,8 @@ source $SCRIPT/common
 MODE=${MODE:-uaa}
 OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-4.0.2-management}
-IMAGE=${IMAGE:-rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-main}
+IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
 RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
 
 if [[ "${MODE}" == "uaa" ]]; then 
