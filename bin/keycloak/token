@@ -5,8 +5,8 @@ CLIENT_ID=${1:?First parameter must be client_id}
 CLIENT_SECRET=${2:?Second parameter must be the client_secret}
 REALM=${3:?Third parameter must be the realm}
 
-URL=http://localhost:8080/realms/${REALM}/protocol/openid-connect/token
-TOKEN=$(curl $URL --silent --location --request POST  \
+URL=https://localhost:8443/realms/${REALM}/protocol/openid-connect/token
+TOKEN=$(curl -k $URL --silent --location --request POST  \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode client_id=${CLIENT_ID} \
 --data-urlencode client_secret=${CLIENT_SECRET} \

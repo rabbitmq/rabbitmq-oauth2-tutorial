@@ -154,3 +154,6 @@ get-jwt-token: ## Get a JWT token from an authorzation server
 start-mqtt-publish: ## publish mqtt message . e.g. make start-mqtt-publish TOKEN=$(bin/jwt_token legacy-token-key private.pem public.pem)
 		@(docker run --rm -it --network rabbitmq_net ruimarinho/mosquitto mosquitto_pub \
 		  -h rabbitmq -u "" -P $(TOKEN) -t test -m hello-world)
+
+clean-certs: ## remove all auto-generated certificates from any oauth provider and rabbitmq 
+	@rm -r conf/*/certs

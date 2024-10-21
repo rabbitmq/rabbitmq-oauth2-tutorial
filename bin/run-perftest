@@ -6,6 +6,8 @@ if [  -z "$TOKEN" ]; then
   echo "Getting token from UAA ..."
   TOKEN=$(uaac context $CLIENT_ID | awk '/access_token/ { print $2}')
 fi
+echo "Using token ${TOKEN}"
+
 url="amqp://:$TOKEN@rabbitmq:5672/%2F"
 
 shift 1
