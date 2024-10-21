@@ -1,24 +1,52 @@
 #!/usr/bin/env bash
 
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
 UAA_IMAGE_TAG=${UAA_IMAGE_TAG:-75.21.0}
 UAA_IMAGE_NAME=${UAA_IMAGE_NAME:-cloudfoundry/uaa}
 UAA_MODE=${UAA_MODE:-"uaa"}
+CONF_DIR=${ROOT}/conf/${UAA_MODE}
+CERTS_DIR=${CONF_DIR}/certs
 
-docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-docker rm -f uaa 2>/dev/null || echo "uaa was not running"
+source $SCRIPT/../common
 
-echo "Running ${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG} docker image with .."
+function generate-keystore-if-required {
+  if [[ ! -f "${CERTS_DIR}/uaa.jks " ]]; then
+	keytool -importkeystore \
+			-destkeystore ${CERTS_DIR}/uaa.jks \
+			-srckeystore ${CERTS_DIR}/server_uaa.p12 \
+			-deststoretype pkcs12 \
+			-srcstoretype pkcs12 \
+            -alias 1 \
+			-destalias uaa-tls \
+			-deststorepass foobar \
+			-destkeypass foobar \
+			-srcstorepass "" \
+			-srckeypass "" \
+			-noprompt
+  fi
+}
 
-docker run \
+function deploy {
+	echo "Running ${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG} docker image with .."
+
+	docker run \
 		--detach \
-    --name uaa --net rabbitmq_net \
+    	--name uaa \
+		--net rabbitmq_net \
 		--publish 8080:8080 \
 		--publish 8443:8443 \
-		--mount "type=bind,source=${ROOT}/conf/${UAA_MODE},target=/config" \
-		--env UAA_CONFIG_PATH="/config" \
-		--env JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
-		--env SPRING_CONFIG_LOCATION="file:/config/application.yml" \
-    "${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
+		-v ${CONF_DIR}:/uaa \
+		-v ${CONF_DIR}/server.xml:/layers/paketo-buildpacks_apache-tomcat/catalina-base/conf/server.xml \
+		--env UAA_CONFIG_PATH="/uaa" \
+		--env JAVA_OPTS="-Djava.security.policy=unlimited -Djava.security.egd=file:/dev/./urandom" \
+    	"${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
+}
+
+ensure_docker_network
+kill_container_if_exist uaa
+generate-ca-server-client-kpi uaa $CERTS_DIR
+generate-keystore-if-required
+deploy

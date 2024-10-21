@@ -11,72 +11,72 @@ OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
 IMAGE_TAG=${IMAGE_TAG:-4.0.2-management}
 IMAGE=${IMAGE:-rabbitmq}
+RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
+
+if [[ "${MODE}" == "uaa" ]]; then 
+  if [[ -z "${CONF_FILES}" ]]; then 
+    CONF_FILES="rabbitmq.conf,oauth2-only.conf"
+  fi 
+fi 
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
+CERTS_DIR=${CONF_DIR}/certs
 
-function generate-ca-server-client-kpi {
-  NAME=$1
-
-  if [ -d "$NAME" ]; then
-    echo "SSL Certificates already present under $NAME. Skip SSL generation"
-    return
+function generate-final-conf-dir {
+  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+  if [[ -z "${CONF_FILES}" ]]; then
+    for i in $CONF_DIR/*.conf
+    do
+      cp $i $FINAL_CONF_DIR        
+    done
+    cp ${CONF_DIR}/${RABBITMQ_CONF} $FINAL_CONF_DIR 
+  else
+    for i in ${CONF_FILES//,/ }
+    do
+      cp $CONF_DIR/${i}.conf $FINAL_CONF_DIR
+    done
   fi
 
-  if [ ! -d "$SCRIPT/tls-gen" ]; then
-    git clone https://github.com/michaelklishin/tls-gen $SCRIPT/tls-gen
+}
+function generate-tls-certs-if-required {
+  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
+    generate-ca-server-client-kpi rabbitmq $CERTS_DIR       
   fi
-
-  echo "Generating CA and Server PKI under $NAME ..."
-  mkdir -p $NAME
-  cp -r $SCRIPT/tls-gen/* $NAME
-
-  CUR_DIR=$(pwd)
-  cd $NAME/basic
-  make CN=localhost
-  #make PASSWORD=$PASSWORD
-  make verify
-  make info
-  cd $CUR_DIR
 }
 
 function deploy {
-  USED_CONFIG=""
-  CERTS_DIR=${CONF_DIR}/certs
-  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
-    generate-ca-server-client-kpi $CERTS_DIR
-    cp $CERTS_DIR/basic/testca/cacert.pem $CERTS_DIR
-    cp $CERTS_DIR/basic/server_localhost/key.pem $CERTS_DIR
-    cp $CERTS_DIR/basic/server_localhost/cert.pem $CERTS_DIR
-    EXTRA_PORTS="-p 15671:15671 "
-  fi
-  EXTRA_MOUNTS="-v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}:/conf "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/conf -v ${CERTS_DIR}:/certs "
+  USED_CONFIG="${FINAL_CONF_DIR}/*.conf "
 
-  if [[ -n "${CONFIG}"  &&  -f "${CONF_DIR}/${CONFIG}" ]]; then
-    USED_CONFIG="${CONF_DIR}/${CONFIG}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.config:ro "
-  elif [ -f "${CONF_DIR}/${CONF:-rabbitmq.conf}" ]; then
-    USED_CONFIG="${CONF_DIR}/${CONF:-rabbitmq.conf}"
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${USED_CONFIG}:/etc/rabbitmq/rabbitmq.conf:ro "
-  fi
+  if [[ -f "${CONF_DIR}/requires-tls" ]]; then 
+    EXTRA_PORTS="-p 15671:15671 "  
+  fi 
+  if [[ "${MODE}" == "oauth2-proxy" ]]; then 
+    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "
+  fi 
+
   if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
     USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
   fi
 
-  docker network inspect rabbitmq_net >/dev/null 2>&1 || docker network create rabbitmq_net
-  docker rm -f rabbitmq 2>/dev/null || echo "rabbitmq was not running"
-  echo "running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
+  echo "Running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
   docker run -d --name rabbitmq \
       --net rabbitmq_net \
       -p 15672:15672 \
       -p 5672:5672 \
       -p 5552:5552 \
-      ${EXTRA_PORTS}\
+      --env RABBITMQ_CONFIG_FILES="/conf" \
+      ${EXTRA_PORTS} \
       ${EXTRA_MOUNTS} \
       ${IMAGE}:${IMAGE_TAG}
 }
 
+generate-final-conf-dir
+generate-tls-certs-if-required
+ensure_docker_network
+kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Time to start RabbitMQ"
+wait_for_message rabbitmq "Starting broker... completed"
 print "RabbitMQ is running"
