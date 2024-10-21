@@ -15,7 +15,7 @@ RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
 
 if [[ "${MODE}" == "uaa" ]]; then 
   if [[ -z "${CONF_FILES}" ]]; then 
-    CONF_FILES="rabbitmq.conf,oauth2-only.conf"
+    CONF_FILES="rabbitmq,oauth2-only"
   fi 
 fi 
 
