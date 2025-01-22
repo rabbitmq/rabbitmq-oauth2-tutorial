@@ -2,13 +2,16 @@
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+#set -x
+
 ROOT=$SCRIPT/../..
 CONF_DIR=${ROOT}/conf/keycloak
 CERTS_DIR=${CONF_DIR}/certs
 
 source $SCRIPT/../common
 
-ensure_docker_network
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${PROVIDER_NETWORK}
 kill_container_if_exist keycloak
 
 generate-ca-server-client-kpi keycloak $CERTS_DIR
@@ -17,7 +20,7 @@ begin "Running keycloack docker image ..."
 
 docker run \
 		--detach \
-		--name keycloak --net rabbitmq_net \
+		--name keycloak --net ${PROVIDER_NETWORK} \
 		--publish 8080:8080 \
         --publish 8443:8443 \
 		--env KEYCLOAK_ADMIN=admin \

@@ -21,6 +21,7 @@ fi
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
 CERTS_DIR=${CONF_DIR}/certs
+RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
 
 function generate-final-conf-dir {
   FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
@@ -52,31 +53,34 @@ function deploy {
   if [[ -f "${CONF_DIR}/requires-tls" ]]; then 
     EXTRA_PORTS="-p 15671:15671 "  
   fi 
-  if [[ "${MODE}" == "oauth2-proxy" ]]; then 
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "
-  fi 
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/${OAUTH_PROVIDER}/certs:/etc/${OAUTH_PROVIDER}/certs "
 
   if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
     USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
   fi
 
-  echo "Running RabbitMQ ($IMAGE:$IMAGE_TAG) with Idp $MODE and configuration file(s) $USED_CONFIG"
+  echo "Running RabbitMQ ($IMAGE:$IMAGE_TAG) with" 
+  echo " - Mode: ${MODE} "
+  echo " - OauthProvider: ${OAUTH_PROVIDER}"
+  echo " - configuration file(s): ${USED_CONFIG}"
+  echo " - mounts: ${EXTRA_MOUNTS}"
+  
   docker run -d --name rabbitmq \
-      --net rabbitmq_net \
+      --net ${RABBIT_NETWORK} \
       -p 15672:15672 \
       -p 5672:5672 \
       -p 5552:5552 \
-      --env RABBITMQ_CONFIG_FILES="/conf" \
       ${EXTRA_PORTS} \
+      --env RABBITMQ_CONFIG_FILES="/conf" \
       ${EXTRA_MOUNTS} \
       ${IMAGE}:${IMAGE_TAG}
 }
 
 generate-final-conf-dir
 generate-tls-certs-if-required
-ensure_docker_network
+ensure_docker_network ${RABBIT_NETWORK}
 kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Starting broker... completed"
+wait_for_message rabbitmq "Server startup complete"
 print "RabbitMQ is running"

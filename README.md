@@ -59,3 +59,7 @@ When the example requires RabbitMQ with TLS enabled, the corresponding `conf` fo
  * [Okta](https://www.rabbitmq.com/docs/next/oauth2-examples-okta)
  * [Google](https://www.rabbitmq.com/docs/next/oauth2-examples-google)  **NOT SUPPORTED**
  * [Multiple OAuth 2.0 servers and/or audiences](https://www.rabbitmq.com/docs/next/oauth2-examples-multiresource)
+
+ ### Commercial-only features
+
+ * [Explicit forward proxy](https://techdocs.broadcom.com/us/en/vmware-tanzu/data-solutions/tanzu-rabbitmq-oci/4-0/tanzu-rabbitmq-oci-image/overview.html)

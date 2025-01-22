@@ -5,7 +5,9 @@ ROOT=$SCRIPT/../..
 CONF_DIR=${ROOT}/conf/multi-keycloak
 CERTS_DIR=${CONF_DIR}/certs
 
-ensure_docker_network
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${PROVIDER_NETWORK}
+
 kill_container_if_exist prodkeycloak
 
 generate-ca-server-client-kpi prodkeycloak $CERTS_DIR
@@ -14,7 +16,7 @@ echo "Running prodkeycloak docker image ..."
 
 docker run \
     --detach \
-    --name prodkeycloak --net rabbitmq_net \
+    --name prodkeycloak --net ${PROVIDER_NETWORK} \
     --publish 8082:8080 \
     --publish 8442:8442 \
     --env KEYCLOAK_ADMIN=admin \

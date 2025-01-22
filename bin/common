@@ -45,7 +45,7 @@ kill_container_if_exist() {
   fi
 }
 ensure_docker_network() {
-  NETWORK=${DOCKER_NETWORK:-rabbitmq_net}
+  NETWORK=${1:?Requires first parameter as docker network}
   begin "Ensuring $NETWORK network ..."
   if [ ! "$(docker network ls | grep $NETWORK)" ]; then
     print "> DOCKER_NETWORK: $NETWORK created"

@@ -8,7 +8,9 @@ CERTS_DIR=${CONF_DIR}/certs
 
 source $SCRIPT/../common
 
-ensure_docker_network
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${PROVIDER_NETWORK}
+
 docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
 generate-ca-server-client-kpi oauth2-proxy $CERTS_DIR
 

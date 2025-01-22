@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+set -x 
+
+ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/forward-proxy
+CERTS_DIR=${CONF_DIR}/certs
+
+source $SCRIPT/../common
+
+HTTPD_DOCKER_IMAGE=httpd:latest
+
+RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${RABBIT_NETWORK}
+ensure_docker_network ${PROVIDER_NETWORK}
+kill_container_if_exist forward-proxy
+
+begin "Running forward-proxy docker image ${HTTPD_DOCKER_IMAGE} ..."
+
+if [ "${RABBIT_NETWORK}" != "${PROVIDER_NETWORK}" ]; then
+  NETWORKS="--network ${RABBIT_NETWORK} --network ${PROVIDER_NETWORK} "
+else 
+  NETWORKS="--network ${RABBIT_NETWORK} "
+fi
+  
+docker run \
+    --detach \
+    --name forward-proxy \
+    --network ${RABBIT_NETWORK} --network ${PROVIDER_NETWORK} \
+    --publish 9092:9092 \
+    --mount "type=bind,source=${CONF_DIR}/httpd,target=/usr/local/apache2/conf" \
+    ${HTTPD_DOCKER_IMAGE}
+
+wait_for_message forward-proxy "initializing worker proxy:forward local"
+print "forward-proxy is ready"

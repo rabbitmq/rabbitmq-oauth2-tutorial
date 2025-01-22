@@ -21,11 +21,17 @@ start-uaa: ## Start uaa (remember to run make build-uaa if you have not done )
 start-keycloak: ## Start keycloak
 	@./bin/keycloak/deploy
 
+start-forward-proxy: ## Start forward-proxy
+	@./bin/forward-proxy/deploy
+
 stop-uaa: ## Stop uaa
 	@docker kill uaa
 
 stop-keycloak: ## Stop keycloak
 	@docker kill keycloak
+
+stop-forward-proxy: ## Stop forward-proxy
+	@docker kill forward-proxy
 
 stop-dev-keycloak: ## Stop dev keycloak
 	@docker kill devkeycloak

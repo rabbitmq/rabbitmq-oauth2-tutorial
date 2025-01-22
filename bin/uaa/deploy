@@ -10,6 +10,8 @@ UAA_MODE=${UAA_MODE:-"uaa"}
 CONF_DIR=${ROOT}/conf/${UAA_MODE}
 CERTS_DIR=${CONF_DIR}/certs
 
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+
 source $SCRIPT/../common
 
 function generate-keystore-if-required {
@@ -35,7 +37,7 @@ function deploy {
 	docker run \
 		--detach \
     	--name uaa \
-		--net rabbitmq_net \
+		--net ${PROVIDER_NETWORK} \
 		--publish 8080:8080 \
 		--publish 8443:8443 \
 		-v ${CONF_DIR}:/uaa \
@@ -45,7 +47,9 @@ function deploy {
     	"${UAA_IMAGE_NAME}:${UAA_IMAGE_TAG}"
 }
 
-ensure_docker_network
+
+ensure_docker_network ${PROVIDER_NETWORK}
+
 kill_container_if_exist uaa
 generate-ca-server-client-kpi uaa $CERTS_DIR
 generate-keystore-if-required
