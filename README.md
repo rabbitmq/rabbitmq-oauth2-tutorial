@@ -54,8 +54,13 @@ When the example requires RabbitMQ with TLS enabled, the corresponding `conf` fo
 
  * [Keycloak](https://www.rabbitmq.com/docs/oauth2-examples-keycloak)
  * [Auth0](https://www.rabbitmq.com/oauth2-examples-auth0)
- * [Microsoft Entra ID](https://www.rabbitmq.com/docs/oauth2-examples-entra-id) (formerly known as Azure Active Directory)
- * [OAuth2 Proxy](https://www.rabbitmq.com/docs/oauth2-examples-proxy)
- * [Okta](https://www.rabbitmq.com/docs/oauth2-examples-okta)
- * [Google](https://www.rabbitmq.com/docs/oauth2-examples-google)  **NOT SUPPORTED**
- * [Multiple OAuth 2.0 servers and/or audiences](https://www.rabbitmq.com/docs/oauth2-examples-multiresource)
+ * [Microsoft Entra ID](https://www.rabbitmq.com/docs/next/oauth2-examples-entra-id) (formerly known as Azure Active Directory)
+ * [OAuth2 Proxy](https://www.rabbitmq.com/docs/next/oauth2-examples-proxy)
+ * [Okta](https://www.rabbitmq.com/docs/next/oauth2-examples-okta)
+ * [Google](https://www.rabbitmq.com/docs/next/oauth2-examples-google)  **NOT SUPPORTED**
+ * [Multiple OAuth 2.0 servers and/or audiences](https://www.rabbitmq.com/docs/next/oauth2-examples-multiresource)
+ * [Identity Provider initiated logon with a web portal](https://www.rabbitmq.com/docs/next/oauth2-examples-idp-initiated)
+
+ ### Commercial-only features
+
+ * [Explicit forward proxy](https://techdocs.broadcom.com/us/en/vmware-tanzu/data-solutions/tanzu-rabbitmq-oci/4-0/tanzu-rabbitmq-oci-image/overview.html)
