@@ -8,14 +8,18 @@ CERTS_DIR=${CONF_DIR}/certs
 
 source $SCRIPT/../common
 
-ensure_docker_network
+cp -rf ${ROOT}/conf/keycloak/certs/* ${CERTS_DIR}
+
+PROVIDER_NETWORK=${PROVIDER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${PROVIDER_NETWORK}
+
 docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml down 2>/dev/null || echo "oauth2-proxy was not running"
 generate-ca-server-client-kpi oauth2-proxy $CERTS_DIR
 
-echo "Running oauth2-proxy docker image ..."
+print "Running oauth2-proxy docker image ..."
 
 export OAUTH2_PROXY_COOKIE_SECRET=`dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 | tr -d -- '\n' | tr -- '+/' '-_' ; echo`
-docker-compose -f $ROOT/conf/oauth2-proxy/compose.yml up -d
+docker compose -f $ROOT/conf/oauth2-proxy/compose.yml up -d
 
 wait_for_message oauth2-proxy-oauth2-proxy-1 "Cookie settings"
 print "oauth2-proxy is running"

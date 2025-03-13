@@ -207,6 +207,14 @@ oauth:
       secret: mgt_api_client
       authorized-grant-types: client_credentials
       authorities: rabbitmq.tag:monitoring
+    rabbit_idp_user:
+      id: rabbit_idp_user
+      secret: rabbit_idp_user
+      authorized-grant-types: client_credentials
+      authorities: uaa.resource,rabbitmq.tag:administrator
+      redirect-uri: https://localhost:3000
+      autoapprove: true
+      allowpublic: true
     rabbit_client_code:
       id: rabbit_client_code
       secret: rabbit_client_code
