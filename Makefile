@@ -24,6 +24,12 @@ start-keycloak: ## Start keycloak
 start-forward-proxy: ## Start forward-proxy
 	@./bin/forward-proxy/deploy
 
+start-portal: ## Start portal
+	@./bin/portal/deploy
+
+start-proxy: ## Start proxy
+	@./bin/proxy/deploy
+
 stop-uaa: ## Stop uaa
 	@docker kill uaa
 
@@ -32,6 +38,12 @@ stop-keycloak: ## Stop keycloak
 
 stop-forward-proxy: ## Stop forward-proxy
 	@docker kill forward-proxy
+
+stop-portal: ## Stop portal
+	@docker kill portal
+
+stop-proxy: ## Stop proxy
+	@docker kill proxy
 
 stop-dev-keycloak: ## Stop dev keycloak
 	@docker kill devkeycloak
@@ -45,7 +57,7 @@ start-oauth2-proxy: ## Start oauth2-proxy
 	@bin/oauth2-proxy/deploy
 
 stop-oauth2-proxy: ## Stop oauth2-proxy
-	@docker-compose -f conf/oauth2-proxy/compose.yml down
+	@bin/oauth2-proxy/undeploy
 
 start-rabbitmq:  ## Run RabbitMQ Server
 	@./bin/deploy-rabbit

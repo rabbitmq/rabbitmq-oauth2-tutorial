@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/oauth2-proxy
+CERTS_DIR=${CONF_DIR}/certs
+
+
+echo "Stopping oauth2-proxy ..."
+
+docker compose -f $ROOT/conf/oauth2-proxy/compose.yml down 
+
+
