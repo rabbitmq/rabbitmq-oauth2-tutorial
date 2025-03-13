@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-#set -x
+if [[ ! -z "${DEBUG}" ]]; then
+  set -x
+fi
 
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -9,8 +11,8 @@ source $SCRIPT/common
 MODE=${MODE:-uaa}
 OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-main}
-IMAGE=${IMAGE:-pivotalrabbitmq/rabbitmq}
+IMAGE_TAG=${IMAGE_TAG:-4.1-rc}
+IMAGE=${IMAGE:-rabbitmq}
 RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
 
 if [[ "${MODE}" == "uaa" ]]; then 
@@ -40,8 +42,8 @@ function generate-final-conf-dir {
 
 }
 function generate-tls-certs-if-required {
-  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}" ]]; then
-    generate-ca-server-client-kpi rabbitmq $CERTS_DIR       
+  if [[ -f "${CONF_DIR}/requires-tls" && ! -f "${CERTS_DIR}/server_rabbitmq_certificate.pem" ]]; then
+    generate-ca-server-client-kpi rabbitmq $CERTS_DIR      
   fi
 }
 
@@ -59,15 +61,21 @@ function deploy {
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
     USED_CONFIG="${USED_CONFIG} ${CONF_DIR}/${ADVANCED}"
   fi
-
+  
   echo "Running RabbitMQ ($IMAGE:$IMAGE_TAG) with" 
   echo " - Mode: ${MODE} "
   echo " - OauthProvider: ${OAUTH_PROVIDER}"
   echo " - configuration file(s): ${USED_CONFIG}"
   echo " - mounts: ${EXTRA_MOUNTS}"
   
+  PLATFORM_ARGS=""
+  if [[ -n "${PLATFORM}" ]]; then
+    PLATFORM_ARGS="--platform ${PLATFORM} "
+  fi
+
   docker run -d --name rabbitmq \
       --net ${RABBIT_NETWORK} \
+      ${PLATFORM_ARGS} \
       -p 15672:15672 \
       -p 5672:5672 \
       -p 5552:5552 \

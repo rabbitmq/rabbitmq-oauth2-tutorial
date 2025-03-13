@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [[ ! -z "${DEBUG}" ]]; then
+  set -x
+fi
+
+ROOT=$SCRIPT/../..
+CONF_DIR=${ROOT}/conf/portal
+CERTS_DIR=${CONF_DIR}/certs
+
+source $SCRIPT/../common
+
+if [ ! -f ${ROOT}/conf/uaa/certs ]; then
+  print "Deploy uaa first so that portal can reference its certificates"
+fi
+
+print "Starting proxy ..."
+
+DOCKER_NETWORK=${DOCKER_NETWORK:-rabbitmq_net}
+ensure_docker_network ${DOCKER_NETWORK}
+kill_container_if_exist proxy
+
+image_tag=($(md5sum $CONF_DIR/package.json))
+if [[ $(docker images -q portal:$image_tag 2> /dev/null) == "" ]]; then
+  docker build -t portal:$image_tag  --target test $CONF_DIR
+fi 
+
+generate-ca-server-client-kpi proxy $CERTS_DIR
+
+begin "Running proxy docker image portal:${image_tag} ..."
+
+rm -f ${CONF_DIR}/certs/ca_certs.pem
+cat ${ROOT}/conf/uaa/certs/ca_uaa_certificate.pem ${CONF_DIR}/certs/ca_rabbitmq_certificate.pem \
+  >> ${CONF_DIR}/certs/ca_certs.pem
+
+docker run \
+  --detach \
+  --name proxy \
+  --net ${DOCKER_NETWORK} \
+  --publish 9090:9090 \
+  --env PORT=9090 \
+  --env RABBITMQ_URL="https://rabbitmq:15671" \
+  --env UAA_URL="https://uaa:8443" \
+  --env CLIENT_ID="rabbit_idp_user" \
+  --env CLIENT_SECRET="rabbit_idp_user" \
+  --env NODE_EXTRA_CA_CERTS=/etc/proxy/ca_certs.pem \
+  -v ${CONF_DIR}/certs:/etc/proxy \
+  -v ${CONF_DIR}:/code/portal \
+  portal:${image_tag} run proxy
+
+print "proxy is running"
