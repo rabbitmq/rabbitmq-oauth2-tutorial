@@ -53,7 +53,7 @@ When the example requires RabbitMQ with TLS enabled, the corresponding `conf` fo
 ### Examples for Specific OAuth 2.0 Identity Providers
 
  * [Keycloak](https://www.rabbitmq.com/docs/next/oauth2-examples-keycloak)
- * [Auth0](https://www.rabbitmq.com/oauth2-examples-auth0)
+ * [Auth0](https://www.rabbitmq.com/docs/next/oauth2-examples-auth0)
  * [Microsoft Entra ID](https://www.rabbitmq.com/docs/next/oauth2-examples-entra-id) (formerly known as Azure Active Directory)
  * [OAuth2 Proxy](https://www.rabbitmq.com/docs/next/oauth2-examples-proxy)
  * [Okta](https://www.rabbitmq.com/docs/next/oauth2-examples-okta)
