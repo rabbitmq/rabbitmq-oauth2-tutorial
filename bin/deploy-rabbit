@@ -23,6 +23,7 @@ fi
 
 CONF_DIR=$SCRIPT/../conf/${MODE}
 CERTS_DIR=${CONF_DIR}/certs
+RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
 
 function generate-final-conf-dir {
   FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
@@ -54,9 +55,8 @@ function deploy {
   if [[ -f "${CONF_DIR}/requires-tls" ]]; then 
     EXTRA_PORTS="-p 15671:15671 "  
   fi 
-  if [[ "${MODE}" == "oauth2-proxy" ]]; then 
-    EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/keycloak/certs:/etc/keycloak/certs "
-  fi 
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v $SCRIPT/../conf/${OAUTH_PROVIDER}/certs:/etc/${OAUTH_PROVIDER}/certs "
+
 
   if [[ -n "${ADVANCED}"  && -f "${CONF_DIR}/${ADVANCED}"  ]]; then
     EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${CONF_DIR}/${ADVANCED}:/etc/rabbitmq/advanced.config:ro "
@@ -91,5 +91,5 @@ generate-tls-certs-if-required
 ensure_docker_network
 kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Starting broker... completed"
+wait_for_message rabbitmq "Server startup complete"
 print "RabbitMQ is running"
