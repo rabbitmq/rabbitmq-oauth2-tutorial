@@ -50,6 +50,7 @@ function generate-tls-certs-if-required {
 
 function deploy {
   cp ${SCRIPT}/../conf/enabled_plugins ${FINAL_CONF_DIR}
+  chmod o+rwx ${FINAL_CONF_DIR}
   EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/etc/rabbitmq -v ${CERTS_DIR}:/certs "
   USED_CONFIG="${FINAL_CONF_DIR}/*.conf "
 
