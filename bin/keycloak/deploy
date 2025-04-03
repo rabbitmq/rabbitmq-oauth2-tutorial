@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [[ ! -z "${DEBUG}" ]]; then
+  set -x
+fi
 
-#set -x
+SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
 CONF_DIR=${ROOT}/conf/keycloak
