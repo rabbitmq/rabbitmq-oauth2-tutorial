@@ -26,7 +26,6 @@ CERTS_DIR=${CONF_DIR}/certs
 RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
 
 function generate-final-conf-dir {
-#  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
   FINAL_CONF_DIR=`mktemp -d -t "oauth2XXXXX"`
 
   if [[ -z "${CONF_FILES}" ]]; then
