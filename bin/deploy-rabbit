@@ -26,7 +26,9 @@ CERTS_DIR=${CONF_DIR}/certs
 RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
 
 function generate-final-conf-dir {
-  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+#  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+  FINAL_CONF_DIR=`mktemp -d -t "oauth2XXXXX"`
+
   if [[ -z "${CONF_FILES}" ]]; then
     for i in $CONF_DIR/*.conf
     do
@@ -91,5 +93,5 @@ generate-tls-certs-if-required
 ensure_docker_network
 kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Starting broker... completed"
+wait_for_message rabbitmq "completed with"
 print "RabbitMQ is running"
