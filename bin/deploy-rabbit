@@ -91,5 +91,5 @@ generate-tls-certs-if-required
 ensure_docker_network
 kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Server startup complete"
+wait_for_message rabbitmq "Starting broker... completed"
 print "RabbitMQ is running"
