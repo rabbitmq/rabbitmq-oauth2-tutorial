@@ -90,5 +90,6 @@ function do_generate-ca-server-client-kpi {
   cp $ROOT/tls-gen/basic/result/server_${NAME}_certificate.pem $FOLDER
   cp $ROOT/tls-gen/basic/result/server_${NAME}_key.pem $FOLDER
   cp $ROOT/tls-gen/basic/result/server_${NAME}.p12 $FOLDER
+  chmod 777 $FOLDER/*
   end "SSL Certificates generated for $NAME under $FOLDER"
 }
