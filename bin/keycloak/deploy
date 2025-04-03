@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [[ ! -z "${DEBUG}" ]]; then
+  set -x
+fi
+
 SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ROOT=$SCRIPT/../..
