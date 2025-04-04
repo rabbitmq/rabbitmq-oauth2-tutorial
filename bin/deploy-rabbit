@@ -26,7 +26,7 @@ CERTS_DIR=${CONF_DIR}/certs
 RABBIT_NETWORK=${RABBIT_NETWORK:-rabbitmq_net}
 
 function generate-final-conf-dir {
-  FINAL_CONF_DIR=`mktemp -d -t "oauth2"`
+  FINAL_CONF_DIR=`mktemp -d -t "oauth2XXXXX"`
   if [[ -z "${CONF_FILES}" ]]; then
     for i in $CONF_DIR/*.conf
     do
@@ -48,8 +48,9 @@ function generate-tls-certs-if-required {
 }
 
 function deploy {
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${SCRIPT}/../conf/enabled_plugins:/etc/rabbitmq/enabled_plugins "
-  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/conf -v ${CERTS_DIR}:/certs "
+  cp ${SCRIPT}/../conf/enabled_plugins ${FINAL_CONF_DIR}
+  EXTRA_MOUNTS="${EXTRA_MOUNTS} -v ${FINAL_CONF_DIR}:/etc/rabbitmq -v ${CERTS_DIR}:/certs "
+  chmod o+rwx ${FINAL_CONF_DIR}
   USED_CONFIG="${FINAL_CONF_DIR}/*.conf "
 
   if [[ -f "${CONF_DIR}/requires-tls" ]]; then 
@@ -80,7 +81,6 @@ function deploy {
       -p 5672:5672 \
       -p 5552:5552 \
       ${EXTRA_PORTS} \
-      --env RABBITMQ_CONFIG_FILES="/conf" \
       ${EXTRA_MOUNTS} \
       ${IMAGE}:${IMAGE_TAG}
 }
@@ -90,5 +90,5 @@ generate-tls-certs-if-required
 ensure_docker_network ${RABBIT_NETWORK}
 kill_container_if_exist rabbitmq
 deploy
-wait_for_message rabbitmq "Server startup complete"
+wait_for_message rabbitmq "complete"
 print "RabbitMQ is running"
