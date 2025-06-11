@@ -11,7 +11,7 @@ source $SCRIPT/common
 MODE=${MODE:-uaa}
 OAUTH_PROVIDER=${OAUTH_PROVIDER:-$MODE}
 ADVANCED=${ADVANCED:-advanced.config}
-IMAGE_TAG=${IMAGE_TAG:-4.0.8-management}
+IMAGE_TAG=${IMAGE_TAG:-4.1.1-management}
 IMAGE=${IMAGE:-rabbitmq}
 RABBITMQ_CONF=${RABBITMQ_CONF:-rabbitmq.conf}
 
