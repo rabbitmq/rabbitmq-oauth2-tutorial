@@ -97,6 +97,14 @@
       "containerId" : "test",
       "attributes" : { }
     }, {
+      "id" : "70200494-09ed-425c-bee5-ba8730612f8b",
+      "name" : "test-var-expansion",
+      "description" : "",
+      "composite" : false,
+      "clientRole" : false,
+      "containerId" : "test",
+      "attributes" : { }
+    }, {
       "id" : "af1bc955-6d4d-42e9-b0d4-343e7eb075d0",
       "name" : "rabbitmq-role",
       "description" : "",
@@ -502,7 +510,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "rabbitmq.tag:administrator", "default-roles-test" ],
+    "realmRoles" : [ "rabbitmq.tag:administrator", "test-var-expansion", "default-roles-test" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -643,6 +651,9 @@
   }, {
     "clientScope" : "rabbitmq.tag:management",
     "roles" : [ "rabbitmq.tag:management" ]
+  }, {
+    "clientScope" : "rabbitmq.configure:*/q-{user_name}",
+    "roles" : [ "test-var-expansion" ]
   } ],
   "clientScopeMappings" : {
     "account" : [ {
@@ -1612,7 +1623,7 @@
         "jsonType.label" : "String"
       }
     } ],
-    "defaultClientScopes" : [ "web-origins", "acr", "rabbitmq.tag:administrator", "profile", "roles", "rabbitmq.tag:management", "email" ],
+    "defaultClientScopes" : [ "web-origins", "rabbitmq.configure:*/q-{user_name}", "acr", "rabbitmq.tag:administrator", "profile", "roles", "rabbitmq.tag:management", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "c265f3db-ed3a-4898-8800-af044b3c30f5",
@@ -1773,7 +1784,8 @@
         "included.client.audience" : "rabbitmq-proxy-client-tls",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
-        "included.custom.audience" : "rabbitmq"
+        "included.custom.audience" : "rabbitmq",
+        "userinfo.token.claim" : "true"
       }
     } ],
     "defaultClientScopes" : [ "rabbitmq.read:*/*", "web-origins", "acr", "rabbitmq.write:*/*", "rabbitmq.tag:administrator", "profile", "roles", "rabbitmq.tag:management", "email", "rabbitmq.configure:*/*" ],
@@ -2349,8 +2361,20 @@
       "include.in.token.scope" : "true",
       "display.on.consent.screen" : "true"
     }
+  }, {
+    "id" : "f2495e2f-2d9a-44e2-b8da-a46b464f9534",
+    "name" : "rabbitmq.configure:*/q-{user_name}",
+    "description" : "",
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "include.in.token.scope" : "true",
+      "display.on.consent.screen" : "true",
+      "gui.order" : "",
+      "consent.screen.text" : ""
+    }
   } ],
-  "defaultDefaultClientScopes" : [ "role_list", "profile", "email", "roles", "web-origins", "acr" ],
+  "defaultDefaultClientScopes" : [ "role_list", "profile", "email", "roles", "web-origins", "acr",
+    "rabbitmq.configure:*/q-{user_name}" ],
   "defaultOptionalClientScopes" : [ "offline_access", "address", "phone", "microprofile-jwt" ],
   "browserSecurityHeaders" : {
     "contentSecurityPolicyReportOnly" : "",

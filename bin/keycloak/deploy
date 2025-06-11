@@ -33,5 +33,8 @@ docker run \
         --https-certificate-file=/opt/keycloak/certs/server_keycloak_certificate.pem \
         --https-certificate-key-file=/opt/keycloak/certs/server_keycloak_key.pem
 
+print " Note: If you modify keycloak configuration. Make sure to run the following command to export the configuration."
+print " docker exec -it keycloak /opt/keycloak/bin/kc.sh export --users realm_file --realm test --dir /opt/keycloak/data/import/"
+
 wait_for_message keycloak "Running the server"
 print "keycloak is running"
